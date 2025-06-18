@@ -113,12 +113,12 @@ def main():
     parser.add_argument("--used-color", type=str, default="green")
     parser.add_argument("--cursor-color", type=str, default="yellow")
     parser.add_argument("--n", type=int, default=27)
-    parser.add_argument("--frame-time", type=int, default=300)
+    parser.add_argument("--frame-time", type=int, default=50)
     parser.add_argument("--even-time", type=int, default=0)
-    parser.add_argument("--hold-frames", type=int, default=5)
+    parser.add_argument("--hold-frames", type=int, default=15)
     parser.add_argument("--label", type=int, default=30)
     parser.add_argument("--output", type=str, default="collatz.gif")
-    parser.add_argument("--odds", action="store_true", default=True, help="odds only mode (default on)")
+    parser.add_argument("--odds", action="store_true", default=False, help="odds only mode (default off)")
     parser.add_argument("--dim-even", action="store_true", default=False, help="if enabled, even numbers are always disabled")
     args = parser.parse_args()
 
@@ -182,12 +182,10 @@ def main():
     frames.extend([img]*hold_frames)
     durations.extend([args.frame_time]*hold_frames)
 
-    # Hold frame 2: disable multiples of prime factors of n (if n is odd)
-    factors = prime_factors(n) if n % 2 == 1 else []
+    # Hold frame 2: disable multiples of n (if n is odd)
     grid2 = dict(cell_states)
-    for f in factors:
-        if f == 1: continue
-        for m in range(f, N+1, f):
+    if n % 2 == 1:
+        for m in range(n, N+1, n):
             if m != n and m in grid2:
                 if not (dim_even and (m%2==0)):
                     grid2[m] = 1
@@ -207,14 +205,11 @@ def main():
                 grid_state[last_v] = 2
                 used.add(last_v)
         if value % 2 == 1:
-            pfacs = prime_factors(value)
-            for f in pfacs:
-                if f == 1: continue
-                for m in range(f, N+1, f):
-                    if m != value and m in grid_state:
-                        if grid_state[m] != 2 and not (dim_even and (m%2==0)):
-                            grid_state[m] = 1
-                            disabled.add(m)
+            for m in range(value, N+1, value):
+                if m != value and m in grid_state:
+                    if grid_state[m] != 2 and not (dim_even and (m%2==0)):
+                        grid_state[m] = 1
+                        disabled.add(m)
         frame = dict(grid_state)
         if value in frame:
             frame[value] = 3
