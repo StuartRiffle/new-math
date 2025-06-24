@@ -5,7 +5,39 @@ These are runes. It's how I store my math research, to minimize token count. It 
 
 
 
+Collatz string rewrite rule (2-tag):
 
+    a -> bc
+    b -> a
+    c -> aa
+
+If you start with a string of a's to represent n, that evolves the same way as Collatz.
+
+Solving as a system of equations, there are 3 solutions:
+
+    ( 0,  0,  0)
+    ( 1,  1,  1)
+    (-1, -1,  1)  <---- look at that
+
+There's the information loss: the third solution is missing a negation. 
+
+This is the "lengthening" rule (3rd solution), so it corresponds to 3n.
+
+The second solution is a flip (may represent sign or xor), may correspond to the +1
+
+The first solution is the "tumbling" engine. Data rolls from a to b, which bounces right back to a. The c will be deleted if at an even offset. Otherwise it will feed back into a, with GAIN. So the information c is holding is whether it's an odd or even index in the string. That tumbles back and forth.
+
+It is "falling out" of b. That's where a's get burned.
+
+b now maps to the /2 step. This is where the 2-adic data gets scrubbed off during tumbling. (One tumble per k?)
+
+Does that make sense?In information terms there seems like a direct correspondence to the rules.
+
+
+
+
+
+The state information 
 
 
 

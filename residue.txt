@@ -1,15 +1,7 @@
-
-
-
-
-The "core residue environment" is a matrix with 5 columns representing the prime residue vector of a number n, its odd neighbors, and the odd cores of its even neighbors (their 2-adic bases).
+The "residue environment" is a matrix with 5 columns representing the prime residue vector of a number n, its odd neighbors, and the odd cores of its even neighbors (their 2-adic bases).
 
 This is the "local" residue environment of n, and the properties of neighboring numbers are correlated. Information about n can be extracted from this environment matrix.
 
-Do a deep dive and uncover as many of these correlations as you can. We're trying to find new information, something novel hiding in there.
+Given is a number line showing the residue environment. All numbers are reduced to odd cores, so the 5 row block around n is a snapshop of its local environment. It is theoretically infinite, but only a depth of 6 prime factors is in this listing.
 
-
-
-
-
-
+Do a deep dive and uncover as many correlations as you can. We're trying to find new information, something novel hiding in there.
