@@ -9,8 +9,10 @@
 #include <memory>
 #include <atomic> // For std::atomic
 
-// This program performs a breadth first traversal of the Collatz state space.
-//
+// Collatz Pipeline BFS with Asynchronous I/O and GPU Processing
+// Accepts a list of shard work folders, processes them in an overlapped 3-stage pipeline
+
+// This program performs a breadth first traversal of the Collatz state space. //
 // Combining small primes into one modulus allows the state to fit in a 64-bit word:
 //
 //  2 × 3 × 5 × 7 × 11 × 13 = 30,030
@@ -28,7 +30,7 @@
 //  × 47 =   614,786,056,966,487,710
 //
 // This comes out to about 614 quadrillion residue vectors. Tracking visited states
-// requires one bit for each of them, so we need almost 78 TB of memory (uncompressed)
+// requires one bit for each of them, so we'll need almost 78 TB of memory (uncompressed)
 // to perform the full breadth first search.
 //
 // The full state space must be sharded to fit in working memory. Each slice of the
@@ -45,19 +47,34 @@
 // Output buffers at runtime require about the same amount of memory.
 //
 // Every Collatz step mutates the state, and each shard represents an equal portion
-// of the state space. Each step "scatters" all its active orbits to a different shard.
-// The space is partitioned to balance thit output between all other shards on average.
-// Incoming batches for a shard are stored in files, providing a simple work queue.
-// The frontier of the search is pushed between shards in this way. The shards can
-// be processed serially or in parallel, as all persistent state is stored in files.
+// of the state space. Each step "scatters" all the active orbits to a different shard.
+// The space is partitioned to balance this outgoing traffic between the other shards.
+// Incoming batches are stored in their own files, which amounts to a simple work queue.
+// The frontier of the search is pushed around between shards in this way. The shards can
+// be processed serially or in parallel, because all persistent state is stored in files.
 //
 // This process is heavily I/O bound. The computation itself is trivial, but the bitset
 // is huge, and "message passing" of states involves a lot of bandwidth. This is a
-// gather/scatter operation that must be performed thousands of times. 
+// gather/scatter operation that must be performed thousands of times.
+//
+// Breathe in, breathe out.
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <thread>
+#include <future>
+#include <array>
+#include <chrono>
+#include <atomic>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+
+// ==== CUDA Headers and Error Helper ====
 #include <cuda_runtime.h>
-
-// Helper to check for CUDA errors
 #define CUDA_CHECK(err) { \
     cudaError_t e = (err); \
     if (e != cudaSuccess) { \
@@ -66,6 +83,7 @@
     } \
 }
 
+// ==== Device Constants and Helpers ====
 constexpr size_t SMALL_PRIMES_PRODUCT = 3 * 5 * 7 * 11 * 13;
 __constant__ uint32_t D_MODULI[]      = { SMALL_PRIMES_PRODUCT, 17, 19, 23, 29, 31, 37, 41, 43, 47 };
 __constant__ uint32_t D_FIELD_BITS[]  = { 15, 5, 5, 5, 5, 5, 6, 6, 6, 6 };
@@ -73,16 +91,6 @@ __constant__ uint64_t D_FIELD_MASK[]  = { 0x7FFF, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 
 
 constexpr int NUM_FIELDS = 10;
 using PackedState = uint64_t;
-
-constexpr size_t SHARD_BITS = 8;
-constexpr size_t NUM_SHARDS = (1ULL << SHARD_BITS);
-constexpr size_t SHARD_SIZE = (1ULL << 20);
-constexpr size_t BITSET_BYTES = SHARD_SIZE / 8;
-
-constexpr int THREADS_PER_BLOCK = 256;
-
-
-// -------------------- DEVICE HELPER FUNCTIONS --------------------
 
 __device__ std::array<uint16_t, NUM_FIELDS> unpack_residues(PackedState state) {
     std::array<uint16_t, NUM_FIELDS> residues{};
@@ -124,16 +132,15 @@ __device__ std::array<uint16_t, NUM_FIELDS> collatz_residue_step(std::array<uint
     return r;
 }
 
-__device__ size_t state_to_shard_id(PackedState s) {
+__device__ size_t state_to_shard_id(PackedState s, size_t SHARD_BITS) {
     return s >> (64 - SHARD_BITS);
 }
 
-__device__ size_t state_to_idx_in_shard(PackedState s) {
+__device__ size_t state_to_idx_in_shard(PackedState s, size_t SHARD_SIZE) {
     return s & (SHARD_SIZE - 1);
 }
 
-// -------------------- MAIN KERNEL --------------------
-
+// ==== Device Kernel ====
 __global__ void process_states_kernel(
     const PackedState* work_queue,
     size_t num_states,
@@ -141,153 +148,281 @@ __global__ void process_states_kernel(
     PackedState** outgoing_buckets,
     uint32_t* bucket_counters,
     size_t max_bucket_size,
-    uint32_t* overflow_counter) // <-- NEW: To detect silent data loss
-{
+    uint32_t* overflow_counter,
+    size_t SHARD_BITS,
+    size_t SHARD_SIZE,
+    size_t NUM_SHARDS
+) {
     size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid >= num_states) {
-        return;
-    }
+    if (tid >= num_states) return;
 
     PackedState s = work_queue[tid];
-    size_t idx = state_to_idx_in_shard(s);
+    size_t idx = state_to_idx_in_shard(s, SHARD_SIZE);
     uint8_t mask = 1 << (idx % 8);
     uint8_t old_val = atomicOr(&visited_bitset[idx / 8], mask);
 
-    if ((old_val & mask) != 0) {
-        return;
-    }
+    if ((old_val & mask) != 0) return;
 
     std::array<uint16_t, NUM_FIELDS> residues = unpack_residues(s);
     residues = collatz_residue_step(residues);
     PackedState neighbor = pack_residues(residues);
 
-    size_t target_shard = state_to_shard_id(neighbor);
+    size_t target_shard = state_to_shard_id(neighbor, SHARD_BITS);
     uint32_t append_idx = atomicAdd(&bucket_counters[target_shard], 1);
 
     if (append_idx < max_bucket_size) {
         outgoing_buckets[target_shard][append_idx] = neighbor;
     } else {
-        // NEW: Atomically increment overflow counter if a bucket is full.
         atomicAdd(overflow_counter, 1);
     }
 }
 
-// -------------------- MAIN HOST FUNCTION --------------------
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <shard_dir>\n";
-        return 1;
-    }
-    std::string shard_dir(argv[1]);
+// ==== Shard Pipeline Structs ====
+using ShardID = size_t;
+struct ShardParams {
+    size_t SHARD_BITS = 8;
+    size_t NUM_SHARDS = 1ULL << 8;
+    size_t SHARD_SIZE = 1ULL << 20;
+    size_t BITSET_BYTES = (1ULL << 20) / 8;
+};
 
-    std::vector<PackedState> h_work_queue;
+struct ShardBuffer {
+    std::vector<PackedState> work_queue;
+    std::unique_ptr<uint8_t[]> bitset;
     std::vector<std::filesystem::path> processed_files;
+    std::string shard_dir;
+    std::vector<std::vector<PackedState>> outgoing_buckets;
+    std::vector<uint32_t> bucket_counters;
+    uint32_t overflow_counter = 0;
+    size_t num_states = 0;
+};
+
+// ==== CLI Argument Parsing ====
+ShardParams parse_args(int argc, char* argv[], std::vector<std::string>& shard_dirs) {
+    ShardParams params;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--shard-bits" && i+1 < argc) {
+            params.SHARD_BITS = std::stoi(argv[++i]);
+            params.NUM_SHARDS = 1ULL << params.SHARD_BITS;
+        } else if (arg == "--num-shards" && i+1 < argc) {
+            params.NUM_SHARDS = std::stoull(argv[++i]);
+            size_t bits = 0; size_t n = params.NUM_SHARDS;
+            while (n > 1) { n >>= 1; bits++; }
+            params.SHARD_BITS = bits;
+        } else if (arg == "--shard-size" && i+1 < argc) {
+            params.SHARD_SIZE = std::stoull(argv[++i]);
+        } else if (arg == "--help") {
+            std::cout << "Usage: program [--shard-bits N | --num-shards N | --shard-size N] <shard_dir_1> ...\n";
+            exit(0);
+        } else {
+            shard_dirs.push_back(arg);
+        }
+    }
+    params.BITSET_BYTES = params.SHARD_SIZE / 8;
+    return params;
+}
+
+// ==== Async Loader ====
+void load_shard_async(const ShardParams& params, const std::string& shard_dir, ShardBuffer* buf) {
+    buf->work_queue.clear();
+    buf->processed_files.clear();
+    buf->shard_dir = shard_dir;
+    buf->outgoing_buckets.clear();
+    buf->bucket_counters.assign(params.NUM_SHARDS, 0);
+    buf->overflow_counter = 0;
+    buf->outgoing_buckets.resize(params.NUM_SHARDS);
+
     for (const auto& entry : std::filesystem::directory_iterator(shard_dir)) {
         if (entry.path().extension() == ".work") {
             std::ifstream in(entry.path(), std::ios::binary);
             PackedState s;
-            while (in.read(reinterpret_cast<char*>(&s), sizeof(PackedState))) {
-                h_work_queue.push_back(s);
-            }
-            processed_files.push_back(entry.path());
+            while (in.read(reinterpret_cast<char*>(&s), sizeof(PackedState)))
+                buf->work_queue.push_back(s);
+            buf->processed_files.push_back(entry.path());
+        }
+    }
+    buf->num_states = buf->work_queue.size();
+    buf->bitset = std::make_unique<uint8_t[]>(params.BITSET_BYTES);
+    std::fill(buf->bitset.get(), buf->bitset.get() + params.BITSET_BYTES, 0);
+    std::string bitset_file = shard_dir + "/visited.bitset";
+    std::ifstream in_bitset(bitset_file, std::ios::binary);
+    if (in_bitset) {
+        in_bitset.read(reinterpret_cast<char*>(buf->bitset.get()), params.BITSET_BYTES);
+    }
+}
+
+// ==== Async Writer ====
+void write_shard_async(const ShardParams& params, ShardBuffer* buf) {
+    std::string bitset_file = buf->shard_dir + "/visited.bitset";
+    std::string tmp_bitset = bitset_file + ".tmp";
+    std::ofstream out_bitset(tmp_bitset, std::ios::binary | std::ios::trunc);
+    out_bitset.write(reinterpret_cast<const char*>(buf->bitset.get()), params.BITSET_BYTES);
+    out_bitset.close();
+    std::filesystem::rename(tmp_bitset, bitset_file);
+
+    for (size_t i = 0; i < params.NUM_SHARDS; ++i) {
+        uint32_t count = buf->bucket_counters[i];
+        if (count > 0) {
+            const auto& out_buf = buf->outgoing_buckets[i];
+            char target_shard_name[8];
+            snprintf(target_shard_name, sizeof(target_shard_name), "%0*zx", int((params.SHARD_BITS+3)/4), int(i));
+            std::filesystem::path target_dir = std::filesystem::path(buf->shard_dir).parent_path() / target_shard_name;
+            std::filesystem::create_directories(target_dir);
+            std::string batch_filename = "batch_" + buf->shard_dir + "_" + std::to_string(std::time(nullptr)) + ".work";
+            std::ofstream out(target_dir / batch_filename, std::ios::binary);
+            out.write(reinterpret_cast<const char*>(out_buf.data()), count * sizeof(PackedState));
         }
     }
 
-    if (h_work_queue.empty()) {
-        std::cout << "Shard " << shard_dir << ": No work to process.\n";
-        return 0;
+    for (const auto& p : buf->processed_files) {
+        try {
+            std::filesystem::rename(p, p.string() + ".processed");
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Warning: could not rename " << p << ": " << e.what() << std::endl;
+        }
     }
-    size_t num_states = h_work_queue.size();
-    std::cout << "Shard " << shard_dir << ": Processing " << num_states << " states from " << processed_files.size() << " file(s)...\n";
+}
 
-    auto h_visited = std::make_unique<uint8_t[]>(BITSET_BYTES);
-    std::string bitset_file = shard_dir + "/visited.bitset";
-    std::ifstream in_bitset(bitset_file, std::ios::binary);
-    if(in_bitset) in_bitset.read(reinterpret_cast<char*>(h_visited.get()), BITSET_BYTES);
+// ==== GPU Processing ====
+// All CUDA API calls are made from the main thread ONLY
+void process_shard_gpu(const ShardParams& params, ShardBuffer& buf) {
+    if (buf.num_states == 0) return;
 
     uint8_t* d_visited;
     PackedState* d_work_queue;
+    CUDA_CHECK(cudaMalloc(&d_visited, params.BITSET_BYTES));
+    CUDA_CHECK(cudaMalloc(&d_work_queue, buf.num_states * sizeof(PackedState)));
+    CUDA_CHECK(cudaMemcpy(d_visited, buf.bitset.get(), params.BITSET_BYTES, cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(d_work_queue, buf.work_queue.data(), buf.num_states * sizeof(PackedState), cudaMemcpyHostToDevice));
+
+    std::vector<PackedState*> d_buckets(params.NUM_SHARDS, nullptr);
+    for (size_t i = 0; i < params.NUM_SHARDS; ++i) {
+        CUDA_CHECK(cudaMalloc(&d_buckets[i], buf.num_states * sizeof(PackedState)));
+    }
+    PackedState** d_buckets_ptr;
+    CUDA_CHECK(cudaMalloc(&d_buckets_ptr, params.NUM_SHARDS * sizeof(PackedState*)));
+    CUDA_CHECK(cudaMemcpy(d_buckets_ptr, d_buckets.data(), params.NUM_SHARDS * sizeof(PackedState*), cudaMemcpyHostToDevice));
+
+    uint32_t* d_bucket_counters;
+    CUDA_CHECK(cudaMalloc(&d_bucket_counters, params.NUM_SHARDS * sizeof(uint32_t)));
+    std::vector<uint32_t> h_bucket_counters(params.NUM_SHARDS, 0);
+    CUDA_CHECK(cudaMemcpy(d_bucket_counters, h_bucket_counters.data(), params.NUM_SHARDS * sizeof(uint32_t), cudaMemcpyHostToDevice));
+
     uint32_t* d_overflow_counter;
     uint32_t h_overflow_counter = 0;
-    CUDA_CHECK(cudaMalloc(&d_visited, BITSET_BYTES));
-    CUDA_CHECK(cudaMalloc(&d_work_queue, num_states * sizeof(PackedState)));
     CUDA_CHECK(cudaMalloc(&d_overflow_counter, sizeof(uint32_t)));
-
-    std::vector<PackedState*> h_buckets(NUM_SHARDS, nullptr);
-    PackedState** d_buckets;
-    uint32_t* h_bucket_counters = new uint32_t[NUM_SHARDS]();
-    uint32_t* d_bucket_counters;
-
-    size_t max_single_bucket_size = num_states; 
-    for (size_t i = 0; i < NUM_SHARDS; ++i) {
-        CUDA_CHECK(cudaMalloc(&h_buckets[i], max_single_bucket_size * sizeof(PackedState)));
-    }
-    CUDA_CHECK(cudaMalloc(&d_buckets, NUM_SHARDS * sizeof(PackedState*)));
-    CUDA_CHECK(cudaMalloc(&d_bucket_counters, NUM_SHARDS * sizeof(uint32_t)));
-    
-    CUDA_CHECK(cudaMemcpy(d_visited, h_visited.get(), BITSET_BYTES, cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemcpy(d_work_queue, h_work_queue.data(), num_states * sizeof(PackedState), cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemcpy(d_buckets, h_buckets.data(), NUM_SHARDS * sizeof(PackedState*), cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemcpy(d_bucket_counters, h_bucket_counters, NUM_SHARDS * sizeof(uint32_t), cudaMemcpyHostToDevice));
     CUDA_CHECK(cudaMemcpy(d_overflow_counter, &h_overflow_counter, sizeof(uint32_t), cudaMemcpyHostToDevice));
 
-    size_t grid_size = (num_states + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    constexpr int THREADS_PER_BLOCK = 256;
+    size_t grid_size = (buf.num_states + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
     process_states_kernel<<<grid_size, THREADS_PER_BLOCK>>>(
-        d_work_queue, num_states, d_visited, d_buckets, d_bucket_counters, max_single_bucket_size, d_overflow_counter);
+        d_work_queue,
+        buf.num_states,
+        d_visited,
+        d_buckets_ptr,
+        d_bucket_counters,
+        buf.num_states,
+        d_overflow_counter,
+        params.SHARD_BITS,
+        params.SHARD_SIZE,
+        params.NUM_SHARDS
+    );
     CUDA_CHECK(cudaGetLastError());
     CUDA_CHECK(cudaDeviceSynchronize());
 
+    CUDA_CHECK(cudaMemcpy(buf.bitset.get(), d_visited, params.BITSET_BYTES, cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(h_bucket_counters.data(), d_bucket_counters, params.NUM_SHARDS * sizeof(uint32_t), cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaMemcpy(&h_overflow_counter, d_overflow_counter, sizeof(uint32_t), cudaMemcpyDeviceToHost));
+
     if (h_overflow_counter > 0) {
-        std::cerr << "!!! FATAL ERROR: " << h_overflow_counter << " states were dropped due to bucket overflow. !!!\n";
+        std::cerr << "!!! FATAL ERROR: " << h_overflow_counter << " states dropped due to bucket overflow in " << buf.shard_dir << std::endl;
     }
+    buf.bucket_counters = h_bucket_counters;
+    buf.overflow_counter = h_overflow_counter;
 
-    CUDA_CHECK(cudaMemcpy(h_visited.get(), d_visited, BITSET_BYTES, cudaMemcpyDeviceToHost));
-    CUDA_CHECK(cudaMemcpy(h_bucket_counters, d_bucket_counters, NUM_SHARDS * sizeof(uint32_t), cudaMemcpyDeviceToHost));
-
-    for (size_t i = 0; i < NUM_SHARDS; ++i) {
+    for (size_t i = 0; i < params.NUM_SHARDS; ++i) {
         uint32_t count = h_bucket_counters[i];
         if (count > 0) {
-            std::vector<PackedState> h_output_buffer(count);
-            CUDA_CHECK(cudaMemcpy(h_output_buffer.data(), h_buckets[i], count * sizeof(PackedState), cudaMemcpyDeviceToHost));
-            
-            char target_shard_name[4];
-            snprintf(target_shard_name, sizeof(target_shard_name), "%02zx", i);
-            std::filesystem::path target_dir = std::filesystem::path(shard_dir).parent_path() / target_shard_name;
-            std::filesystem::create_directories(target_dir);
+            buf.outgoing_buckets[i].resize(count);
+            CUDA_CHECK(cudaMemcpy(buf.outgoing_buckets[i].data(), d_buckets[i], count * sizeof(PackedState), cudaMemcpyDeviceToHost));
+        }
+    }
 
-            // Using shard_dir in the filename helps trace work origin
-            std::string batch_filename = "batch_" + shard_dir + "_" + std::to_string(time(nullptr)) + ".work";
-            std::ofstream out(target_dir / batch_filename, std::ios::binary);
-            out.write(reinterpret_cast<const char*>(h_output_buffer.data()), count * sizeof(PackedState));
-        }
-    }
-    
-    // Atomically save the updated bitset
-    std::string tmp_bitset = bitset_file + ".tmp";
-    std::ofstream out_bitset(tmp_bitset, std::ios::binary | std::ios::trunc);
-    out_bitset.write(reinterpret_cast<const char*>(h_visited.get()), BITSET_BYTES);
-    out_bitset.close();
-    std::filesystem::rename(tmp_bitset, bitset_file);
-    
-    // NEW: Rename processed files for safety, then delete at the very end.
-    for (const auto& p : processed_files) {
-        try {
-             std::filesystem::rename(p, p.string() + ".processed");
-        } catch (const std::filesystem::filesystem_error& e) {
-             std::cerr << "Warning: could not rename " << p << ": " << e.what() << std::endl;
-        }
-    }
-    
-    // Cleanup
-    for (size_t i = 0; i < NUM_SHARDS; ++i) cudaFree(h_buckets[i]);
-    cudaFree(d_buckets);
+    for (size_t i = 0; i < params.NUM_SHARDS; ++i) cudaFree(d_buckets[i]);
+    cudaFree(d_buckets_ptr);
     cudaFree(d_bucket_counters);
     cudaFree(d_visited);
     cudaFree(d_work_queue);
     cudaFree(d_overflow_counter);
-    delete[] h_bucket_counters; // <-- FIXED: Was a memory leak
+}
 
-    std::cout << "Shard " << shard_dir << ": Cleanup complete.\n";
+// ==== Main Pipeline Loop ====
+int main(int argc, char* argv[]) {
+    std::vector<std::string> shard_dirs;
+    ShardParams params = parse_args(argc, argv, shard_dirs);
+
+    if (shard_dirs.empty()) {
+        std::cerr << "Usage: " << argv[0] << " [--shard-bits N | --num-shards N | --shard-size N] <shard_dir_1> <shard_dir_2> ...\n";
+        return 1;
+    }
+
+    constexpr int PIPELINE_DEPTH = 3;
+    std::array<ShardBuffer, PIPELINE_DEPTH> pipeline_bufs;
+    std::array<std::future<void>, PIPELINE_DEPTH> io_futures;
+
+    size_t num_shards = shard_dirs.size();
+
+    // Start the first load
+    if (num_shards > 0)
+        io_futures[0] = std::async(std::launch::async, load_shard_async, std::ref(params), shard_dirs[0], &pipeline_bufs[0]);
+
+    for (size_t i = 0; i < num_shards + PIPELINE_DEPTH - 1; ++i) {
+        size_t buf_idx = i % PIPELINE_DEPTH;
+
+        // Wait for previous IO on this buffer (load or store) to finish
+        if (i >= PIPELINE_DEPTH - 1)
+            io_futures[buf_idx].wait();
+
+        // Process this buffer on GPU after loading
+        if (i < num_shards) {
+            io_futures[buf_idx].wait();
+            std::cout << "[Shard " << pipeline_bufs[buf_idx].shard_dir << "] Loaded, num_states: " << pipeline_bufs[buf_idx].num_states << "\n";
+            process_shard_gpu(params, pipeline_bufs[buf_idx]);
+            io_futures[buf_idx] = std::async(std::launch::async, write_shard_async, std::ref(params), &pipeline_bufs[buf_idx]);
+            std::cout << "[Shard " << pipeline_bufs[buf_idx].shard_dir << "] Processed, async scatter started.\n";
+        }
+
+        // Start loading the next shard if any
+        size_t next_shard = i + PIPELINE_DEPTH;
+        if (next_shard < num_shards + PIPELINE_DEPTH - 1 && next_shard - (PIPELINE_DEPTH - 1) < num_shards) {
+            size_t next_buf_idx = (i + 1) % PIPELINE_DEPTH;
+            size_t next_shard_idx = next_shard - (PIPELINE_DEPTH - 1);
+            if (next_shard_idx < num_shards) {
+                io_futures[next_buf_idx] = std::async(std::launch::async, load_shard_async, std::ref(params), shard_dirs[next_shard_idx], &pipeline_bufs[next_buf_idx]);
+            }
+        }
+    }
+
+    std::cout << "All shards processed. Exiting.\n";
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
