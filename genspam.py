@@ -8,6 +8,16 @@ def calc_primes(n):
 
 PRIMES = calc_primes(1000)
 
+
+def odd_core(n):
+    while n % 2 == 0:
+        n = n // 2
+    return n
+
+def collatz_next(n):
+    n =  3 * n + 1
+    return odd_core(n)
+
 def get_str_in_radix(n, base):
     """Convert number to string representation in given base"""
     if n == 0:
@@ -19,29 +29,112 @@ def get_str_in_radix(n, base):
     return digits[::-1]
 
 bases = False
-length = 10000
-depth = 20
-header = 'n,k,oc'
+length = 30000
+depth = 0
+#header = 'desc,k,oc'
+header = 'oc,k,dist'
 
 if bases:
     header += ',base3,base2'
 for i in range(depth):
     header += ',m' + str(PRIMES[i + 1])
-print(header)
-for n in range(1, length + 1):
-    msg = str(n)
+
+
+def print_vec(n, comment = ''):
     i = n
     k = 0
     while i > 1 and i % 2 == 0:
         i = i // 2
         k += 1
-    msg += ',' + str(k)
-    msg += ',' + str(i)
+    #msg = comment
+    #msg += ',' 
+    msg = str(i)
+    #msg += ',' + str(i)
+    if n % 2 == 0:
+        msg += ',,' + str(odd_to_odd_dist(i))
+    else:
+        msg += ',' + str(k)
+
     if bases:
         msg += ',' + get_str_in_radix(i, 3)
         msg += ',' + get_str_in_radix(i, 2)
+
     for j in range(depth):
         msg += ',' + str(i % PRIMES[j + 1])
+
     print(msg)
 
 
+def odd_to_odd_dist(n):
+    dist = 0
+    while n > 1:
+        n = collatz_next(n)
+        dist += 1
+    return dist
+
+
+known = {
+    5: 5, 
+    7: 16, 
+    27: 111, 
+    31: 106, 
+    41: 109,  
+    47: 104, 
+    55: 112, 
+    73: 115, 
+    83: 110, 
+    97: 118, 
+    871: 178, 
+    6171: 261}
+
+
+if False:
+    by_dist = {}
+    for num in range(1, 5001):
+        if num % 2 == 0:
+            continue
+        dist = odd_to_odd_dist(num)
+        if dist not in by_dist:
+            by_dist[dist] = []
+        by_dist[dist].append(num)
+
+    print(header)
+    print()
+
+    for dist in reversed(sorted(by_dist.keys())):
+        print(f'# dist {dist}:')
+        for num in by_dist[dist]:
+            print_vec(num - 1, comment = f'oc({num}-1)')
+            print_vec(num + 1, comment = f'oc({num}+1)')
+        print()        
+
+
+if False:
+    for startpos in known.keys():
+        num = startpos
+        print(f'Collatz orbit of {startpos}:')
+        print(header)
+        print()
+        while num > 1:
+            print(f'# {num} (dist {odd_to_odd_dist(num)})')
+            print_vec(num - 1, comment = f'oc({num - 1})')
+            print_vec(num + 1, comment = f'oc({num + 1})')
+            print()
+
+            num = collatz_next(num)
+
+        print()
+
+if True:
+    print(header)
+    for num in range(1, length + 1):
+        #if num % 2 == 1:
+        #    comment = f'dist {odd_to_odd_dist(num)}'
+        #else:
+        #    comment = f'oc({num})'
+        print_vec(num)#, comment = comment)
+
+
+if False:
+    for num in range(1,10001):
+        print(f'{odd}')

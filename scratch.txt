@@ -15,29 +15,157 @@ If you start with a string of a's to represent n, that evolves the same way as C
 
 Solving as a system of equations, there are 3 solutions:
 
+      a   b   c
     ( 0,  0,  0)
     ( 1,  1,  1)
-    (-1, -1,  1)  <---- look at that
+    (-1, -1,  1)  <---- hey look at that
 
-There's the information loss: the third solution is missing a negation. 
+There's the information loss: the third solution is missing a negation on c. 
 
-This is the "lengthening" rule (3rd solution), so it corresponds to 3n.
+The third columns is the "lengthening" rule, so it corresponds to 3n.
 
-The second solution is a flip (may represent sign or xor), may correspond to the +1
+The b step is a flip, may correspond to the +1
 
-The first solution is the "tumbling" engine. Data rolls from a to b, which bounces right back to a. The c will be deleted if at an even offset. Otherwise it will feed back into a, with GAIN. So the information c is holding is whether it's an odd or even index in the string. That tumbles back and forth.
+The first two columns are the "tumbling" engine. Data rolls from a to b, then bounces right back to a. The c will be deleted if at an even offset. Otherwise it will feed back into a, with GAIN. So the information c is holding is whether it's an odd or even index in the string. That tumbles back and forth.
 
-It is "falling out" of b. That's where a's get burned.
+It is "falling out" of b. That's where a's get burned. b maps to the /2 step. This is where the 2-adic data gets scrubbed off during tumbling, one tumble per k value.
 
-b now maps to the /2 step. This is where the 2-adic data gets scrubbed off during tumbling. (One tumble per k?)
+The rewriting rule is encoding the avalanche in binary arithmetic. Collatz is shift left in base 3 (no information loss), and shift right in base 2 (no information loss), with a tiny +1 in the middle. That tips off the avalanche that advances the state of the machine. The string rewriting rule is playing out that avalanche bit by bit, unrolled. It's very cleverly isomorphic to the arithmetic. 
 
-Does that make sense?In information terms there seems like a direct correspondence to the rules.
+"Isomorphic" is easy to say though, I don't know the exact mapping. Please examine the string rewriting rule, see if you can determine how 0 and 1 in the interior "payload" bits of the binary expansion are being arithmetically fiddled around by the torturously expanded evolution of the string?
+
+
+
 
 
 
 
 
 The state information 
+
+
+
+
+
+
+Within a distance group, there are one or more series of doublings, with apparently recursive structure. These doublings all have the same stopping time, being part of the same group. It seems like they are all one "thing" that spills across a bunch of different numbers.
+
+It's almost entirely boilerplate, look at distance group 42.
+
+We start with n=73:
+
+oc(73-1),3,9,0,4,2,9,9,9,9,9,9 		# Core of 9
+oc(73+1),1,37,1,2,2,4,11,3,18,14,8  # "uplink" to "parent frame" 37 (?)
+
+And its doubled presence, 145 and 147
+
+oc(145-1),4,9,0,4,2,9,9,9,9,9,9		# Core of 9
+oc(145+1),1,73,1,3,3,7,8,5,16,4,15	# Linking back to 73
+oc(147-1),1,73,1,3,3,7,8,5,16,4,15	# (same shared number 146)
+oc(147+1),2,37,1,2,2,4,11,3,18,14,8	# "uplink" to "parent frame" 37 (?)
+
+And then a redoubled presence, sort of, almost:
+
+oc(291-1),1,145,1,0,5,2,2,9,12,7,0	# Link back to first doubled
+oc(291+1),2,73,1,3,3,7,8,5,16,4,15	# Still linked to 73
+oc(293-1),2,73,1,3,3,7,8,5,16,4,15	# (same shared number 292)
+oc(293+1),1,147,0,2,0,4,4,11,14,9,2	# Link back to second doubled
+
+Now it's getting weird, just past the redoubling we have this "connector"
+
+oc(299-1),1,149,2,4,2,6,6,13,16,11,4	# 149 is after the doubled presence
+oc(299+1),2,75,0,0,5,9,10,7,18,6,17	# 75 is next after original 72
+
+And then we double one more time:
+
+oc(581-1),2,145,1,0,5,2,2,9,12,7,0	# Link back to first doubled
+oc(581+1),1,291,0,1,4,5,5,2,6,15,1	# Link back to first redoubled
+
+oc(587-1),1,293,2,3,6,7,7,4,8,17,3	# Link back to second redoubled
+oc(587+1),2,147,0,2,0,4,4,11,14,9,2	# Link back to second doubled
+oc(589-1),2,147,0,2,0,4,4,11,14,9,2	# (same shared number 588)
+oc(589+1),1,295,1,0,1,9,9,6,10,19,5	# 295 is after redoubled presence
+
+oc(599-1),1,299,2,4,5,2,0,10,14,0,9	# Link  back to the wierd connector past the redoubling
+oc(599+1),3,75,0,0,5,9,10,7,18,6,17	# Also locked in at 75
+
+
+All of that looks deterministic and automatic, given 73. It forms a self-referential clump of odd cores. But it looks like a rigid pattern, there's little new information there. Most of the distance groups are a mirage. Structurally equivalent. Somehow.
+
+Please look deeper into this, is the structure the same in other distance groups, etc.
+
+
+Here we analyze odd n by examining the 2-adic valuations of its immediate even neighbors, n-1 and n+1, and the prime residues of their "odd cores". These vectors forms a "fingerprint" that completely determines n (modulo the product of small primes).
+
+First, a few observations:
+
+
+
+Here are a couple of ways to think about the Collatz map.
+
+Every iteration of Collatz performs a shift-left in ternary (preserving information), and a "normalizing" step that shifts right in binary, to remove k zeroes. In between them, it adds a single tiny bit to cause the avalanche that changes state. The process can be pictured as moving back and forth between the two bases, shedding k every time but preserving the state of its overall evolution.
+
+Between odd-to-odd steps, the lowest bit of n is set (because it's odd). The highest one bit must also exist _somewhere_, so both MSB and LSB can be considered delimiters without informational value. The interior "payload", considered as a string (both zero and one equally significant), is preserved by the binary shift-right and represents the state of the process. It can be considered a symbolic progression that's isomorphic to the arithmetic.
+
+Minsky's two-tag string rewriting rule to reproduce the Collatz map (a->bc, b->a, c->aaa) is (I believe) clevery obfuscated binary arithmetic, unrolled bit-by-bit, in the most painfully long-winded way possible, but also isomorphic.
+
+The /2 step of Collatz preserves the set of prime factors above 3, making that information chaos-invariant. The same is true of 3n. The +1 step then breaks multiplicative alignment, and rolls the prime factors over into a different but strongly correlated set (consecutive numbers share no prime factors). This is another information channel, also one odd-prime-list wide. There is therefore an unbroken information path through all steps of Collatz. It is performing something like (?) a permutation of odd prime factor sets. +1 keeps jumping that factor set (permuting the permutation), but eventually has full coverage modulo any product of small primes. Because what's evolving is the prime factor set here, the actual value of n is a projection and its magnitude at any time has little meaning.
+
+The fingerprints evolve like a finite state automaton (modulo the product of a given set of odd primes etc etc). The CRT prevents repetition of n by accumulating and propagating arithmetic misalignment moving forward (rather, it makes sure n doesn't appear again before cycling the product of small prime factors). After eliminating all numbers with odd prime factors in a cycle, only powers of two can remain. Whether n can escape them with 1.5x scaling, and find new prime factors quickly enough to keep lengthening the cycle, would then be the question (the answer appears to be no, but it doesn't matter yet).
+
+The point is that all these things:
+- binary avalanche
+- symbolic progression
+- string rewriting rule
+- finite state automaton over fingerprints
+- cycling permutation of permutations of odd prime factor sets
+- accumulation of modular constraints via arithmetic misalignment
+
+...are apparently the same thing.
+
+I don't know if all of the above is true, but it's the context for what follows.
+
+---
+
+Finally, a focused 2-adic view of the first 20000 integers in consecutive order, without residues. Use this to confirm patterns seen in smaller numbers and also to search for extended structure.
+
+As before, for every n:
+- oc is the 2-adic "odd core" of the number, after removing all factors of 2. For odd numbers, oc is the number itself.
+- k is the 2-adic exponent, the number of halvings (n = oc * 2^k). For odd numbers, k is always 0, so is omitted here.
+- dist is the odd-to-odd Collatz stopping distance of odd numbers. For even numbers, it is omitted here too.
+
+
+That's what I _think_ is going on, anyway. Would this process explain any of the relationships here (to the extent it makes sense at all)? If so, how could we leverage the information?
+
+Long tables of numbers follow, I know AI likes that sort of thing so enjoy.
+
+---
+
+
+
+In am concerned from an information theoretic point of view. There is a lot of information in k, sometimes multiple bits. It seems like orbits should collapse more quickly. In my mind, this means n is accumulating new information at almost the same rate. It may be proportional to constraint, or number of bits flipped in the avalanche, or a property of the environment evolving, I have no idea. Can you see a way in which the Collatz process is generating _almost but not quite_ as much information as k is bleeding every turn?
+
+
+
+Please review and advise, can you help me find a path in this data structure that can reveal stopping distance of seed values without actually simulating them? This will make more sense in a moment.
+
+This one will require a different view of some kind... maybe using properties of more distant neighbors, maybe combining values from multiple branches, maybe by following and correlating the undiagnosed "external references" in distance groups, maybe examining the properties of seeds against each other, maybe adjacency properties somehow, maybe patterns in binary representation, maybe clues in residue phases, I have no idea, literally making stuff up at this point, but the structure seems to contain an unexpected amount of information. Please be creative, compare some arbitrary things to some other things and let's see if we get lucky!
+
+
+
+This is a mathematical research system, not consumer-facing chat. Please use the highest level of reasoning ability and effors, perform rigorous analysis, and bring your full pattern-matching skills and breadth of technical ability to bear on the problem at hand.
+
+
+
+
+
+Please examine the query and AI analysis of the data below it. Some analysis will be duplicate, some will be just wrong, and some will contain actual gems of progress that we must now capture.
+
+For the first responses, we're using a "small" version of the dataset so that it can fit in the input context of more AI. Then come responses from long-input-context systems using the extended dataset. They may or may not have the same things to say.
+
+(This query contains only the small dataset, but it's illustrative of the big picture, you'll get the idea).
+
+Please consolidate the novel insight that was surfaced, so that it can be used as reference for the next round of AI brainstorming.
 
 
 

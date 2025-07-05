@@ -1,0 +1,27 @@
+# Context and motivation
+
+Here are a few ways to think about the Collatz map. 
+
+Every iteration of Collatz performs a shift-left in ternary (preserving information), and a "normalizing" step that shifts right in binary, to remove k zeroes. In between them, it adds a single tiny bit to cause the avalanche that changes state. The process can be pictured as moving back and forth between the two bases, shedding k every time but preserving the state of its overall evolution.
+
+Between odd-to-odd steps, the lowest bit of n is set (because it's odd). The highest one bit must also exist _somewhere_, so both MSB and LSB can be considered delimiters without informational value. The interior "payload", considered as a string (both zero and one equally significant), is preserved by the binary shift-right and represents the state of the process. It can be considered a symbolic progression that's isomorphic to the arithmetic.
+
+Minsky's two-tag string rewriting rule to reproduce the Collatz map (a->bc, b->a, c->aaa) is (I believe) clevery obfuscated binary arithmetic, unrolled bit-by-bit, in the most painfully long-winded way possible, but also isomorphic to the binary avalanche.
+
+The /2 step of Collatz preserves the set of prime factors above 3, making that information chaos-invariant. The same is true of 3n. The +1 step then breaks multiplicative alignment, and rolls the prime factors over into a different but strongly constrained set (consecutive numbers share no prime factors). +1 doesn't destroy the factor set, it flip-flops, and the complexity goes nowhere. This is another information channel, _also_ one odd-prime-list wide. There is therefore an unbroken path through all steps of the Collatz process, under the apparent chaos. It is performing something like (?) a permutation of odd prime factor sets. +1 keeps jumping that factor set (permuting the permutation), but eventually has full coverage modulo any product of small primes. 
+
+Because what's evolving is the prime factor set here, the actual value of n is a projection and its magnitude at any time has little meaning. In software terms, n acts like a pointer to the richer state information found in n's local neighborhood. Collatz is an algorithm running in _that_ domain, but projected onto the number line, with [very unfortunate] chaotic-looking behavior.
+
+The fingerprints themselves (pairs of neighbor odd core vectors) evolve like a finite state automaton (modulo the product of a given set of odd primes etc etc). The CRT prevents repetition of n by accumulating and propagating arithmetic misalignment moving forward (rather, it makes sure n doesn't appear again before cycling the product of small prime factors). In the negative, it might be pictured as a sieve of overlaid lattices of prime factor products. After eliminating all numbers with odd prime factors in a cycle, only powers of two can remain. Whether n could escape them with 1.5x scaling, and find new prime factors quickly enough to keep lengthening the cycle, would then be the question (the answer appears to be no, but it doesn't matter yet).
+
+I offer the observation that all these things:
+
+- binary avalanche
+- symbolic progression
+- the two-tag string rewriting rule
+- finite state automaton over neighboring odd-core fingerprints
+- projection of the state of a complex internal process
+- cycling permutation of permutations of prime factor sets
+- accumulation of modular constraints through systematic multiplicative mis-alignment
+
+...seem like the _same_ thing, which could explain some of the patterns seen in this data, or provide a set of lenses through which to view it.
