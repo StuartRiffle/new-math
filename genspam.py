@@ -28,9 +28,9 @@ def get_str_in_radix(n, base):
         n //= base
     return digits[::-1]
 
-bases = False
+bases = True
 length = 30000
-depth = 0
+depth = 19
 #header = 'desc,k,oc'
 header = 'oc,k,dist'
 
@@ -49,11 +49,9 @@ def print_vec(n, comment = ''):
     #msg = comment
     #msg += ',' 
     msg = str(i)
-    #msg += ',' + str(i)
-    if n % 2 == 0:
-        msg += ',,' + str(odd_to_odd_dist(i))
-    else:
-        msg += ',' + str(k)
+    msg += ',' + str(k)
+
+    msg += ',' + str(odd_to_odd_dist(i))
 
     if bases:
         msg += ',' + get_str_in_radix(i, 3)
@@ -61,6 +59,9 @@ def print_vec(n, comment = ''):
 
     for j in range(depth):
         msg += ',' + str(i % PRIMES[j + 1])
+
+    if comment:
+        msg += ' # ' + comment
 
     print(msg)
 
@@ -77,12 +78,8 @@ known = {
     5: 5, 
     7: 16, 
     27: 111, 
-    31: 106, 
-    41: 109,  
-    47: 104, 
     55: 112, 
     73: 115, 
-    83: 110, 
     97: 118, 
     871: 178, 
     6171: 261}
@@ -90,7 +87,7 @@ known = {
 
 if False:
     by_dist = {}
-    for num in range(1, 5001):
+    for num in range(1, 101):
         if num % 2 == 0:
             continue
         dist = odd_to_odd_dist(num)
@@ -102,30 +99,34 @@ if False:
     print()
 
     for dist in reversed(sorted(by_dist.keys())):
-        print(f'# dist {dist}:')
+        print(f'# Distance {dist}:')
+        print()
         for num in by_dist[dist]:
             print_vec(num - 1, comment = f'oc({num}-1)')
+            print_vec(num, comment = f"{num} -> {collatz_next(num)}")
             print_vec(num + 1, comment = f'oc({num}+1)')
-        print()        
+            print()        
+        print()
 
 
-if False:
+if True:
+    print(header)
     for startpos in known.keys():
         num = startpos
-        print(f'Collatz orbit of {startpos}:')
-        print(header)
+        print(f'## Collatz orbit of {startpos}')
         print()
         while num > 1:
-            print(f'# {num} (dist {odd_to_odd_dist(num)})')
-            print_vec(num - 1, comment = f'oc({num - 1})')
-            print_vec(num + 1, comment = f'oc({num + 1})')
+            #print(f'# {num} (dist {odd_to_odd_dist(num)})')
+            print_vec(num - 1, comment = f'oc({num}-1)')
+            print_vec(num)#, comment = f"dist = {odd_to_odd_dist(num)}")
+            print_vec(num + 1, comment = f'oc({num}+1)')
             print()
 
             num = collatz_next(num)
 
         print()
 
-if True:
+if False:
     print(header)
     for num in range(1, length + 1):
         #if num % 2 == 1:

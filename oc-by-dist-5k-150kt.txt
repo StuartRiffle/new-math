@@ -1,4 +1,4 @@
-# "Odd core neighbor" fingerprints by Collatz odd-to-odd stopping distance
+# "Neighbor odd core" fingerprints of odd numbers, grouped by their Collatz odd-to-odd stopping distance
 
 desc,k,oc,m3,m5,m7,m11,m13,m17,m19,m23,m29
 

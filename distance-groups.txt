@@ -1,15 +1,14 @@
 # Stopping distance groups
 
-Attached is a list of the first odd numbers, grouped by Collatz odd-to-odd stopping distance.
+Attached you will find a list of the first odd integers, grouped by Collatz odd-to-odd stopping distance.
 
-Each odd number is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its even neighbors.
-For example, the odd number 73 is represented like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
+Each odd number is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
 
 desc,k,oc,m3,m5,m7,m11,m13,m17,m19,m23,m29,m31
 oc(73-1),3,9,0,4,2,9,9,9,9,9,9,9
 oc(73+1),1,37,1,2,2,4,11,3,18,14,8,6
 
-This pair of vectors (oc(n-1), oc(n+1)) is like a "fingerprint" of a number's local arithmetic environment.
+This pair of vectors {oc(n-1), oc(n+1)} is like a "fingerprint" of a number's local arithmetic environment.
 It is *self-similar* and correlated with arithmetic properties in general, and Collatz evolution specifically.
 Within some distance groups, there are doublings with apparently recursive structure.
 It seems like they are part of the same graph but spilled across a wide range of numbers.
@@ -59,14 +58,12 @@ oc(589+1),1,295,1,0,1,9,9,6,10,19,5,16	# 295 appears after the redoubled presenc
 oc(599-1),1,299,2,4,5,2,0,10,14,0,9,20	# Link back to the previous connector, after the re-doubling
 oc(599+1),3,75,0,0,5,9,10,7,18,6,17,13	# Also locked in at 75, like previous connector
 
-It appears to continue like this. The distance groups seem something like a handful of seed values in an infinite hall of mirrors. Just spot checking, it appears that simply following the even neighbor with the lowest k value (??) can allow n to move through the tree of doublings to its distance group seed. That would make determining stopping distance a matter of solving just the seed values, a much [astronomically] smaller problem, and there is a nonzero chance we can do that.
+It appears to continue like this. The distance groups seem to be something like a handful of seed values in an infinite hall of mirrors. It appears that simply following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed. I don't know if that pattern holds, but if true, it would make determining stopping distance for *any* n a matter of solving just these seed values, an astronomically smaller problem.
 
-Pay particular attention to distance groups with multiple seed values listed. The doublings may be illusions, but there is something linking all the seeds to the same stopping distance, a property all those seed numbers share, making them Collatz-equivalent in this way. Look at their neighborhoods, why did those seed values end up together in this distance group?
-
-There is analytical opportunity here: if the different seeds in the distance groups proceed along their orbits and diverge, it means there are multiple "paths" to the root of the structure, and the differences between them could expose the actual invariants/relationships we're looking for. 
-
-There are known branching points in the inverse Collatz tree. Being special, they may expose clues. 
 The external references (9, 37, 75, 149, 295) have stopping distances all small multiples of 3.
 They seem to be correlated at least with each other (?), whether or not they reflect anything about distance group 42 itself.
 
-The final mapping from seed to stopping distance is going to be subtle, and probably annoyingly multi-step in some way, or it would have been discovered before now. I have a human hunch there's some kind of correlation with the residue vectors (?), please stay sensitive to patterns in that mapping.
+The final mapping from seed to stopping distance is going to be subtle, and probably annoyingly multi-step in some way, or the world would have discovered it long before now. I have a human hunch there's some kind of correlation with the residue vectors (?), please stay sensitive to patterns in that mapping.
+
+But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along.
+
