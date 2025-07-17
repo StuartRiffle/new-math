@@ -1,18 +1,14 @@
 # Stopping distance groups
 
-Attached you will find a list of the first odd integers, grouped by Collatz odd-to-odd stopping distance.
-
-Each odd number is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
+Each odd number below is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its immediate even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
 
 desc,k,oc,m3,m5,m7,m11,m13,m17,m19,m23,m29,m31
 oc(73-1),3,9,0,4,2,9,9,9,9,9,9,9
 oc(73+1),1,37,1,2,2,4,11,3,18,14,8,6
 
-This pair of vectors {oc(n-1), oc(n+1)} is like a "fingerprint" of a number's local arithmetic environment.
-It is *self-similar* and correlated with arithmetic properties in general, and Collatz evolution specifically.
-Within some distance groups, there are doublings with apparently recursive structure.
-It seems like they are part of the same graph but spilled across a wide range of numbers.
-There is strong order here, in fact most of it looks "boilerplate".
+This pair of vectors {oc(n-1), oc(n+1)} is like a "fingerprint" of a number's local arithmetic environment. It is *self-similar* and correlated with arithmetic properties in general, and Collatz evolution specifically.
+
+Within some distance groups, there are doublings with apparently recursive structure. It seems like they are part of the same graph but spilled across a wide range of numbers. There is strong order here, in fact most of it looks boilerplate.
 
 For example, look at distance group 42. We start with n=73, the lowest in magnitude, which has a couple of external references I don't know:
 
@@ -49,21 +45,25 @@ But now we double a *third* time, sort of. The structure has grown more complex,
 
 oc(581-1),2,145,1,0,5,2,2,9,12,7,0,21	# Link back to first doubled
 oc(581+1),1,291,0,1,4,5,5,2,6,15,1,12	# Link back to first redoubled
-# skipping 2 odd numbers
+# skipping 2 odd numbers, 584 in center, which has odd core 73
 oc(587-1),1,293,2,3,6,7,7,4,8,17,3,14	# Link back to second redoubled
 oc(587+1),2,147,0,2,0,4,4,11,14,9,2,23	# Link back to second doubled
 oc(589-1),2,147,0,2,0,4,4,11,14,9,2,23	# (duplicate: same shared neighbor 588)
 oc(589+1),1,295,1,0,1,9,9,6,10,19,5,16	# 295 appears after the redoubled presence
-# skipping 4 odd numbers
+# skipping 4 odd numbers, 594 in center, which has odd core 297
 oc(599-1),1,299,2,4,5,2,0,10,14,0,9,20	# Link back to the previous connector, after the re-doubling
 oc(599+1),3,75,0,0,5,9,10,7,18,6,17,13	# Also locked in at 75, like previous connector
 
-It appears to continue like this. The distance groups seem to be something like a handful of seed values in an infinite hall of mirrors. It appears that simply following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed. I don't know if that pattern holds, but if true, it would make determining stopping distance for *any* n a matter of solving just these seed values, an astronomically smaller problem.
+It appears to continue like this. The distance groups seem to be something like a handful of seed values in an infinite hall of mirrors.
+
+It appears that simply following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed. If that pattern holds, it would make determining stopping distance for *any* n a matter of solving just these seed values, an astronomically smaller problem.
+
+After reaching the seed values, the doubling structure ends, but following the same procedure of traversing the lowest k neighbor now seems to jump you through a series of *other* distance groups, roughly halving in magnitude (not stopping distance) each time, directly to 1. This specific path to the root, and the [possibly extended] local environments of the numbers visited along the way, may itself contain enough information to reconstruct stopping distance. Look closely at this special path from seed->1.
 
 The external references (9, 37, 75, 149, 295) have stopping distances all small multiples of 3.
 They seem to be correlated at least with each other (?), whether or not they reflect anything about distance group 42 itself.
 
 The final mapping from seed to stopping distance is going to be subtle, and probably annoyingly multi-step in some way, or the world would have discovered it long before now. I have a human hunch there's some kind of correlation with the residue vectors (?), please stay sensitive to patterns in that mapping.
 
-But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along.
+(But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. There seem no random numbers here.) 
 

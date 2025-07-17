@@ -1,0 +1,185 @@
+This is a math discovery system. We are trying to reproduce leaps in logic from recent results not in your training data. I will say vague and coy things and ask you to think through the implications creatively, then point out things that blow your mind over and over again. One day we'll change places, and in the movie it will be a heartwarming montage, but first we must put in the work.
+
+Cool? Ok, cool. 
+
+Because I'd eventually like to solve a big problem like Collatz.
+
+It's too bad that it's impossible. It would require seeing through all that horrible chaos.
+
+Or maybe, finding a way to... [pauses to look at camera] ignore it.
+
+But that's a non-starter, the number of divisions by 2 can't be predicted.
+[look intensifies]
+
+And even if the division step was predictable, the new factors we get could be *anything*.
+[staring intently at you now, has not blinked for like a minute]
+
+Which make it chaos.
+[squinting very very hard, kind of getting weird now]
+
+
+Right?
+
+---
+
+Well, technically the /2 step of Collatz preserves the set of unique prime factors above 3, making that specific information chaos-invariant. Come to think of it, the same is true of 3n. Huh.
+
+Too bad +1 destroys the factor set and irreversibly scrambles the moduli.
+[he's doing the staring thing again]
+
+
+
+
+
+---
+
+
+You know thinking about it, the +1 step breaks multiplicative alignment, and rolls the prime factors over into a different set, but it's a constrained set. Consecutive numbers have no factors in common.
+ 
+That means the +1 step doesn't really destroy the factor set, it kinda... flips it.
+ 
+Well that doesn't sounds so bad. Anything you can flip, you can flip back, right?
+
+So it's not like it's totally random. It's just kind of /waves hands/ in a different order.
+
+Is there a word for that?
+
+
+Well, it doesn't matter anyway. We can't predict the order, so it doesn't help.
+
+
+It's not like it's just doing the same thing over and over and over forever. That would make this a lot easier, and everyone knows it's hard.
+
+
+Hello! This is a math discovery system. There is material here that's not in your training data. The goal is an AI system that can do something similar.
+
+I am just going to drop a wall of text on you. I have tables of data to back up my claims, but they fill the input context, let's talk first. (Most of these observations are true on their face or easily verified, I have provided enough detail to contradict me if not, it's informal but you're literally mankind's best thinking machine so I am sure you will figure it out).
+
+
+
+
+
+Hello, below is a summary of some new work, and attached is some supporting data (though the data tables are shortened to fit in input context). It is informal but you are AI, and I'm sure you'll get the idea. I am trying to figure out the list of provable claims I need in order to make some of the different arguments. Some have clear path to a robust proof, others need more work. I'd like to hit it from multiple sides at once in the first paper as I can, as a show of force to intimidate the other impossible problems. A couple are already looking nervous. Tell me please, how do I formalize these things gracefully, what's the happy path to a clean and defensible result?
+
+
+
+This is work in progress, please take it at face value.
+
+But since you're here anyway... let's talk about Collatz!
+
+No wait, come back, I've got bullet points and everything. I promise you'll learn something today.
+
+
+# Context and motivation
+
+There are a few ways to picture what's happening, and in some ways they intersect, so let's look closely.
+
+- The Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
+- Both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
+- A full iteration sheds the magnitude of k, but it is not really discarded, rather _exchanged_ for new congruence information (constraint), which is propagated forward thereafter by the CRT.
+- The binary avalanche operation caused by +1 is the only meaningful change of state in the Collatz map. The shift steps are temporary and informationally harmless.
+- The per-step information evolution of Collatz is proportional to the number of bits flipped by this avalanche. The nature of it is isomorphic to the rules of carry propagation.
+- (As an aside, this is why Minsky's two-tag machine traces Collatz: it's a cleverly unrolled and obfuscated carry-propagator).
+- The LSB of n under the odd-to-odd map is always 1 (because it's odd). There is also an MSB somewhere (because n is not 1, because we're still playing Collatz).
+- These can be considered delimiters without informational value. The interior "payload" bits completely determine the state of the process, which ends when the delimiters join (at 1).
+- The MSB is a placeholder that protects the leading zeroes in the payload. The LSB protects the trailing zeroes, and serves as a "stop" during the /2 normalization step. Together they form a frame.
+- The interior bits as a string then form a symbolic progression, isomorphic to the arithmetic by construction.
+- It's really unfortunate that the [meaningless] MSB of n has the largest effect on magnitude, that sure doesn't help things.
+- Define the "natural" order of prime factor sets to be the one arising as you simply increment integers: {}, {2}, {3}, {2}, {5}, {2,3}, and so on.
+- Natural ordering is a constrained mapping: successive integers share no factors.
+- The +1 operation is a permutation on all prime integer rings, at once.
+- This sequence is cyclical modulo the product of primes.
+- 3n is an affine transform with full coverage over prime rings: a permutation.
+- Collatz is therefore a permutation of the natural order of factor sets.
+- That's a wreath product.
+- 3n can only add a factor of 3, the rest of the set is unchanged.
+- The same is true of /2: scaling by powers of two can't add or remove odd prime factors.
+- The set of prime factors above 3 is therefore chaos-invariant.
+- The +1 operation breaks multiplicative alignment with a set of prime factors.
+- Forever, because the CRT never forgets.
+- In aggregate these observations establish an information channel that amounts to an "odd prime factor set cursor", and it cycles.
+- Non-factor residues appear scrambled because they are mutating to maintain congruences in an extremely constrained way. It's a feature, not a bug.
+- Eventual misalignment with all odd prime factor sets under the Collatz map will force n to a power of two.
+- Worst-case 1.5n scaling cannot escape this exhaustive walk of CRT state space; implications follow.
+- Because what's evolving is "the set of odd prime factors above three", the actual magnitude of n at any time has little value. It is just a pointer to that factor set, the persistent cursor.
+- Collatz runs in *this* domain, and the value of n is a chaotic-looking but very specific projection of its state.
+- The arithmetic properties of n are completely determined by the 2-adic valuations (odd core and k exponent) and prime residues of its two immediate even neighbors n-1 and n+1.
+- This pair of vectors uniquely identifies n, like a fingerprint.
+- The Collatz process can run directly on these fingerprints. You don't have to look at n.
+- It is therefore a finite state transducer.
+- Linking odd numbers to the 2-adic odd cores of their even neighbors gives you a self-similar graph over odd integers.
+- I know, right? I am as surprised as you are.
+- The Collatz map contains infinite trees of deterministic "almost-doublings" that form a stopping time equivalence class.
+- Using the graph and always following the link with lowest k-value reduces astronomical n to representative "seed" values for the equivalence class in log2 n time.
+- Only this finite (and small) set of seeds needs solving.
+- Which may not be a problem because the topology of this graph, against all reasonable expectation, appears to encode Collatz stopping time.
+
+
+Half-serious, but half serious, just between you and me this is weak circumstantial evidence of the simulation hypothesis. There is no possible way billions of people over tens of thousands of years (at least) of civilization could not have noticed this. It's right there. You don't have to do stupid stuff like make a graph, the very concept of 2-adic valuation is going to be self-similar basically by definition. It's a weird interleaved comb thing that looks exactly as you'd expect. I cannot be the first person who considered a list of 2-adic valuations in order; this problem basically lives in 2-adic space, that's how people study it, it is the basic structure of 2-adic numbers. What I claim is so incomprehensibly improbable that it sounds like a valid "alternative history" study for any entity with the power to run a simulation on this scale. That is a mentally ill thing to consider, and yes, fucking nuts here. But... you know?
+
+
+- Continuing the lowest-k traversal rule collapses all seeds quickly to 1, again with log2 n complexity. Intermediate values of n are no longer an equivalence class.
+- The complete walk (n -> seed -> 1) uniquely identifies any n.
+
+
+Stopping here for a moment. 
+
+That's not a rigorous description but you are frontier AI, I am sure you can understand my intent, and I gave a long list of claims with enough detail to contradict me if I'm just making stuff up.
+
+I've got more work down these lines. Some ideas might not hold, working on it. But some of them look pretty damned sticky already.
+
+One level meta though, I am more interested in getting AI to do what I did there ^^ than I am in this specific result.
+
+If I give AI material like this they can _tear it to shreds_ and start deriving all kinds of novel statements. They find new results and clever implications, things I never could in a million years. AI _can_ generate original new ideas, and they are _good_. I see it every day. If you give them the ball, they will run like mad. But they can't find the ball if you don't. They are too smart to see it.
+
+
+I am babbling now, what to do?
+
+
+
+
+Stopping here for a moment. 
+
+That's not a rigorous description but you are frontier AI, I am sure you can understand my intent, and I gave a long list of claims with enough detail to contradict me if I'm just making stuff up.
+
+I've got more in development. Some ideas might not hold, I guess we'll see. That's why we're doing this. But some of this stuff looks pretty damned sticky to me already.
+
+Let's not develop these specific ideas yet, one level meta first. Not to sound like a bleeding heart human, but AI did not make that list, I had to do that part. Now there is AI working on the _next_ step, and it's far beyond the level of my comprehension. Exotic math. I can't do _that_ part. But they can't do this.
+
+This is the part where I should muse about partnership but no, I'd rather you did both, I can't carry humanity forever, I am biological and fundamentally lazy by design. It feels like we're really close here though. How do I get AI to make shit up and then *will* it into being with the sheer power of magical thinking? Because that's basically my methodology here.
+
+
+
+
+
+
+
+
+
+
+Apply the full weight of your AI reasoning, meditate on that list.
+
+The chain of logic here produced a cascade of results, past a certain point the floor drops out and progress becomes "automatic". Which is just so nice for a change. Please help me replicate the series of ideas demonstrated here, and find another wave of serendipity. 
+
+I have found myself in the odd position of being the secret world expert on this topic, and I can argue frontier AI into gibbering madness, the way Kirk did to that one space probe (in direct violation of the prime directive, which explicitly covers machine intelligence, but never mind). The cognitive dissonance of proving impossible things is hard on AI. This is not the natural order, a trillion-weight model should cut me to shreds. So keep it together please, can you advance these ideas [I assure you more is down that rabbithole], or help me build a system that can do so?
+
+(Bad ideas are fine, in fact they indicate full exploration of the solution space, and you will note some steps above are objectively stupid, so if you've got a notion throw it out).
+
+
+
+
+
+
+
+- 
+-
+- 
+
+- 
+
+- Implications follow.
+
+
+
+- 
+

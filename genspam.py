@@ -6,18 +6,37 @@ def calc_primes(n):
             sieve[i*i::i] = [False] * len(sieve[i*i::i])
     return [i for i in range(n) if sieve[i]]
 
-PRIMES = calc_primes(1000)
-
+PRIMES = calc_primes(1000000)
+odd_primes = PRIMES[1:]
 
 def odd_core(n):
-    while n % 2 == 0:
-        n = n // 2
+    if n != 0:
+        while n % 2 == 0:
+            n = n // 2
     return n
+
+def odd_core_k(n):
+    k = 0
+    if n != 0:
+        while n % 2 == 0:
+            n = n // 2
+            k += 1
+    return n, k
+   
 
 def collatz_next(n):
     n =  3 * n + 1
     return odd_core(n)
 
+def get_neighbors(n):
+    n1, k1 = odd_core_k(n - 1)
+    n2, k2 = odd_core_k(n + 1)
+
+    if k1 < k2:
+        return n1, n2
+    else:
+        return n2, n1
+    
 def get_str_in_radix(n, base):
     """Convert number to string representation in given base"""
     if n == 0:
@@ -28,19 +47,47 @@ def get_str_in_radix(n, base):
         n //= base
     return digits[::-1]
 
+def get_factor_mask(n, include_two = False):
+    prime_index = 0
+    mask = 0
+
+    prime_list = PRIMES
+    if not include_two:
+        prime_list = prime_list[1:]
+
+    while n > 1:
+        if n % prime_list[prime_index] == 0:
+            mask |= 1 << prime_index
+            n //= prime_list[prime_index]
+        else:
+            prime_index += 1
+
+    return mask
+
+def get_factor_mask_binary(n, pad = 0, include_two = False):
+    mask = get_factor_mask(n, include_two)
+    maskstr = get_str_in_radix(mask, 2)
+    maskstr = maskstr[::-1]
+    while len(maskstr) < pad:
+        maskstr += '0'
+    return maskstr
+
 bases = True
-length = 30000
-depth = 19
+add_mask = True
+show_odd_k = True
+length = 210
+depth = 0
 #header = 'desc,k,oc'
 header = 'oc,k,dist'
 
 if bases:
     header += ',base3,base2'
+if add_mask:
+    header += ',factors'
 for i in range(depth):
     header += ',m' + str(PRIMES[i + 1])
 
-
-def print_vec(n, comment = ''):
+def print_vec(n, comment = '', indent = 0):
     i = n
     k = 0
     while i > 1 and i % 2 == 0:
@@ -48,14 +95,20 @@ def print_vec(n, comment = ''):
         k += 1
     #msg = comment
     #msg += ',' 
-    msg = str(i)
-    msg += ',' + str(k)
 
+    msg = ' ' * indent
+    msg += str(i)
+    msg += ','
+    if show_odd_k or n % 2 == 0:
+        msg += str(k)
     msg += ',' + str(odd_to_odd_dist(i))
 
     if bases:
         msg += ',' + get_str_in_radix(i, 3)
         msg += ',' + get_str_in_radix(i, 2)
+
+    if add_mask:
+        msg += ',' + get_factor_mask_binary(i)
 
     for j in range(depth):
         msg += ',' + str(i % PRIMES[j + 1])
@@ -74,20 +127,30 @@ def odd_to_odd_dist(n):
     return dist
 
 
+
+def print_tree(n, indent = 0):
+    if n < 2:
+        return
+    
+    left, right = get_neighbors(n)
+
+    print_vec(n - 1, comment = f'oc({n}-1)', indent = indent)
+    print_vec(n + 1, comment = f'oc({n}+1)', indent = indent)
+
+    if left != n:
+        print_tree(left, indent + 4)
+    if right != n:
+        print_tree(right, indent + 4)
+
 known = {
-    5: 5, 
-    7: 16, 
-    27: 111, 
-    55: 112, 
-    73: 115, 
-    97: 118, 
     871: 178, 
-    6171: 261}
+    #6171: 261,
+    }
 
 
 if False:
     by_dist = {}
-    for num in range(1, 101):
+    for num in range(1, 1001):
         if num % 2 == 0:
             continue
         dist = odd_to_odd_dist(num)
@@ -102,40 +165,121 @@ if False:
         print(f'# Distance {dist}:')
         print()
         for num in by_dist[dist]:
+            if num == 0:
+                break
+
+            ocl = odd_core(num - 1)
+            ocr = odd_core(num + 1)
+
+            print_vec(ocl - 1, comment = f'oc(oc({num}-1)-1)')
             print_vec(num - 1, comment = f'oc({num}-1)')
+            print_vec(ocl + 1, comment = f'oc(oc({num}-1)+1)')
             print_vec(num, comment = f"{num} -> {collatz_next(num)}")
+            print_vec(ocr - 1, comment = f'oc(oc({num}+1)-1)')
             print_vec(num + 1, comment = f'oc({num}+1)')
+            print_vec(ocr + 1, comment = f'oc(oc({num}+1)+1)')
             print()        
         print()
 
 
-if True:
+if False:
     print(header)
     for startpos in known.keys():
         num = startpos
         print(f'## Collatz orbit of {startpos}')
         print()
         while num > 1:
-            #print(f'# {num} (dist {odd_to_odd_dist(num)})')
-            print_vec(num - 1, comment = f'oc({num}-1)')
-            print_vec(num)#, comment = f"dist = {odd_to_odd_dist(num)}")
-            print_vec(num + 1, comment = f'oc({num}+1)')
-            print()
-
+            print_vec(num)
+            ##print(f'# {num} (dist {odd_to_odd_dist(num)})')
+            #ocl = odd_core(num - 1)
+            #ocr = odd_core(num + 1)
+#
+            #print_vec(ocl - 1, comment = f'oc(oc({num}-1)-1)')
+            #print_vec(num - 1, comment = f'oc({num}-1)')
+            #print_vec(ocl + 1, comment = f'oc(oc({num}-1)+1)')
+            #print_vec(num, comment =     f"{num} -> {collatz_next(num)}")
+            #print_vec(ocr - 1, comment = f'oc(oc({num}+1)-1)')
+            #print_vec(num + 1, comment = f'oc({num}+1)')
+            #print_vec(ocr + 1, comment = f'oc(oc({num}+1)+1)')
+            #print()        
             num = collatz_next(num)
 
         print()
 
+if True:
+    print_tree(135)
+
 if False:
     print(header)
-    for num in range(1, length + 1):
-        #if num % 2 == 1:
-        #    comment = f'dist {odd_to_odd_dist(num)}'
-        #else:
-        #    comment = f'oc({num})'
-        print_vec(num)#, comment = comment)
+    ternary_width = len(get_str_in_radix(length + 1, 3))
+    binary_width = len(get_str_in_radix(length + 1, 2))
+    factor_width = len(get_factor_mask_binary(length + 1, include_two = True))
+    #for n in range(1, length + 1):
+    n = 27
+    while n > 1:
+        num = n
+        oc, k = odd_core_k(num)
+        num = oc
+
+        ternary = get_str_in_radix(num, 3)
+        while len(ternary) < ternary_width:
+            ternary = '0' + ternary
+        binary = get_str_in_radix(num, 2)
+        while len(binary) < binary_width:
+            binary = '0' + binary
+        factors = get_factor_mask_binary(num, factor_width, include_two = True)
+
+        factors = factors.replace('0', '-')
+        factors = factors.replace('1', 'X')
+
+        # print num right justified in a field of 4
+        print(f'{num:4d},{k},{ternary},{binary},{factors}')
+        n = collatz_next(n)
+
 
 
 if False:
     for num in range(1,10001):
         print(f'{odd}')
+
+def get_special_path(n):
+    path = [str(n)]
+    while True:
+        nlo, nhi = get_neighbors(n)
+        if nlo == 0:
+            break
+        path.append(f"{nlo}({nhi})")
+        n = nlo
+    return path
+
+if False:
+    print(header)
+    path_examples = [31, 33, 73, 75, 83, 85, 97, 587, 599, 9895]
+    for num in path_examples:
+
+        special_path = ' -> '.join(get_special_path(num) + [str(1)])
+        print(f"# Root path {special_path}")
+        print()
+
+        n = num
+        while True:
+            next = collatz_next(n)
+            comment = str(n)
+            if n != 1:
+                comment += f" (Collatz next is {next})"
+
+            print_vec(n - 1, comment = f'oc({n}-1)')
+            print_vec(n, comment = comment)
+            print_vec(n + 1, comment = f'oc({n}+1)')
+            print()
+
+            if n == 1:
+                break
+
+            nlo, nhi = get_neighbors(n)
+            #if nlo == 1 and nhi == 1:
+            #    break
+
+            n = nlo
+
+        print()
