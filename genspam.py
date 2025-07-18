@@ -9,24 +9,44 @@ def calc_primes(n):
 PRIMES = calc_primes(1000000)
 odd_primes = PRIMES[1:]
 
-def odd_core(n):
-    if n != 0:
-        while n % 2 == 0:
-            n = n // 2
-    return n
 
-def odd_core_k(n):
+def padic(base, n):
     k = 0
     if n != 0:
-        while n % 2 == 0:
-            n = n // 2
+        while n % base == 0:
+            n = n // base
             k += 1
     return n, k
-   
+
+def oc(n):
+    n, _ = padic(2, n)
+    return n
+
+def k(n):
+    _, k = padic(2, n)
+    return k
+
+
+def odd_core_k(n):
+    return padic(2, n)
+
+def calc_stopping_time(n):
+    oc_l,  k_l  = padic(2, n-1)
+    oc_r,  k_r  = padic(2, n+1)
+    oc_lo, k_lo = (oc_l, k_l) if k_l < k_r else (oc_r, k_r)
+    oc_hi, k_hi = (oc_r, k_r) if k_l < k_r else (oc_l, k_l)
+
+
+
+if oc(n-1) < oc(n+1):
+    return oc(n-1), k(n-1)
+else:
+    return oc(n+1), k(n+1)
+
 
 def collatz_next(n):
     n =  3 * n + 1
-    return odd_core(n)
+    return oc(n)
 
 def get_neighbors(n):
     n1, k1 = odd_core_k(n - 1)
@@ -168,8 +188,8 @@ if False:
             if num == 0:
                 break
 
-            ocl = odd_core(num - 1)
-            ocr = odd_core(num + 1)
+            ocl = oc(num - 1)
+            ocr = oc(num + 1)
 
             print_vec(ocl - 1, comment = f'oc(oc({num}-1)-1)')
             print_vec(num - 1, comment = f'oc({num}-1)')

@@ -1,0 +1,100 @@
+# Proof Strategies
+
+The research allows independent arguments in multiple domains of math. They are sketched here at various stages of development.
+
+## Prime Factor Set Cursor
+- Establish Collatz as permutation of natural order
+- Define the action of the semidirect product ⟨2⟩ ⋉ ⟨3⟩ on the free abelian group of odd primes. 
+- Compute orbit lengths of factor-sets mod small square-free products; look for a local-to-global principle (“if the cursor empties mod M then it empties globally”)
+
+## Finite State Transducer over Odd Cores
+- Use a Mealy machine
+- Prove acyclic using Buchi acceptance or rank induction
+
+## Functorial Action over Wreath Products
+- Model the transform as a wreath product.
+- Formalize Collatz as a semidirect product of Z (via +1) and (Z/2Z ≀ Z/3Z) for shifts. 
+- Prove it's a faithful action on the natural factor order, with invariant subsets (factors >3 unchanged).
+- Use this to show orbits are cycles in a quotient group, forcing descent to powers of 2 (misalignment exhausts CRT states)
+- Prove the action exhausts CRT states (forcing power-of-2) via coset walks could sieve all orbits to 1 (is this a different argument or isomorphic?)
+
+## Semigroup Action
+- You're observing natural structure formed by {3n+1, /2, iteration} and their matrix representation.
+- Working in a semigroup is more flexible than full group constraints. 
+- Action of semigroup on residue lattices preserves so much structure that it may expose an invariant signature that triggers stopping. 
+- Use ping-pong argument + matrix word trace to exclude periodicity for large n.
+
+## 2-adic Graph Traversal
+- Model seed walk and root traversal
+- Directly calculate stopping time
+
+## Information Theory
+- Measure info as bit-flips + residue constraints; show each step leaks info (Kolmogorov complexity drops) until 1. 
+- Show each step preserves total info but "leaks" via avalanche
+- Prove net info decreases (to 1) using Kolmogorov complexity on bitstrings
+- Gives a physical-style Lyapunov function: the average carry chain is logarithmic, the average left-shift is linear – a net information bleed is plausible.
+- Model carries as a branching process, compute expected avalanche length, compare to the expected (3n+1)/2^k shrink factor.
+- A formal bound of “expected log₂(n) drops by ε per step” would kill all divergent trajectories in expectation.
+
+## Lattice Sieve
+- Rigorously define Φ(n) as the multiset of all v_p(n) for all odd primes, or possibly a bounded set. 
+- Show that Φ(T(n)) <_mul Φ(n) in the multiset order (Dickson's Lemma). 
+
+## Billiard Trajectories in a Hyperbolic CRT Lattice
+- +1 as geodesic flow
+- Prove closure via negative curvature forcing contraction to power-of-two attractor.
+- View CRT state space as a hyperbolic lattice (mod prime products). Collatz steps as billiard trajectories... 
+- Your +1 permutation is a geodesic flow; prove all trajectories close (reach power of 2) due to hyperbolicity (negative curvature forces contraction).
+
+## Quantum Circuit Simulation
+- Simulate Collatz as a quantum circuit (shifts = Hadamard gates for superposition of residues; +1 = phase shift). 
+- Your CRT space is the Hilbert space; prove no periodic orbits via unitarity (info preservation) and Grover-like search for cycles (none found → none exist). 
+- Residues as qubits; fingerprints as entangled states.
+- Use Shor's algorithm variant to factor CRT moduli; if no cycles, quantum phase estimation shows convergence. Simulate small cases with Qiskit.
+
+## Tropical Geometry on Log-Scale Mapping
+- Take logarithms: log T(n) ≈ max( log n – 1, log n + log 3 – ν₂(3n+1) ).
+- Write this as a piecewise-linear 'tropical' map on ℝ.
+- Prove no escape via piecewise-linear contraction
+
+## Equilibrium Measures on Orbits
+- Prove concentration at 1 via spectral radius.
+
+## Discrete Morse Theory
+- Lowest-k rule is a vector field
+- Formally collapse along that field; the DAG retracts onto a 1-dimensional spine iff Collatz is true.
+- Critical cells correspond to non-trivial cycles; showing there are none is a purely combinatorial Morse-matching statement.
+- Prove no critical cells exist
+
+## Multiset Measure with Well-Quasi-ordering
+- Define Φ(n) = multiset{v_p(n) : odd primes p}
+- Use Dickson's lemma: (ℕ^(#primes), ≤) is a well-quasi-order under pointwise ≤
+- Show Φ(T(n)) <_mul Φ(n) in the multiset order except when n is a power of 2
+- This certifies termination via a decrease in the prime valuation structure
+
+## Symbolic Shift
+- ?
+
+## Symbolic Collapse
+- ?
+
+## Markov Chain on Residue Vectors
+- For each M = 2^κ·product(odd primes up to p_max) the induced state chain on CRT classes is irreducible on its graph; then the unique absorbing state is the class 1 inverse image.
+- Use the known fair coin phase-transition (Tao/Jeffrey) to show positive probability flow into the class {1}.
+
+## Integer Equivalence Class Partition
+- ?
+
+---
+
+This is work in progress and does not prove anything.
+
+
+
+
+
+
+[clears throat and inhales deeply]
+
+<soapbox>
+

@@ -20,57 +20,21 @@ def get_child(n):
 
     raise ValueError(f"Could not determine child for {n}")
 
-# --- The S-Value Calculation ---
+def is_pow_two(n):
+    return n & (n - 1) == 0
 
-def get_C(oc1, oc2):
-    key = tuple(sorted((oc1, oc2)))
-    
-    C_TABLE = {
-        (1, 1): 2,
-        (1, 3): -4,
-        (3, 7): 0,
-        (3, 13): 8,
-        (3, 25): 14,
-        (3, 49): -3,
 
-    }
-    
-    if key not in C_TABLE:
-        raise NotImplementedError(f"Correction Factor C for pair {key} is not defined.")
-        
-    return C_TABLE[key]
+def calc_stopping_distance(n):
+    if is_pow_two(n * 3 + 1):
+        return 1
 
-def get_S_value(n):
-    """Calculates the stopping time contribution (S-value) for n's neighborhood."""
-    if n == 1:
-        # Base case from observation: d(3) = 5, and d(3) = d(1) + S(at n=3)
-        # S(at n=3) = nu(2)+nu(4)+C(1,1) = 1+2+2 = 5
-        return 5
+    steps = 4
+    fixup = 0
 
-    oc_prev, k_prev = odd_core(n - 1)
-    oc_next, k_next = odd_core(n + 1)
-    
-    c_factor = get_C(oc_prev, oc_next)
-    
-    return k_prev + k_next + c_factor
+    while n > 1:
+        oc_l, k_l
 
-# --- The Main Recursive Function ---
 
-@functools.lru_cache(maxsize=None)
-def dist(n):
-    """
-    Recursively calculates the stopping distance of an odd number n.
-    """
-    # Base case: The stopping time of 1 is 0.
-    if n == 1:
-        return 0
-    
-    # Phase 1: Find the child (the next step on the walk down to 1)
-    child = get_child(n)
-    
-    # Phase 2: Recursively call dist on the child and add the S-value
-    # from the current neighborhood on the way back up.
-    return dist(child) + get_S_value(n)
 
 # --- Demonstration ---
 if __name__ == "__main__":

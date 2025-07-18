@@ -701,3 +701,11 @@ Because of chaos and stuff?
 Assyrian ledger masters: Counting discrete objects , never indexing neighbors’ prime bowls
 
 Explicitly, the structures exhibit infinite, explicit fractal, explicitly infinite self-similarity explicitly inherent explicitly in arithmetic explicitly 
+
+
+- The odd-to-odd stopping distance of a seed can be calculated directly by summing the k values of branches *not* taken along the path to root, and adding a baseline cost of 4.
+- There are three exceptions to this formula, related to quirks in the rules of Collatz that allow "shortcuts" past the general traversal rules.
+- The first is a class of trivial seeds of the form n = (2^m - 1) / 3, which will reach a power of two on the next step and terminate, for example 5, 21, 85, etc. They have a known fixed stopping distance of 1.
+- The second special case is similar and applies when the lowest-k path bypasses a connection to one of fundamental seeds 1 or 3. This pattern requires a correction of -3 after applying the general formula.
+- The final special case applies when the lowest-k path is nonzero and bypasses a connection to 5. The correction factor for this case is still an open problem.
+
