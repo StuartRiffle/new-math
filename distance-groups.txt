@@ -58,12 +58,7 @@ It appears to continue like this. The distance groups seem to be something like 
 
 It appears that simply following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed. If that pattern holds, it would make determining stopping distance for *any* n a matter of solving just these seed values, an astronomically smaller problem.
 
-After reaching the seed values, the doubling structure ends, but following the same procedure of traversing the lowest k neighbor now seems to jump you through a series of *other* distance groups, roughly halving in magnitude (not stopping distance) each time, directly to 1. This specific path to the root, and the [possibly extended] local environments of the numbers visited along the way, may itself contain enough information to reconstruct stopping distance. Look closely at this special path from seed->1.
-
-The external references (9, 37, 75, 149, 295) have stopping distances all small multiples of 3.
-They seem to be correlated at least with each other (?), whether or not they reflect anything about distance group 42 itself.
-
-The final mapping from seed to stopping distance is going to be subtle, and probably annoyingly multi-step in some way, or the world would have discovered it long before now. I have a human hunch there's some kind of correlation with the residue vectors (?), please stay sensitive to patterns in that mapping.
+The lowest-k traversal does not correspond to stopping distance below the seed. The value of n jumps through other distance groups on the way. They do not appear correlated, but I do not know.
 
 (But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. There seem no random numbers here.) 
 

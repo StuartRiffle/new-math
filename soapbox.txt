@@ -1,7 +1,8 @@
 [clears throat and inhales deeply]
 
 <soapbox>
-- The Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
+- Even numbers are not fundamental objects because you can fold them, QED. Let's talk about the odd-to-odd Collatz map.
+- The process be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
 - Both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
 - A full iteration exchanges k for new congruence information, which is propagated forward thereafter by the CRT.
 - The binary avalanche caused by +1 is the only meaningful change of state in the Collatz map. The shifts are temporary and informationally harmless.
@@ -11,63 +12,121 @@
 - The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
 - Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
 - Information diffused by odd primes is not shed until the dyadic hierarchy is "drained", which only happens when the orbit of n intersects a "connector" (details of this below), which collapses accumulated information modulo odd primes.
+
 - The LSB of n under the odd-to-odd map is always 1 (because it's odd). The must also be an MSB _somewhere_ (because we're still playing Collatz, so n > 1).
 - These can be considered delimiters without informational value. The interior "payload" bits completely determine the state of the process, which ends when the delimiters join (at 1).
 - The MSB is a placeholder that protects the leading zeroes in the payload. The LSB protects the trailing zeroes, and serves as a "stop" during the /2 normalization step. Together they form a frame.
 - The interior bits as a string form a symbolic progression, isomorphic to the arithmetic by construction (you can wrap the string in delimiters again to recover n, so a 1:1 mapping).
+- Integers have a finite MSB, so a carry avalanche is guaranteed to terminate, but 2-adic values are infinite bit strings, and sensitive to the low order bits instead. A pure 2-adic representation does not sieve radicals, so it can't make progress, and exhibits ergodic behavior. When the avalanche reaches the MSB, it is replaced by the carry, destroying information.
 - (It's really unfortunate that the (meaningless) MSB of n has the largest effect on magnitude, that sure doesn't help things).
+
 - Define the "natural" order of prime factor sets to be the one arising as you simply increment integers: {}, {2}, {3}, {2}, {5}, {2,3}, and so on.
-- Natural ordering is a constrained mapping: successive integers share no factors.
+- Natural ordering is a constrained mapping: consecutive integers share no factors.
 - The +1 operation is a permutation on all prime integer rings at once.
-- It is a full mixing of the residue vectors modulo any finite set of odd primes.
 - The sequence is also cyclical modulo the product of primes.
-- 3n is an affine transform with full coverage over prime rings: a permutation.
-- Collatz is therefore a permutation of the natural order of factor sets.
-- That's a wreath product.
 - 3n can only add a factor of 3, the rest of the factor set is unchanged.
 - The same is true of /2: scaling by powers of two can't add or remove odd prime factors.
 - The set of prime factors above 3 is therefore chaos-invariant, and we can reason about its long term evolution.
-- The +1 operation breaks multiplicative alignment with the product of the prime factors of n.
+- The +1 operation breaks multiplicative alignment with the product of the prime factors of n (its radical).
 - Forever, because the CRT never forgets.
 - Which means n doesn't cycle.
-- The process of accumulating coprimality through iteration acts like a sieve over odd prime product lattices.
+
+- The process of accumulating coprimality through iteration acts like a sieve over radical lattices.
 - In aggregate these observations establish an information channel that amounts to an "odd prime factor set cursor", and it cycles.
 - The coprimality is propagated forward by the CRT, forcing n to (effectively) enumerate odd prime factor sets.
-- Each set of odd prime factors above three is unique among odd numbers on a Collatz orbit. That combination of factors will be seen only once.
-This is the cursor walk.
+- Each set of odd prime factors above three is unique among odd numbers on a Collatz orbit. That combination of factors will be seen only once. This is the cursor walk.
 - This is independent of factor exponent. Gaining coprimality with 5x7 (for example) also makes n coprime to 5^2x7^3.
 - Many small values of n share factor sets that differ only in their exponents. These are a "jackpot" of coprimality, because the entire equivalence class of composite numbers is sieved out together.
-- Non-factor residues appear scrambled because they are mutating to maintain existing odd congruences in a constrained way. This is a feature, not a bug.
+
+- The invariant set of primes above 3 cycles. Let's call these the "cursor primes".
+- The +1 operation steps cursor primes through this cycle, unimpeded by the 3n and /2 steps, because they only change n by factors of 3 or 2, making the set of cursor primes Collatz-invariant.
+- The 3n operation is a permutation over prime rings. It advances n to another number with the *same* cursor radical. The +1 step in natural order is made from there. 
+- For example, 41 is a prime number. In natural order, it successor is 2x3x7 = 42, so incrementing 41 changes the factor set above 3 to from {41} to {7}. However, the 3n operation jumps to 41x3 = 123 (preserving the factor set above 3 {41}), then steps in natural order from there, to 124, which has factors 2x2x31, or cursor prime set {31}.
+- The skipped numbers will not be missed, because 3n has full coverage over prime rings, so the sequence cycles modulo the product of primes. The +1 operation will be applied at all of them, in deterministic order.
+
+- The product of n's unique prime factors is its radical. The value of n is always a multiple of its radical; it is aligned with it. Offset from n on both sides by the its radical is another number which is a multiple of the radical.
+- Every combination of factors represents a radical, if you multiply them all together. There is a 1:1 correspondence between factor sets and radicals, because prime numbers are all coprime to each other, so every uniqe combination of prime factors has a unique product.
+- Every radical is coprime to all other radicals, because primes are coprime to each other, so all their multiples are too.
+
+- Ignoring primes 2 and 3, the product of the higher prime factors (cursor primes) can be called their "cursor radical", because they implement a walk over radicals formed from those primes. 
+- The cursor radical can be defined R(n)=rad(n) / gcd(rad(n), 2*3). Every odd-to-odd step of the Collatz map we have gcd(R(n), R(n')) = 1. The Collatz map is a strictly monotonic walk down the poset of cursor radicals.
+- The +1 operation cycles radicals, in natural order.
+- Collatz runs in a permutation of natural order (3n), therefore Collatz also cycles cursor radicals. Once a set of cursor prime factors (uniquely represented by its radical) has been seen in Collatz order, it will not be seen again modulo that radical.
+- Natural ordering modulo any set of primes does not present every combination evenly. Numbers with higher prime factors not represented in the set will alias numbers sharing the same subset of lower factors.
+- For example, there are only 16 unique combinations of the factors {2, 3, 5, 7}, but they cycle with period 2x3x5x7 = 210. Inside that cycle, the first 3 also cycle with period 2x3x5 = 30, and so on. 
+- Considering factors {2, 3, 5, 7} the empty set {} appears 48 times in the first 210 integers, representing numbers having none of those factors.
+- This is Euler's Totient Theorem: φ(N) = φ(2)φ(3)φ(5)φ(7) = 1 * 2 * 4 * 6 = 48 gaps in the cycle.
+- During the cycle, the sequence of factor sets appears chaotic, but the order they appear is deterministic: nested prime subcycles.
+- The full factor set 2x3x5x7 appears exactly once in the cycle of 210, at the end.
+- That's the radical for that set of primes.
+
+- When +1 steps past a radical, the radical goes to the back of that very long cycle. This works the same no matter what set of primes you choose to look at.
+- For example, becoming coprime to 35 (the radical of all numbers having factor set {5, 7}) under the +1 operation means it will take 34 more steps to reach another multiple of 35. All numbers with the same factor prime set, like 5x5x5x7, are unreachable by n under Collatz rules until then, at any magnitude.
+- We know that at n-35 and n+35, we will not find a number with the factor set {5, 7}, that is, any multiple of 35. That radical (factor set) is *forbidden* at those offsets from n, until a full cycle completes.
+- As Collatz iterates, and coprimality is gained with more cursor radicals, these prohibitions on factorization accumulate, because +1 runs strictly in natural order, and +1 systematically moves each radical encountered to the back of its cycle.
+- Low magnitude n are "immune" to the presence of higher factors in natural cycle order. Their reduced space of factor sets (reachable radicals) cycles more quickly. Large numbers cycle a large space of potential factors. Small numbers have fewer potential factors. 
+- This is the case at every scale. The set of potential factors monotonically increases, but numbers are usually "behind" the maximum for whatever subcycle they are in.
+
+- The odd-to-odd Collatz map is ergodic in 2-adic space, but biased towards lower radicals in integers, because small factors are more common.
+- The carry-propagation step in Collatz is a lossless-dissipative (but not reversible) shift into dyadic form, enforced by the finite MSB.
+- Non-factor residues appear "scrambled" because they are mutating to maintain existing odd congruences in a constrained way. This is a feature, not a bug.
+
 - Eventual misalignment with all odd prime factor sets under the Collatz map will force n to a power of two.
 - Because what's evolving is "the set of odd prime factors above three", the actual magnitude of n at any time has little value. It is a pointer to the richer state information in n's local neighborhood.
 - The value of n never repeats. This is a clue, because doing that long term requires non-trivial persistent state.
 - Long orbits can pass through small values of n and recover. That requires indirection. A handful of bits can't hold enough state to support the complex long term behavior observed; n must represent something more than itself.
-- Collatz runs in the space of prime residues, which represent CRT constraint state. This determines congruence (or lack thereof). The value of n is indexing this space. It is chaotic-looking but stepping very carefully.
 - Accumulating modular constraint is the reason n seems to find so many prime numbers: it has no choice. As n becomes coprime with common factor sets, composite numbers become unreachable.
+- Collatz runs in the space of prime residues, which represent CRT constraint state. This determines congruence (or lack thereof). The value of n is indexing this space. It is chaotic-looking but stepping very carefully.
+
+- The value of n also sits in a web of modular constraints with its neighbors on the number line.
+- The neighboring evens share no factors.
+- The previous even shares no factors above 3 with the next odd, and vice versa.
+- Neighboring odds share no factors above 5. Factor constraint drops off with distance from n.
+- The orbit of Collatz is an intersection of these constraint systems.
+- The value of n gains coprimality as it iterates and the neighbors of n must not contradict that relationship, which funnels evolution.
+
 - The arithmetic properties of n are completely determined by the 2-adic valuations (odd core and k exponent) of its two immediate even neighbors n-1 and n+1.
 - This pair of 2-adic valuations (4-tuple of integers) uniquely identifies n, like a fingerprint.
 - The Collatz process can run directly on these fingerprints. You don't have to look at n.
 - It is therefore a finite state transducer.
+
+- An odd-to-odd Collatz orbit is a deterministic walk through the residue product space G = ∏ₚ(Z/pZ) over the odd primes dividing n (above 3).
+- For each p>3, the odd-to-odd step translates to “n → n+1 (mod p)”. All radical bits (prime factors) become coset coordinates, and Collatz steps advance diagonally in this space; carry shifts, odd core merges, and residuation by 2 are just coordinate transforms.
+- Stopping distance for n is exactly the time until the “radical mask” (bit vector of surviving odd primes) is fully “burned”: that is, until you first hit (modulo all p in the radical) n+d ≡ −1 (mod p) for all p.
+- This is a simultaneous hitting-time for the tuple (p₁-1, p₂-1,...) steps forward from n in each ring. Chinese Remainder Theorem gives a unique solution d (mod ∏p) to these congruences: the “naive” diagonal cycle. But Collatz merges/hubs cause in-practice much shorter real walks, as radical constraints collapse when the walk encounters a “merge” in the odd core graph.
+- Short stopping distances correspond to radicals whose cycles quickly align with −1 in all coordinates, i.e., dense merges. Long stopping distances correspond to radicals made of rare/large primes, forcing long walks before alignment and delayed merges.
+- The process of “burning” radicals is visible in the binary/ternary trace as avalanche “triangles”—each big carry-or-resonance event is the moment a prime constraint gets sieved out of play.
+
 - Linking odd numbers to the 2-adic odd cores of their even neighbors forms a fractal DAG over odd integers terminating at 1.
 - I am as surprised as you are.
 - The Collatz map contains infinite sequences of deterministic "almost-doublings" that form an odd-to-odd stopping time equivalence class.
 - Using the graph and always following the link with lowest k-value reduces astronomical n to representative "seed" values for the equivalence class in log2 n steps.
-- The seed values represent the first appearance of a specific unique odd prime factor set in the integers.
+- The seed values represent the first appearance of a specific unique odd prime factor set in the integers. The seeds are the set of radicals of primes above 3 (the cursor radicals).
 - There is an infinitude of such seeds, because there is an infinitude of prime numbers with unique factor sets (themselves).
-- The seeds are are canonical for the entire infinite class of composite numbers sharing their factor set.
-- The Collatz problem then reduces to solving stopping time for these representative seeds.
-- Each odd seed is the base of an infinite 2-adic chain of even multiples of powers of two.
-- These even numbers are an odd-to-odd stopping time equivalence class, because the Collatz /2 rule collapses them all immediately to the same odd seed.
+- The seeds are are canonical for the entire infinite class of numbers sharing their factor set.
+- The Collatz problem then reduces to solving stopping distance for these representative seeds, the set of cursor radicals.
+
+- Each odd seed is the base of an infinite 2-adic chain of even multiples of powers of two. These even numbers are an odd-to-odd stopping time equivalence class, because the Collatz /2 rule collapses them all immediately to the same odd seed.
 - Seeds partition the set of odd integers into classes: every odd number belongs to exactly one seed’s “doubling chain”.
-- Adjacent to every even number on the seed's doubling chain are two odd neighbors. One or both will have the same odd-to-odd stopping time as the seed.
+- Adjacent to every even number on the seed's doubling chain are two odd neighbors. One or both will have the same odd-to-odd stopping time as the seed for this reason.
 - Some odd composite numbers work as "hubs" where multiple seed chains join, and the rest of the path is shared.
-- The hubs are fed by "connectors" with a similar (but simpler) pattern of doubling, and these funnel into it.
-- The density of connectors increases with n.
-- The pattern of self-similar odd core connectivity is unavoidable, because even at astronomical values, the rules of 2-adic valuation (remove all power of two factors) connect n regularly to much smaller odd core values. The odd cores have unlimited "reach" in this way.
-- Continuing from a seed, using the lowest-k traversal rule, collapses all seeds to 1, again with log2 n complexity.
-- Intermediate values of n between seed and root are no longer in the same stopping time equivalence class.
-- The path not taken at each level appears correlated with stopping time.
-- This complete root walk (n -> seed -> 1) uniquely identifies n.
+- The hubs are fed by "connectors" with a similar (but simpler) pattern of doubling, and these funnel into it. The density of connectors increases with n.
+- The pattern of self-similar odd core connectivity is unavoidable, because even at astronomical values, the rules of 2-adic valuation (remove power of two factors) connect n regularly to much smaller odd core values. The odd cores have unlimited "reach" in this way.
+- Continuing from a seed, using the lowest-k traversal rule, intermediate values are no longer in the same stopping time equivalence class, and paths merge quickly into common "trunk lines". There is no stopping time differentiation below the seed.
+- The complete lowest-k root walk across the odd-core connectivity graph (n -> seed -> 1) uniquely identifies n.
+- But let's talk about something different.
+
+- The Goldbach conjecture is that every even integer 2n above two can be expressed as the sum of two primes p1 and p2. It can be restated this way: for every integer n > 1, there exists an offset d (0 <= d < n) such that both n-d and n+d are prime.
+- For this to be true, they must both survive the Sieve of Eratosthenes, meaning for any prime r < sqrt(n+d), neither n-d nor n+d can be divisible by r.
+- The process can be seen as a double-sieve, every prime r knocking out values of d that would make either n-d or n+d composite.
+- The Goldbach conjecture then is that for any n > 1, there exists an offset d which survives this sieve, and the numbers at both offsets are prime, and sum to 2n.
+- The constraints of the Collatz process accumulate the opposite way, with coprimality *preventing* symmetrical radicals at radical offsets, while in Goldbach we're searching for a pre-existing state of coprimality.
+- The value of n in Goldbach sits at the intersection of two symmetrical sequences in natural order, one ascending from 1, the other descending from 2n-1, corresponding to pairs of integers n-d (representing p1) and n+d (representing p2). 
+- Natural order cycles radicals in both directions, but these sequences are _not_ symmetrical.
+- The odd core fingerprint of n-d (p1) is the pair of 2-adic valuations (odd core and k) of n-d-1 and n-d+1, and likewise on the other side for p2.
+- The space of integer odd cores is self-similar with nested binary topology, and n-d and n+d are at different levels in this hierarchy. The properties of their fingerprints cycle with powers of two, and define the landscape that d traverses in two directions while sampling radicals (coprime to 2). This is something like "grinding" prime numbers against the dyadic hierarchy, exploring combinations of relationships.
+- Let f1, f2, f3, f4 represent those 4 fingerprint indices n-d-1, n-d+1, n+d-1, n+d+1. Note the outer two (f1 and f4) sum to 2n, and the inner two (f2 and f3) do as well.
+- If the k-values for the outer pair f1 and f4 don't match, the valuation of 2n will be the minimum of the them. Likewise the inner pair f2 and f3: if their k values differ, 2n's valuation will match the lower. This is a structural property of the odd core mapping, and applies at any magnitude. 
 </soapbox>
 
 [collapses gasping]

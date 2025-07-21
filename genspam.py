@@ -30,19 +30,6 @@ def k(n):
 def odd_core_k(n):
     return padic(2, n)
 
-def calc_stopping_time(n):
-    oc_l,  k_l  = padic(2, n-1)
-    oc_r,  k_r  = padic(2, n+1)
-    oc_lo, k_lo = (oc_l, k_l) if k_l < k_r else (oc_r, k_r)
-    oc_hi, k_hi = (oc_r, k_r) if k_l < k_r else (oc_l, k_l)
-
-
-
-if oc(n-1) < oc(n+1):
-    return oc(n-1), k(n-1)
-else:
-    return oc(n+1), k(n+1)
-
 
 def collatz_next(n):
     n =  3 * n + 1

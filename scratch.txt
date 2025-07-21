@@ -709,3 +709,70 @@ Explicitly, the structures exhibit infinite, explicit fractal, explicitly infini
 - The second special case is similar and applies when the lowest-k path bypasses a connection to one of fundamental seeds 1 or 3. This pattern requires a correction of -3 after applying the general formula.
 - The final special case applies when the lowest-k path is nonzero and bypasses a connection to 5. The correction factor for this case is still an open problem.
 
+Again very good. This time, note the divergence between distance group members. 291 and 293 are both double doublings of 73 and in the same distance class. They go in very different directions. But have the same stopping time. Basically, we're jumping from one distance group, to the next, to the next. Every n in group 42 has a successor in group 41. What is the same?
+Actually, I just realized:
+
+
+
+Hello!
+
+I am working on the exploration described in the attachments. Have been trying to calculate stopping distance from seed to root (1), using data/correlations detected on a walk to it. The seed doublings follow lowest-k rule, and I have been trying to use that for the root walk as well, but it doesn't work, at least not the ways I've tried. The highest-k drops even faster. If the root walk from seed does not reveal anything more about stopping distance, we must find some more numbers and try to tack them together.
+
+So we're scanning the data again, the oc/k of all numbers can be seen in the tables and followed.
+
+You can see from the sorted piano roll of 27 that the mechanism I propose is, if not correct, pretty doggone close. Collatz never repeats odd prime (above 3) factor sets for odd numbers on the orbit, the mechanism is accumulated coprimality, how it works is the CRT and outlined in soapbox.txt. Orbits of Collatz are intersecting this structure. The stopping distance groups are connected in Collatz order (which makes sense when you think about it), so look for correlations in those progressions too.
+
+I want to try something different. Let's look laterally.
+
+We see the relationship in the odd core graph for distance equivalence class doublings down to a seed value representing the first instance of an odd prime above 3 factor set. From that point down, the tree walk does not seem helpful. So. Look at the number line at the seed values. You see them clumping together in 2s and 3s, and we think we kinda get that part. But they are all braided together. Adjacent values of odd n under the seed generally (always?) have a different distance.
+
+That's information already. Whatever is important to calculating the distance, is different for neighboring odds, in some way.
+
+- note 291 and 293 are in the same distance group, and doublings of 73
+- they go in different directions but share stopping time
+- looking at the distance groups, Collatz moves n to the next group down, and again, etc until 1
+- ever n has a successor right underneath, in the next Collatz distance group (42, 41, etc)
+- distance equivalence groups are odd prime (above 3) factor sets
+- stepping Collatz is factor set enumeration
+- the order of this is exactly the cursor pattern
+- this is a permutation of a permutation, but we have a tiny bit more information
+- adjacent integers share no factors (on the number line)
+- so adjacent odd numbers share an even neighbor with a disjoint factor set
+- adjacent odd numbers also share no factors, being coprime to 2, because none of the others can wrap around in +2
+- odd n-2 may share a factor of 3 with even n+1, no others can wrap. Likewise even n-1 and odd n+2.
+- odds n-2 and n+2 may share a factor of 5, but no others.
+- successive Collatz iterates share no odd prime factors above 3
+- this is a constraint in two directions: adjacent odds and evens are (with the exception of maybe 5), disjoint in factors, and Collatz iteration order is disjoint in both directions, though on first iteration only the successor can be calculated
+- in both cases this constraint is simple natural order
+- we have here a clump of relative coprimality
+
+
+
+- Collatz ends after a looooong series of coprimality-gaining moves
+- Towards the end it is coprime to almost all products of primes
+- If you could run Collatz backwards, those products would snap back into alignment, one by one
+- There are... a lot of possible products of prime factors, I guess radicals
+- It's not like you can test alignment with all combinations, it's combinatorial (haha)
+- 
+
+I have natural order of factor sets. It's a permutation.
+I have Collatz order.  It's a permutation of _that_.
+Is there a way to "solve" permutations?
+Can you take the inverse of one?
+Can I do any stupid permutation tricks like put another permutation on _top_ of it and then undo the one on the bottom and get an inverse mapping?
+
+
+
+- Factor sets in the pre-image
+
+
+
+We're back in research mode, trolling for numbers. There are a lot to sort through.
+
+It's not much information, any way to leverage this handful of facts?
+
+
+for numbers adjacent to others in a different distance group, this is a constraint in multiple directions. n is constrained by the factors of evens n-1, n+1, previous Collatz value, next Collatz value and maybe (?) odds n-2 and n+2, and even mayber the odd cores of n-1 and n+1 (?)
+that's prev/next in number line order, odds and evens, and prev/next in permuted order
+what can we say about the factors of n and n+/-2? Except for 2, they are disjoint... right?
+unrolling a permutation of natural order sounds hard, but we have a cluster of factor constraints, can this fact be leveraged in any way?
