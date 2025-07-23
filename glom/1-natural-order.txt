@@ -290,7 +290,8 @@ Factor  Length
 
 Subcycles still happen at the same rate, and note that prime factors higher than n at any given time "don't count". 
 
----
+
+# Factor set visualization
 
 This is a "piano roll" view showing an extended factor set, padded with dashes for readability. The column for prime 2 has been removed, and the first 45 odd prime factors (3-199 inclusive) are marked, for numbers up to 2*3*5*7 = 210. Even numbers are represented by their 2-adic valuations. Note that this does not change their odd prime factor sets, so the permutation you see is still in natural order.
 
@@ -512,7 +513,7 @@ This is a "piano roll" view showing an extended factor set, padded with dashes f
  105, 1, 10220, 01101001, XXX------------------------------------------
  
 
-# Factor set distribution
+# Factor set distribution on Collatz orbits
 
  This is the Collatz orbit of 27, with a very wide factor set to show all of them in a piano roll view
 
@@ -525,7 +526,6 @@ This is a "piano roll" view showing an extended factor set, padded with dashes f
 Note the way changes in the binary-derived symbol echo through the ternary symbol.
 Starting at distance 18, notice a triangle of five O begins shifting off to the right, step by step.
 The effects flow directly in the ternary representation, forming an upside down triangle of the same size.
-No correlation with factor set is apparent here.
 
    n, dist,    base3,        base2,     symbol,symbol3, factors
   27,   41,     1000,        11011,        O-O,---|     ,X--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -622,10 +622,6 @@ Note that multi-prime symbols do too. 3077 has 2 factors, and compared to the sp
    35,    3,     1022,       100011,       ---O, OO-|     ,-XX------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   175,   28,    20111,     10101111,     -O-OOO, |||-O    ,-XX------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    27,   41,     1000,        11011,        O-O, ---|     ,X--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                                                          (reminder: not in Collatz order, sorted by factor set here)
-
-
-
-
+                                                          (reminder: not in Collatz order, it's sorted by factor set here)
 
 

@@ -1,6 +1,6 @@
 # Stopping distance groups
 
-Each odd number below is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its immediate even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
+Each odd number in the stopping group listing is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its immediate even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
 
 desc,k,oc,m3,m5,m7,m11,m13,m17,m19,m23,m29,m31
 oc(73-1),3,9,0,4,2,9,9,9,9,9,9,9
@@ -60,5 +60,5 @@ It appears that simply following the even neighbor with the lowest k value can a
 
 The lowest-k traversal does not correspond to stopping distance below the seed. The value of n jumps through other distance groups on the way. They do not appear correlated, but I do not know.
 
-(But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. There seem no random numbers here.) 
+(But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. I see no other examples at a glance, but there seem no random numbers here).
 
