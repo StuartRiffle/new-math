@@ -264,21 +264,21 @@ The first 4 factors appear in a cycle with period (2 * 3 * 5 * 7) = 210:
 Some states appear much more often than others, but all combinations of factors are represented at least once. Numbers having no factors among {2, 3, 5, 7} (0000) appear 48/210 times, and the full factor set {2, 3, 5, 7} = 210 (1111) appears only once, at the very end. 
 
 0000 * 48 (0)
-1000 * 48	(2)
+1000 * 48 (2)
 0100 * 24 (3)
 0010 * 12 (5)
 1010 * 12 (10)
 0001 * 8  (7)
 1001 * 8  (14)
 1100 * 8  (6)
-0110 * 6	(15)
-1110 * 6	(30)
-0101 * 4	(21)
-1101 * 4	(42)
-0011 * 2	(35)
-1011 * 2	(70)
-0111 * 1	(105)
-1111 * 1	(210)
+0110 * 6  15)
+1110 * 6  30)
+0101 * 4  21)
+1101 * 4  42)
+0011 * 2  35)
+1011 * 2  70)
+0111 * 1  105)
+1111 * 1  210)
 
 Including new prime factors for large values of n quickly explodes the length of an exhaustive cycle:
 

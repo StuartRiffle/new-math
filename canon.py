@@ -24,27 +24,99 @@ symbol_map = {
 
 mask_map = '-X'
 
-def is_pow_two(n):
-    return n & (n - 1) == 0
-
-def padic_val(base, n):
+def padic(n, base = 2):
     k = 0
-    if n != 0:
-        while n % base == 0:
-            n = n // base
-            k += 1
+    while n and n % base == 0:
+        n = n // base
+        k += 1
     return n, k
 
 def odd_core(n):
-    return padic_val(2, n)
+    k = 0
+    while n and n & 1 == 0:
+        n >>= 1
+        k += 1
+    return n, k
+
+def get_automaton(n):
+    ocl, kl = odd_core(n - 1)
+    ocr, kr = odd_core(n + 1)
+    return (ocl, kl, ocr, kr)
+
+def step_automaton(t):
+    if t == (0, 0, 1, 1):
+        return t 
+    
+    ocl, kl, ocr, kr = t
+
+    if kl >= 3 and kr == 1: # n ≡ 1 (mod 8)
+        ocl, kl = 3 * ocl, kl - 2
+        ocr, kr = ocl * (1 << (kl - 1)) + 1, 1
+
+    elif kr >= 2 and kl == 1: # n ≡ 3 (mod 4)
+        ocr, kr = 3 * ocr, kr - 1
+        ocl, kl = ocr * (1 << (kr - 1)) - 1, 1
+
+    else: # n ≡ 5 (mod 8) 
+        assert(kl == 2 and kr == 1)
+
+        # We can predict the next k drop without using the +1 carry to roll over factors,
+        # by counting low *set* bits of ocl*3 (because they are the ones about to flip)
+
+        k = 1
+        m = ocl * 3
+        while m & 1 == 1:
+            m >>= 1
+            k  += 1
+        
+        # New 2-adic valuations can be calculated directly
+
+        next = (ocl * 3 + 1) >> k
+        sl, sr = 2, 1 if (next % 4 == 1) else 1, 2
+
+        ocl, kl = (next - 1) >> sl, sl
+        ocr, kr = (next + 1) >> sr, sr
+
+    return (ocl, kl, ocr, kr)
+
+
+
+def step_transducer_old(t):
+    if t == (0, 0, 1, 1):
+        return t 
+    
+    ocl, kl, ocr, kr = t
+    if kl >= 3 and kr == 1:
+        ocl, kl = 3 * ocl, kl - 2
+        oct, kt = padic(2, 3 * ocr + 1)
+        ocr, kr = oct, kt - 1
+    elif kr >= 2 and kl == 1:
+        ocl, kl = padic(2, 3 * ocl + 1)
+        ocr, kr = 3 * ocr, kr - 1
+    elif kl == 2 and kr == 1:
+        ocn, _  = padic(2, 3 * ocl + 1)
+        ocl, kl = padic(2, ocn - 1)
+        ocr, kr = padic(2, ocn + 1)
+    else:
+        raise ValueError(f"Invalid transducer state: {t}")
+    
+    return (ocl, kl, ocr, kr)
+
+def is_pow_two(n):
+    return n & (n - 1) == 0
+
+def odd_core(n):
+    return padic(2, n)
 
 def oc(n):
-    n, _ = padic_val(2, n)
+    n, _ = padic(2, n)
     return n
 
 def k(n):
-    _, k = padic_val(2, n)
+    _, k = padic(2, n)
     return k
+
+
 
 def collatz_odd_next(n):
     n = 3 * n + 1
@@ -98,6 +170,8 @@ def get_str_in_radix(n, base):
         n //= base
     return digits[::-1]
 
+
+
 def booktable():
     cols = 5
     rows = 100
@@ -117,8 +191,8 @@ def chart():
             continue
 
 def get_n_values(n):
-    oc, k = padic_val(2, n)
-    tc3, v3 = padic_val(3, n)
+    oc, k = padic(2, n)
+    tc3, v3 = padic(3, n)
 
     val = {}
     val['n'] = n

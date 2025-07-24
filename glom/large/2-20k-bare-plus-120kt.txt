@@ -1,3 +1,5 @@
+# Bare odd core stopping times
+
 This is a focused 2-adic view of the first 20000 integers in consecutive order, without residues. Use this to confirm patterns seen in smaller numbers and also to search for extended structure.
 
 For every integer n:
@@ -20006,3 +20008,4 @@ oc,k,dist
 9999,1,30
 19999,,20
 625,5,6
+

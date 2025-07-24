@@ -776,3 +776,10 @@ for numbers adjacent to others in a different distance group, this is a constrai
 that's prev/next in number line order, odds and evens, and prev/next in permuted order
 what can we say about the factors of n and n+/-2? Except for 2, they are disjoint... right?
 unrolling a permutation of natural order sounds hard, but we have a cluster of factor constraints, can this fact be leveraged in any way?
+
+
+I want to prototype a transducer, and I am not sure if it's valid, but the n ≡ 5 (mod 8) is weak either way. It depends on a variable shift because of the 2adic valuation. Dig into the math please, is there any better way to model this transition? We can sample a wider neighborhood and lug it around if that helps. There are a lot of ways to do this that are basically obfuscated Collatz, please explore deeper, what other relationships can we establish/carry to simplify this implementation?
+
+
+he five lowest bits of n together with the valuation of
+n+3

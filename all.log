@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.17)  20 JUL 2025 09:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.17)  23 JUL 2025 19:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -465,61 +465,61 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 {C:/Users/Stuart/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 221.
+(hyperref)                removing `math shift' on input line 228.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 221.
+(hyperref)                removing `math shift' on input line 228.
 
 [3]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 254.
+(hyperref)                removing `math shift' on input line 261.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 254.
+(hyperref)                removing `math shift' on input line 261.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 258.
+(hyperref)                removing `math shift' on input line 265.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 258.
+(hyperref)                removing `subscript' on input line 265.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 258.
+(hyperref)                removing `math shift' on input line 265.
 
 [4]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 277.
+(hyperref)                removing `math shift' on input line 284.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 277.
+(hyperref)                removing `subscript' on input line 284.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 277.
+(hyperref)                removing `math shift' on input line 284.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 277.
+(hyperref)                removing `math shift' on input line 284.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 277.
+(hyperref)                removing `subscript' on input line 284.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 277.
+(hyperref)                removing `math shift' on input line 284.
 
 [5]
 
-LaTeX Warning: Empty `thebibliography' environment on input line 303.
+LaTeX Warning: Empty `thebibliography' environment on input line 310.
 
 [6] (all.aux)
  ***********
@@ -527,20 +527,20 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `all.out' has not changed.
-(rerunfilecheck)             Checksum: AF37046D25DA8A1C758AEF3897022C40;4179.
+(rerunfilecheck)             Checksum: 855AFCD2100C682525A2AC80B578CE2B;4392.
  ) 
 Here is how much of TeX's memory you used:
- 15083 strings out of 474484
- 244403 string characters out of 5743240
+ 15087 strings out of 474484
+ 244463 string characters out of 5743240
  1936542 words of memory out of 5000000
- 37156 multiletter control sequences out of 15000+600000
+ 37158 multiletter control sequences out of 15000+600000
  577919 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,10n,79p,786b,558s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,786b,538s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1000.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0800.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on all.pdf (6 pages, 241631 bytes).
+Output written on all.pdf (6 pages, 243792 bytes).
 PDF statistics:
- 510 PDF objects out of 1000 (max. 8388607)
- 34 named destinations out of 1000 (max. 500000)
- 153 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 522 PDF objects out of 1000 (max. 8388607)
+ 36 named destinations out of 1000 (max. 500000)
+ 169 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,3 +1,5 @@
+# Bare odd core stopping times
+
 This is a focused 2-adic view of the first 30000 integers in consecutive order, without residues.
 
 For every integer n:
@@ -30006,3 +30008,4 @@ oc,k,dist
 14999,1,29
 29999,,19
 1875,4,63
+
