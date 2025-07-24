@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1753324332.54529 "c:/Dev/new-math/all.tex" "all.pdf" "all" 1753324333.81065 0
+["pdflatex"] 1753373667.70293 "c:/Dev/new-math/all.tex" "all.pdf" "all" 1753373669.08966 0
   "C:/Users/Stuart/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1749290772.98782 1574854 9aaff1bc1e74849eb99c55b8dd05e739 ""
   "C:/Users/Stuart/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1000.pk" 1753028543.61413 25420 3d03d9facf54a242a68aa178e5197b01 ""
   "C:/Users/Stuart/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1095.pk" 1744562776.81703 28976 3bf3a5b2d8e545f42578083772b2c87d ""
@@ -126,9 +126,9 @@
   "C:/Users/Stuart/AppData/Local/Programs/MiKTeX/tex/latex/tools/tabularx.sty" 1700599895 7147 d45559f8a31b8c53ada0640516660003 ""
   "C:/Users/Stuart/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/Stuart/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "all.aux" 1753324333.57182 2990 bdecda09e410ea4e740cb64b148c34db "pdflatex"
-  "all.out" 1753324333.57282 4392 855afcd2100c682525a2ac80b578ce2b "pdflatex"
-  "c:/Dev/new-math/all.tex" 1753324329.32994 16174 80165259e6d1ff88b343ca23110b0ef4 ""
+  "all.aux" 1753373668.85055 2990 bdecda09e410ea4e740cb64b148c34db "pdflatex"
+  "all.out" 1753373668.85155 4392 855afcd2100c682525a2ac80b578ce2b "pdflatex"
+  "c:/Dev/new-math/all.tex" 1753373665.63173 16182 84f672a06d639347f482d63967526a28 ""
   (generated)
   "all.aux"
   "all.log"

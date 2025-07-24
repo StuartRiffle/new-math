@@ -44,20 +44,20 @@ def get_automaton(n):
     return (ocl, kl, ocr, kr)
 
 def step_automaton(t):
-    if t == (0, 0, 1, 1):
-        return t 
-    
     ocl, kl, ocr, kr = t
 
-    if kl >= 3 and kr == 1: # n ≡ 1 (mod 8)
+    if t == (0, 0, 1, 1):
+        return t
+
+    if kl >= 3 and kr == 1:
         ocl, kl = 3 * ocl, kl - 2
         ocr, kr = ocl * (1 << (kl - 1)) + 1, 1
 
-    elif kr >= 2 and kl == 1: # n ≡ 3 (mod 4)
+    elif kr >= 2 and kl == 1:
         ocr, kr = 3 * ocr, kr - 1
         ocl, kl = ocr * (1 << (kr - 1)) - 1, 1
 
-    else: # n ≡ 5 (mod 8) 
+    else: 
         assert(kl == 2 and kr == 1)
 
         # We can predict the next k drop without using the +1 carry to roll over factors,
@@ -68,39 +68,19 @@ def step_automaton(t):
         while m & 1 == 1:
             m >>= 1
             k  += 1
-        
-        # New 2-adic valuations can be calculated directly
 
         next = (ocl * 3 + 1) >> k
-        sl, sr = 2, 1 if (next % 4 == 1) else 1, 2
+        kl, kr = (2, 1) if next % 4 == 1 else (1, 2)
+        ocl, ocr = (next - 1) >> kl, (next + 1) >> kr
 
-        ocl, kl = (next - 1) >> sl, sl
-        ocr, kr = (next + 1) >> sr, sr
-
-    return (ocl, kl, ocr, kr)
+    return ocl, kl, ocr, kr
 
 
+def peek_automaton(t):
+    ocl, kl = t
+    return ocl << kl + 1 
 
-def step_transducer_old(t):
-    if t == (0, 0, 1, 1):
-        return t 
-    
-    ocl, kl, ocr, kr = t
-    if kl >= 3 and kr == 1:
-        ocl, kl = 3 * ocl, kl - 2
-        oct, kt = padic(2, 3 * ocr + 1)
-        ocr, kr = oct, kt - 1
-    elif kr >= 2 and kl == 1:
-        ocl, kl = padic(2, 3 * ocl + 1)
-        ocr, kr = 3 * ocr, kr - 1
-    elif kl == 2 and kr == 1:
-        ocn, _  = padic(2, 3 * ocl + 1)
-        ocl, kl = padic(2, ocn - 1)
-        ocr, kr = padic(2, ocn + 1)
-    else:
-        raise ValueError(f"Invalid transducer state: {t}")
-    
-    return (ocl, kl, ocr, kr)
+
 
 def is_pow_two(n):
     return n & (n - 1) == 0
@@ -191,24 +171,21 @@ def chart():
             continue
 
 def get_n_values(n):
-    oc, k = padic(2, n)
-    tc3, v3 = padic(3, n)
 
     val = {}
     val['n'] = n
     val['dist'] = collatz_odd_dist(oc)
+
+    oc, k = padic(2, n)
     val['oc'] = oc
-    val['core2'] = oc
-    val['k'] = k(n)
+    val['k'] = k
     val['v2'] = k
+
+    tc3, v3 = padic(3, n)
     val['tc'] = tc3
-    val['tc3'] = tc3
-    val['tcore'] = tc3
-    val['core3'] = tc3
     val['v3'] = v3
 
     if arg.residues > 0:
-        val['residues'] = []
         for r in range(arg.residues):
             p = PRIMES[r]
             val['m' + str(p)] = oc % p
@@ -240,34 +217,30 @@ def get_n_values(n):
         cursor_factors = '{' + cursor_factors + '}'
 
     val['factors'] = factors
-    val['cfac'] = cursor_factors
-    val['cursor'] = cursor_factors
-    val['cursor_factors'] = cursor_factors
+    val['cfactors'] = cursor_factors
 
     rad = 1
     for p in all_factors:
         rad *= p
     val['rad'] = rad
-    val['radical'] = rad
 
     crad = 1
     for p in cursor_factors:
         crad *= p
     val['crad'] = crad
-    val['cradical'] = crad
-    val['cursor_radical'] = crad
 
     mask = get_factor_mask(oc)
     val['mask'] = mask
-    val['factor_mask'] = mask
 
     cmask = mask[2::]
     val['cmask'] = cmask
-    val['cursor_mask'] = cmask
+
+    t = get_automaton(n)
+    val['automaton'] = t
 
     return val
 
-
+def emit_dataset
 
 
 if __name__ == "__main__":

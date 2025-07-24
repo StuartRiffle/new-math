@@ -78,6 +78,7 @@
 - This is the case at every scale. The set of potential factors monotonically increases, but numbers are usually "behind" the maximum for whatever subcycle they are in.
 - The odd-to-odd Collatz map is ergodic in 2-adic space, but biased towards lower radicals in integers, because small factors are more common.
 - The carry-propagation step in Collatz is a lossless-dissipative (but not reversible) shift into dyadic form, enforced by the finite MSB.
+- The presence of the MSB is what allows Collatz to make forward progress.
 - Non-factor residues appear "scrambled" because they are mutating to maintain existing odd congruences in a constrained way. This is a feature, not a bug.
 
 - Eventual misalignment with all odd prime factor sets under the Collatz map will force n to a power of two.
@@ -173,6 +174,6 @@
 [collapses gasping]
 
 --------------------------------------------------------------------------------------
-This is work in progress and of course proves nothing about anything; the standard disclaimers apply.
+This is work in progress and of course proves nothing about anything; standard disclaimers apply.
 Stuart Riffle, July 2025
 
