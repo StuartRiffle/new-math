@@ -78,6 +78,7 @@
 - This is the case at every scale. The set of potential factors monotonically increases, but numbers are usually "behind" the maximum for whatever subcycle they are in.
 - The odd-to-odd Collatz map is ergodic in 2-adic space, but biased towards lower radicals in integers, because small factors are more common.
 - The carry-propagation step in Collatz is a lossless-dissipative (but not reversible) shift into dyadic form, enforced by the finite MSB.
+- The presence of the MSB is what allows Collatz to make forward progress.
 - Non-factor residues appear "scrambled" because they are mutating to maintain existing odd congruences in a constrained way. This is a feature, not a bug.
 
 - Eventual misalignment with all odd prime factor sets under the Collatz map will force n to a power of two.
@@ -173,8 +174,8 @@
 [collapses gasping]
 
 --------------------------------------------------------------------------------------
-This is work in progress and of course proves nothing about anything; the standard disclaimers apply.
-Stuart Riffle, July 2025
+This is work in progress and of course proves nothing about anything; standard disclaimers apply.
+- Stuart Riffle, July 2025
 
 # Natural order of prime factor sets
 
@@ -803,47 +804,82 @@ Note that multi-prime symbols do too. 3077 has 2 factors, and compared to the sp
                                                           (reminder: not in Collatz order, it's sorted by factor set here)
 
 
-## Totients on totients
+# Countercycling gap alignment
 
-The fact that there are 48 gaps in the cycle of 2*3*5*7 = 210 is Euler's totient theorem in action.
+This shows the alignment of countercycles +/1 offsets from the radical for an odd cycle length (3*5 = 15).
+There is no center element of the cycle, but you can see in the middle they meet with a gap of 2 regardless.
+So with an odd cycle length, the gaps neccessarily align at constant offsets from the radical.
+
+     1            15 
+     |             | 
+ 3: X--X--X--X--X--X
+ 5: X----X----X----X
+-5  X----X----X----X
+-3  X--X--X--X--X--X
+    |             | 
+   -15           -1
+
+
+Adding a factor of 2, to get an even cycle length, displays a similar pattern.
+The center element is radical 3*5 = 15, so 3 and 5 reflect around that point, and 2 does not align with them, blocking that gap.
+The factor of 2 also blocks half (ish?) of the gap channels by being coprime. The rest survive.
+
+     1            15             30 
+     |             |              | 
+ 2: X-X-X-X-X-X-X-X-X-X-X-X-X-X-X-X
+ 3: X--X--X--X--X--X--X--X--X--X--X
+ 5: X----X----X----X----X----X----X
+-5  X----X----X----X----X----X----X
+-3  X--X--X--X--X--X--X--X--X--X--X
+-2: X-X-X-X-X-X-X-X-X-X-X-X-X-X-X-X
+    |              |             | 
+   -30           -15            -1
+
+
+For clarity: the factor sets in the cycle do *not* repeat going backwards, but the _gaps_ line up going in opposite directions, aligned on zero or the radical.
+
+This is not a widely-noted property of totient gaps, and may be unique leverage in proof strategies for some existing problems regarding prime density.
+
+
+# Totients on totients
+
+Let's look closer at the full cycle of 2*3*5*7 = 210. The fact that there are 48 gaps is Euler's totient theorem in action.
 
         φ(N) = φ(2)φ(3)φ(5)φ(7) = 1 * 2 * 4 * 6 = 48
 
 The gaps (0000) appear at these offsets in the cycle:
 [0, 10, 12, 16, 18, 22, 28, 30, 36, 40, 42, 46, 52, 58, 60, 66, 70, 72, 78, 82, 88, 96, 100, 102, 106, 108, 112, 120, 126, 130, 136, 138, 142, 148, 150, 156, 162, 166, 168, 172, 178, 180, 186, 190, 192, 196, 198, 208]
 
-The pattern is actually symmetrical around the midpoint of the cycle, and the radical.
-If you mirror it left to right, you get the same gaps at the same offsets in both directions, all 48 of them line up.
-You can see the | "channels" higher primes can pass through.
+The pattern is symmetrical around the midpoint of the cycle, and the radical, exactly as demonstrated above.
+You can see the | "channels" highlighted that higher primes can pass through.
 
-        (natural order)
+                                                                                                         (natural order)-->
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-    2: X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|
-    3: X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|
-    5: X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|
-    7: X|.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|
+    2: X|X.X.X.X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X.X|X.X|X.X.X|X.X.X.X|X.X|X|X.X|X|X.X|X.X.X.X|X.X.X|X.X|X.X.X|X|X.X|X.X.X|X|X.X.X|X.X.X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X.X.X.X|X
+    3: X|.X..X..X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X..X|.X.|X..X.|X..X..X|.X.|X|.X.|X|.X.|X..X..X|.X..X|.X.|X..X.|X|.X.|X..X.|X|.X..X|.X..X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X..X..X.|X
+    5: X|...X....X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X...|X..|.X...|X....X.|..X|.|.X.|.|X..|.X....X|...X.|..X|...X.|.|X..|.X...|X|...X.|..X..|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X....X...|X
+    7: X|.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
+   -7: X|.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
+   -5: X|...X....X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X...|X..|.X...|X....X.|..X|.|.X.|.|X..|.X....X|...X.|..X|...X.|.|X..|.X...|X|...X.|..X..|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X....X...|X
+   -3: X|.X..X..X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X..X|.X.|X..X.|X..X..X|.X.|X|.X.|X|.X.|X..X..X|.X..X|.X.|X..X.|X|.X.|X..X.|X|.X..X|.X..X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X..X..X.|X
+   -2: X|X.X.X.X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X.X|X.X|X.X.X|X.X.X.X|X.X|X|X.X|X|X.X|X.X.X.X|X.X.X|X.X|X.X.X|X|X.X|X.X.X|X|X.X.X|X.X.X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X.X.X.X|X
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-   -7:  |.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
-   -5:  |...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X
-   -3:  |.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X
-   -2:  |X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        (reversed order)
+                                                                                                      <--(reversed order)
 
-Seems like this should always the case when mirroring around a radical, because the pattern of gaps should be symmetrical around the midpoint due to the nature of prime cycling, and therefore match.
-For clarity: the cycle does not repeat going backwards, on account of going backwards, and the factorization is different, but the _gaps_ line up going in opposite directions, aligned on zero or the radical.
+# Relative alignment of mirrored cycles
 
 If you start at one end, say at 210, and walk in both directions, you match 209 in the back cycle with 211 in the forward, 208 against 212, and so on. This is the case above, the gaps align perfectly.
 If you walk out symmetrically from, say, 211, you will be matching 210 against 212, etc. Fewer gaps match along that progression: 15/210.
 Symmetrical walks cross forward/back sequences in steps of 2, and the pattern of matching gaps varies as the filters intersect in different places. 
 This shows the cycle of 210 against all relative phases of the backwards cycle. The "o" characters mark blocked gaps in the reversed sequence, and "#" indicates gaps which align to permit the existence of higher primes.
+It demonstrates that there is always significant gap alignment at any relative offset for the mirrored sequences. There is a count of them in the right margin for every row.
            
-     2: |X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X|X.X.X|X
-     3: |.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X.|X..X.|X
-     5: |...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X..|.X...|X
-     7: |.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
+        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
+    2: X|X.X.X.X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X.X|X.X|X.X.X|X.X.X.X|X.X|X|X.X|X|X.X|X.X.X.X|X.X.X|X.X|X.X.X|X|X.X|X.X.X|X|X.X.X|X.X.X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X.X.X.X|X
+    3: X|.X..X..X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X..X|.X.|X..X.|X..X..X|.X.|X|.X.|X|.X.|X..X..X|.X..X|.X.|X..X.|X|.X.|X..X.|X|.X..X|.X..X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X..X..X.|X
+    5: X|...X....X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X...|X..|.X...|X....X.|..X|.|.X.|.|X..|.X....X|...X.|..X|...X.|.|X..|.X...|X|...X.|..X..|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X....X...|X
+    7: X|.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
         V         V V   V V   V     V V     V   V V   V     V     V V     V   V V     V   V     V       V   V V   V V   V       V     V   V     V V   V     V V     V     V   V V   V     V V     V   V V   V V         V 
@@ -2550,52 +2586,6 @@ digraph G {
   511 -> 1;
 }
 
-# Counter automaton prototype
-
-def odd_core(n):
-    k = 0
-    while n and n & 1 == 0:
-        n >>= 1
-        k += 1
-    return n, k
-
-def get_automaton(n):
-    ocl, kl = odd_core(n - 1)
-    ocr, kr = odd_core(n + 1)
-    return (ocl, kl, ocr, kr)
-
-def step_automaton(t):
-    if t == (0, 0, 1, 1):
-        return t
-    
-    ocl, kl, ocr, kr = t
-
-    if kl >= 3 and kr == 1: # n ≡ 1 (mod 8)
-        ocl, kl = 3 * ocl, kl - 2
-        ocr, kr = ocl * (1 << (kl - 1)) + 1, 1
-
-    elif kr >= 2 and kl == 1: # n ≡ 3 (mod 4)
-        ocr, kr = 3 * ocr, kr - 1
-        ocl, kl = ocr * (1 << (kr - 1)) - 1, 1
-
-    else: # n ≡ 5 (mod 8) 
-        assert(kl == 2 and kr == 1)
-
-        # We can predict the next k drop without using the +1 carry to roll over factors,
-        # by counting low *set* bits of ocl*3 (because they are the ones about to flip)
-
-        k = 1
-        m = ocl * 3
-        while m & 1 == 1:
-            m >>= 1
-            k  += 1
-        
-        next = (ocl * 3 + 1) >> k
-        kl, kr = 2, 1 if (next % 4 == 1) else 1, 2
-        ocl, ocr = (next - 1) >> kl, (next + 1) >> kr
-
-    return (ocl, kl, ocr, kr)
-
 # Stopping distance groups
 
 Each odd number in the stopping group listing is represented by 2 consecutive lines giving partial residue vectors for the 2-adic odd cores of its immediate even neighbors. For example, the odd number 73 is listed like below, as the odd core residues and 2-adic valuations of 72 and 74 respectively:
@@ -2659,73 +2649,6 @@ It appears that simply following the even neighbor with the lowest k value can a
 The lowest-k traversal does not correspond to stopping distance below the seed. The value of n jumps through other distance groups on the way. They do not appear correlated, but I do not know.
 
 (But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. I see no other examples at a glance, but there seem no random numbers here).
-
-# Great-great-grandchildren of 4331
-
-This is a hierarchy that shows 3 levels down the "odd-core-neighbor" tree
-
-                oc(67-1),1,33,0,3,5,0,7,16,14,10,4
-                oc(67+1),2,17,2,2,3,6,4,0,17,17,17
-            oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-                oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-                oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-            oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-        oc(541-1),2,135,0,0,2,3,5,16,2,20,19
-        oc(541+1),1,271,1,1,5,7,11,16,5,18,10
-                oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-                oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-            oc(271-1),1,135,0,0,2,3,5,16,2,20,19
-            oc(271+1),4,17,2,2,3,6,4,0,17,17,17
-                oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-                oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-    oc(2165-1),2,541,1,1,2,2,8,14,9,12,19
-    oc(2165+1),1,1083,0,3,5,5,4,12,0,2,10
-                oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-                oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-            oc(541-1),2,135,0,0,2,3,5,16,2,20,19
-            oc(541+1),1,271,1,1,5,7,11,16,5,18,10
-                oc(271-1),1,135,0,0,2,3,5,16,2,20,19
-                oc(271+1),4,17,2,2,3,6,4,0,17,17,17
-        oc(1083-1),1,541,1,1,2,2,8,14,9,12,19
-        oc(1083+1),2,271,1,1,5,7,11,16,5,18,10
-                oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-                oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-            oc(271-1),1,135,0,0,2,3,5,16,2,20,19
-            oc(271+1),4,17,2,2,3,6,4,0,17,17,17
-                oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-                oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-oc(4331-1),1,2165,2,0,2,9,7,6,18,3,19
-oc(4331+1),2,1083,0,3,5,5,4,12,0,2,10
-                oc(67-1),1,33,0,3,5,0,7,16,14,10,4
-                oc(67+1),2,17,2,2,3,6,4,0,17,17,17
-            oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-            oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-                oc(3-1),1,1,1,1,1,1,1,1,1,1,1
-                oc(3+1),2,1,1,1,1,1,1,1,1,1,1
-        oc(541-1),2,135,0,0,2,3,5,16,2,20,19
-        oc(541+1),1,271,1,1,5,7,11,16,5,18,10
-                oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-                oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-            oc(271-1),1,135,0,0,2,3,5,16,2,20,19
-            oc(271+1),4,17,2,2,3,6,4,0,17,17,17
-                oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-                oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-    oc(1083-1),1,541,1,1,2,2,8,14,9,12,19
-    oc(1083+1),2,271,1,1,5,7,11,16,5,18,10
-                oc(67-1),1,33,0,3,5,0,7,16,14,10,4
-                oc(67+1),2,17,2,2,3,6,4,0,17,17,17
-            oc(135-1),1,67,1,2,4,1,2,16,10,21,9
-            oc(135+1),3,17,2,2,3,6,4,0,17,17,17
-                oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-                oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-        oc(271-1),1,135,0,0,2,3,5,16,2,20,19
-        oc(271+1),4,17,2,2,3,6,4,0,17,17,17
-                oc(1-1),0,0,0,0,0,0,0,0,0,0,0
-                oc(1+1),1,1,1,1,1,1,1,1,1,1,1
-            oc(17-1),4,1,1,1,1,1,1,1,1,1,1
-            oc(17+1),1,9,0,4,2,9,9,9,9,9,9
-                oc(9-1),3,1,1,1,1,1,1,1,1,1,1
-                oc(9+1),1,5,2,0,5,5,5,5,5,5,5
 
 # "Odd core neighbor" fingerprints by Collatz odd-to-odd stopping distance
 
@@ -4857,3 +4780,117 @@ oc,k,dist,m3,m5,m7,m11,m13,m17,m19,m23,m29,m31
 999,0,15,0,4,5,9,11,13,11,10,13,7
 125,3,39,2,0,6,4,8,6,11,10,9,1
 
+# automaton.py - Collatz odd-to-odd map as a "blind" counter machine.
+# Stuart Riffle
+#
+# This is a one-register automaton that performs the Collatz transform without performing
+# arithmetic on n. It carries the 2-adic valuations (odd core and k) of n's immediate 
+# even neighbors n-1 and n+1, which completely determine the evolution of n itself. That
+# 4-tuple of integers can model the Collatz map without simulating the binary avalanche.
+
+TERMINAL_STATE = (0, 0, 1, 1) # 1
+
+def v2(n):
+    k = 0
+    while n and n & (1 << k) == 0:
+        k += 1
+    return k
+
+def odd_core(n):
+    k = v2(n)
+    return n >> k, k
+
+def create_automaton(n):
+    ocl, kl = odd_core(n - 1)
+    ocr, kr = odd_core(n + 1)
+    return (ocl, kl, ocr, kr)
+
+def step_automaton(t):
+    if t == TERMINAL_STATE:
+        return t
+
+    ocl, kl, ocr, kr = t
+
+    if kl >= 3 and kr == 1:
+        ocl, kl = 3 * ocl, kl - 2
+        ocr, kr = ocl * (1 << (kl - 1)) + 1, 1
+
+    elif kr >= 2 and kl == 1:
+        ocr, kr = 3 * ocr, kr - 1
+        ocl, kl = ocr * (1 << (kr - 1)) - 1, 1
+
+    else: 
+        assert(kl == 2 and kr == 1)
+
+        # A trick: we predict the next k drop without performing +1 and measuring the avalanche,
+        # by sampling the low *set* bits of ocl*3 (because we know +1 will flip exactly these).
+        # Looping k to count bits makes this a "counter machine" instead of a pure transducer
+        # (but still not Turing complete).
+
+        k = 0
+        m = 3 * ocl
+        while m & (1 << k):
+            k += 1
+
+        # The extracted k value now lets us calculate the next state tuple in closed form, 
+        # withoutmore looping to recalculate neighbor 2-adic valuations.
+
+        nl = ((m + 1) >> k) - 1   # n' - 1
+        nr = nl + 2               # n' + 1
+
+        kl, kr = (2, 1) if nl % 4 == 0 else (1, 2)
+        ocl, ocr = nl >> kl, nr >> kr
+
+    return ocl, kl, ocr, kr
+
+def peek_automaton(t):
+    ocl, kl, _, _ = t
+    return (ocl << kl) + 1
+
+def validate_automaton(t):
+    assert(len(t) == 4)
+    assert(all(isinstance(x, int) for x in t))
+    
+    ocl, kl, ocr, kr = t
+    assert(ocl & 1 == 1 or not ocl)
+    assert(ocr & 1 == 1 or not ocr)
+    assert(kl == 1 or kr == 1)
+
+    nl = (ocl << kl) + 1
+    nr = (ocr << kr) - 1
+    assert(nl == nr)
+    assert(nl & 1 == 1)
+
+
+def collatz_odd_next(n):
+    n = 3 * n + 1
+    while n % 2 == 0:
+        n = n // 2
+    return n
+
+def collatz_odd_dist(n):
+    dist = 0
+    while n > 1:
+        dist += 1
+        n = collatz_odd_next(n)
+    return dist
+
+def run_automaton(n):
+    t = create_automaton(n)
+    while t != TERMINAL_STATE:
+        print(f"{t} [{peek_automaton(t)}]")
+        t = step_automaton(t)
+    return t
+
+def test_orbit(n):
+    while n != 1:
+        t = create_automaton(n)
+        tt = step_automaton(t)
+        next = collatz_odd_next(n)
+        print(f'{n:3} -> {next:3}  {t} -> {tt}')
+
+        n = next
+
+if __name__ == "__main__":
+    test_orbit(27)
+        

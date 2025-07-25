@@ -1,0 +1,15 @@
+# Lemmas
+
+These are the main provable claims. 
+
+## General
+
+Lemma (Countercycling gap alignment):
+- Let N = p₁p₂…pₖ. Let f(x) = 1 if gcd(x,N)=1, 0 otherwise. Then for all k: f(N+k)=f(N-k), i.e., symmetric at each offset from N. 
+- This holds regardless of the parity of N or the inclusion of 2. 
+- For general x, f(x) = f(2N-x), so the gap pattern is periodic mod N.
+
+## Collatz
+
+## Goldbach
+

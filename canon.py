@@ -38,48 +38,6 @@ def odd_core(n):
         k += 1
     return n, k
 
-def get_automaton(n):
-    ocl, kl = odd_core(n - 1)
-    ocr, kr = odd_core(n + 1)
-    return (ocl, kl, ocr, kr)
-
-def step_automaton(t):
-    ocl, kl, ocr, kr = t
-
-    if t == (0, 0, 1, 1):
-        return t
-
-    if kl >= 3 and kr == 1:
-        ocl, kl = 3 * ocl, kl - 2
-        ocr, kr = ocl * (1 << (kl - 1)) + 1, 1
-
-    elif kr >= 2 and kl == 1:
-        ocr, kr = 3 * ocr, kr - 1
-        ocl, kl = ocr * (1 << (kr - 1)) - 1, 1
-
-    else: 
-        assert(kl == 2 and kr == 1)
-
-        # We can predict the next k drop without using the +1 carry to roll over factors,
-        # by counting low *set* bits of ocl*3 (because they are the ones about to flip)
-
-        k = 1
-        m = ocl * 3
-        while m & 1 == 1:
-            m >>= 1
-            k  += 1
-
-        next = (ocl * 3 + 1) >> k
-        kl, kr = (2, 1) if next % 4 == 1 else (1, 2)
-        ocl, ocr = (next - 1) >> kl, (next + 1) >> kr
-
-    return ocl, kl, ocr, kr
-
-
-def peek_automaton(t):
-    ocl, kl = t
-    return ocl << kl + 1 
-
 
 
 def is_pow_two(n):
@@ -170,11 +128,9 @@ def chart():
         if arg.odds and n % 2 == 0:
             continue
 
-def get_n_values(n):
-
+def get_n_values(n, cols = []):
     val = {}
     val['n'] = n
-    val['dist'] = collatz_odd_dist(oc)
 
     oc, k = padic(2, n)
     val['oc'] = oc
@@ -184,6 +140,10 @@ def get_n_values(n):
     tc3, v3 = padic(3, n)
     val['tc'] = tc3
     val['v3'] = v3
+
+    val['dist'] = collatz_odd_dist(oc)
+    val['next'] = collatz_odd_next(oc)
+    val['orbit'] = collatz_orbit_str(oc)
 
     if arg.residues > 0:
         for r in range(arg.residues):

@@ -99,8 +99,7 @@
 - This pair of 2-adic valuations (4-tuple of integers) uniquely identifies n, like a fingerprint.
 - The fingerprint of even n must have k-values (2-adic valuations) that follow one of two patterns: (>1, 1, >1, 1) or (1, >1, 1, >1).
 - For odd n, it will be one of (>1, 1, 1, >1) or (1, >1, >1, 1).
-- The Collatz process can run directly on these fingerprints, as a one-register counter automaton.
-- You don't need to look at n.
+- The Collatz process can run directly on these fingerprints, as a counter automaton; you don't need to use n at all.
 
 - The local environment E(n) is the complete local state vector of an integer n. It is the set of measurements of n's local neighborhood that are sufficient to uniquely determine n's global arithmetic properties, including its prime factorization. It's a map from a neighborhood of integers to a vector of their 2-adic and p-adic properties.
 - Iₙ is the set of integers being measured. Here we focus on n's immediate neighbors, {n-1, n+1}, but this set can include more distant neighbors.
@@ -175,5 +174,5 @@
 
 --------------------------------------------------------------------------------------
 This is work in progress and of course proves nothing about anything; standard disclaimers apply.
-Stuart Riffle, July 2025
+- Stuart Riffle, July 2025
 
