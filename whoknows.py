@@ -50,13 +50,13 @@ def generate_graphviz(start=1, end=63, odd_label="number"):
         "  rankdir=TB;",
         "  node [fontsize=30 style=filled fillcolor=white];",
         "",
-        "  // Prime",
-        "  node [shape=circle];"
     ]
 
-    for n in prime_nodes:
-        dot.append(f"  {n} [label={get_label(n)}];")
-    dot.append("")
+    #dot.append("  // Prime")
+    #dot.append("  node [shape=circle];")
+    #for n in prime_nodes:
+    #    dot.append(f"  {n} [label={get_label(n)}];")
+    #dot.append("")
 
     dot.append("  // Radical")
     dot.append("  node [shape=doublecircle];")
@@ -64,23 +64,25 @@ def generate_graphviz(start=1, end=63, odd_label="number"):
         dot.append(f"  {n} [label=<{get_label(n)}>];")
     dot.append("")
 
-    dot.append("  // Composite")
-    dot.append("  node [shape=square];")
-    for n in regular_nodes:
-        dot.append(f"  {n} [label=<{get_label(n)}>];")
-    dot.append("")
+    #dot.append("  // Composite")
+    #dot.append("  node [shape=square];")
+    #for n in regular_nodes:
+    #    dot.append(f"  {n} [label=<{get_label(n)}>];")
+    #dot.append("")
 
     radix = 2
     # Edges (edges still use the numbers, not Collatz label)
     dot.append("  // Edges")
     for n in odd_numbers:
-        for neighbor in [n-1, n+1]:
-            core = odd_core(neighbor, radix=radix)
-            if core != n and start <= core <= end and core % radix == 1:
-                dot.append(f"  {n} -> {core};")
+        if odd_prime_radical(n) and not is_prime(n):
+            for neighbor in [n-1, n+1]:
+                core = odd_core(neighbor, radix=radix)
+                if odd_prime_radical(core) or is_prime(core):
+                    if core != n and start <= core <= end and core % radix == 1:
+                        dot.append(f"  {n} -> {core};")
     dot.append("}")
 
     return "\n".join(dot)
 
 # Example: Collatz stopping distance as label
-print(generate_graphviz(1, 511, odd_label="collatz"))
+print(generate_graphviz(1, 2047, odd_label="number"))

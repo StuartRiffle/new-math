@@ -1,12 +1,3 @@
-digraph G {
-  rankdir=TB;
-  node [fontsize=30 style=filled fillcolor=white];
-
-  // Prime
-  node [shape=circle];
-  3 [label=3];
-  5 [label=5];
-  7 [label=7];
   11 [label=11];
   13 [label=13];
   17 [label=17];
@@ -49,6 +40,7 @@ digraph G {
   193 [label=193];
   197 [label=197];
   199 [label=199];
+  
   211 [label=211];
   223 [label=223];
   227 [label=227];
@@ -147,6 +139,8 @@ digraph G {
   203 [label=<203>];
   205 [label=<205>];
   209 [label=<209>];
+
+  
   213 [label=<213>];
   215 [label=<215>];
   217 [label=<217>];

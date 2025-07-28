@@ -783,3 +783,7 @@ I want to prototype a transducer, and I am not sure if it's valid, but the n ≡
 
 he five lowest bits of n together with the valuation of
 n+3
+
+# ░▒▓█ ▂▃▄▅▆▇█━──┈┅┉═░┋┃║│┊┆ ■□▪▫▲▼◀▶◆◇●○◌◍◉◈
+
+

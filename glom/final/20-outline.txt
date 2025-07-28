@@ -1,13 +1,13 @@
 # Outline
 
-This is a rough scope/gameplan to formalize the [useful] notes towards a defensible paper.
-
 
 Intro etc etc etc
 
 Definitions
 
+Res
 
-Conjectures
+
 - The symmetry of totient gaps in radical cycles is what enabled an infinitude of primes.
-- For any finite radical cycle  the symmetry of the gap structure ensures φ(N) coprime positions remain, and as N grows to include more primes, the recursive symmetry guarantees that new coprime positions (potential primes) always exist. Thus, there are infinitely many primes.
+- For any finite radical cycle the symmetry of the gap structure ensures φ(N) coprime positions remain, and as N grows to include more primes, the recursive symmetry guarantees that new coprime positions (potential primes) always exist. Thus, there are infinitely many primes.
+

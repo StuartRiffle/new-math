@@ -26,10 +26,8 @@ def k(n):
     _, k = padic(2, n)
     return k
 
-
 def odd_core_k(n):
     return padic(2, n)
-
 
 def collatz_next(n):
     n =  3 * n + 1
@@ -38,7 +36,7 @@ def collatz_next(n):
 def get_neighbors(n):
     n1, k1 = odd_core_k(n - 1)
     n2, k2 = odd_core_k(n + 1)
-
+    
     if k1 < k2:
         return n1, n2
     else:

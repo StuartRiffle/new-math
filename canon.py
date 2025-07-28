@@ -1,3 +1,6 @@
+from automaton import *
+
+
 import argparse
 arg = argparse.ArgumentParser()
 arg.add_argument("--min", type=int, default=1)
@@ -195,17 +198,15 @@ def get_n_values(n, cols = []):
     cmask = mask[2::]
     val['cmask'] = cmask
 
-    t = get_automaton(n)
+    t = create_automaton(n)
     val['automaton'] = t
 
     return val
 
-def emit_dataset
-
 
 if __name__ == "__main__":
 
-    # commands
+    # commands  (143 2 43 1)
     # canon.py booktable
     # canon.py dataset
 
