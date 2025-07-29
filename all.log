@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.17)  27 JUL 2025 00:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.17)  29 JUL 2025 15:39
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -463,8 +463,60 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {C:/Users/Stuart/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+c:/Dev/new-math/all.tex:195: Missing $ inserted.
+<inserted text> 
+                $
+l.195 ...alanche shuffles the corresponding mod 2^
+                                                  k class, erasing low-order...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
 
-LaTeX Warning: Empty `thebibliography' environment on input line 157.
+c:/Dev/new-math/all.tex:197: Missing $ inserted.
+<inserted text> 
+                $
+l.197 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (516.22905pt too wide) in paragraph at lines 194--197
+\T1/cmr/m/n/12 spond-ing mod 2$[]\OML/cmm/m/it/12 class; erasinglow \OMS/cmsy/m/n/12 ^^@ \OML/cmm/m/it/12 ordermemory: \OMS/cmsy/m/n/12 ^^@ \OML/cmm/m/it/12 Informationdiffusedbyoddprimesisnotsheduntilthedyadichierarchyis\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 drained\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 ; whichhappenswhenevertheavalancherollsovertheMSB:$ 
+ []
+
+c:/Dev/new-math/all.tex:199: Missing $ inserted.
+<inserted text> 
+                $
+l.199 ...ause it's odd). The must also be an MSB _
+                                                  somewhere_ (because we're ...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+c:/Dev/new-math/all.tex:203: Missing $ inserted.
+<inserted text> 
+                $
+l.203 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (357.00218pt too wide) in paragraph at lines 198--203
+\OML/cmm/m/it/12 Thesearedelimiterswithoutinformationalvalue:Theinterior\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 payload\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 bitscompletelydeterminethestateoftheprocess; whichendswhenthedelimitersjoinatone: \OMS/cmsy/m/n/12 ^^@
+ []
+
+
+Overfull \hbox (386.16373pt too wide) in paragraph at lines 198--203
+\OML/cmm/m/it/12 TheMSBprotectstheleadingzeroesinthepayload:TheLSBprotectsthetrailingzeroes; andservesasa\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 stop\OT1/cmr/m/n/12 "\OML/cmm/m/it/12 duringthe=\OT1/cmr/m/n/12 2\OML/cmm/m/it/12 normalizationstep:Togethertheyformaframe: \OMS/cmsy/m/n/12 ^^@
+ []
+
+
+Overfull \hbox (338.56319pt too wide) in paragraph at lines 198--203
+\OML/cmm/m/it/12 Theinteriorbitsasastringformasymbolicprogression; isomorphictothearithmeticbyconstruction\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 youcanalwayswrapthestringindelimitersagaintorecovern\OT1/cmr/m/n/12 )\OML/cmm/m/it/12 :$ 
+ []
+
+
+LaTeX Warning: Empty `thebibliography' environment on input line 213.
 
 [2] (all.aux)
  ***********
@@ -475,17 +527,17 @@ Package rerunfilecheck Info: File `all.out' has not changed.
 (rerunfilecheck)             Checksum: BA10AFC4B98DAAAF90850DC7E144B3EB;215.
  ) 
 Here is how much of TeX's memory you used:
- 14978 strings out of 474484
- 242942 string characters out of 5743240
- 1928542 words of memory out of 5000000
- 37094 multiletter control sequences out of 15000+600000
- 567142 words of font info for 56 fonts, out of 8000000 for 9000
+ 15002 strings out of 474484
+ 243198 string characters out of 5743240
+ 1931542 words of memory out of 5000000
+ 37111 multiletter control sequences out of 15000+600000
+ 571489 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,266b,440s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk>
-Output written on all.pdf (2 pages, 33638 bytes).
+ 75i,6n,79p,413b,440s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\Stuart\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Stuart/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on all.pdf (2 pages, 113049 bytes).
 PDF statistics:
- 123 PDF objects out of 1000 (max. 8388607)
+ 205 PDF objects out of 1000 (max. 8388607)
  6 named destinations out of 1000 (max. 500000)
  17 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -149,7 +149,63 @@
 
 
 
+Odd core decomposition
+Reference table 
+Local arithmetic constraints
+
+
+
+Information flow
+- shifting is harmless
+- role of LSB and MSB
+
+
+Radical 
+
+Natural order
+- Definition
+- Explain nested prime cycles
+- Piano roll visualization
+- Define radical, show it maps to factor sets
+- Gaps are symmetric
+- At least one per cycle when masking a bidirectional walk
+
+
+
+
+Prime cycle gaps
+
+Odd core environment
+- Reference table
+
+Odd core graph
+- Diagram
+
+
 \newpage
+
+
+- The odd-to-odd Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
+- Both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
+- The binary avalanche caused by +1 is the only meaningful change of state in the Collatz map. The shifts are temporary and informationally harmless.
+- The number of bits flipped in the avalanche is k.
+- The per-step information evolution of Collatz is proportional to k. The nature of it is isomorphic to the rules of carry propagation.
+
+- The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
+- Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
+- Information diffused by odd primes is not shed until the dyadic hierarchy is "drained", which happens whenever the avalanche rolls over the MSB.
+
+Symbolic progression
+- The LSB of n under the odd-to-odd map is always 1 (because it's odd). The must also be an MSB _somewhere_ (because we're still playing Collatz, so n > 1).
+- These are delimiters without informational value. The interior "payload" bits completely determine the state of the process, which ends when the delimiters join at one.
+- The MSB protects the leading zeroes in the payload. The LSB protects the trailing zeroes, and serves as a "stop" during the /2 normalization step. Together they form a frame.
+- The interior bits as a string form a symbolic progression, isomorphic to the arithmetic by construction (you can always wrap the string in delimiters again to recover n).
+
+
+- Integers have a finite MSB, so a carry avalanche is guaranteed to terminate, but 2-adic values are infinite bit strings, and sensitive to the low order bits instead. A pure 2-adic representation does not sieve radicals, so it can't make progress, and exhibits ergodic behavior. When the avalanche reaches the MSB, it is replaced by the carry, destroying information.
+
+- (As an aside, this is why Minsky's two-tag machine traces Collatz: it's a cleverly obfuscated carry-propagator).
+
 
 
 \begin{thebibliography}{9}

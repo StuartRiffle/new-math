@@ -47,22 +47,20 @@ def collatz_odd_dist(n):
         n = collatz_odd_next(n)
     return dist
 
-def create_automaton(n):
-    ocl, kl = odd_core(n - 1)
-    ocr, kr = odd_core(n + 1)
-    return (ocl, kl, ocr, kr)
 
 
 def peek_automaton(t):
     ocl, kl, _, _ = t
     return (ocl << kl) + 1
 
+
+def create_automaton(n):
+    ocl, kl = odd_core(n - 1)
+    ocr, kr = odd_core(n + 1)
+    return (ocl, kl, ocr, kr)
+
 def step_automaton(t):
     (ocl, kl, ocr, kr) = t
-
-    check = peek_automaton(t)
-    next = collatz_odd_next(check)
-    correct = create_automaton(next)
 
     if t == TERMINAL_STATE:
         return t
@@ -73,15 +71,19 @@ def step_automaton(t):
     if kr >= 2 and kl == 1:
         return (ocl, 1, 3 * ocr, kr - 1)
 
+    # The low bits in 3*ocl predict the k drop of 3n+1
+
     m  = 3 * ocl
     k  = count_low_1(m)
-    m -= 1 << k
+
+
+    
+    m -= (1 << k)
     nl = (m >> k) + 1
-    nr = nl + 2
     kl = 2 - ((nl >> 1) & 1)
     kr = 3 - kl
 
-    return (nl >> kl, kl, nr >> kr, kr)
+    return (nl >> kl, kl, (nl + 2) >> kr, kr)
 
 def validate_automaton(t):
     if t == TERMINAL_STATE:

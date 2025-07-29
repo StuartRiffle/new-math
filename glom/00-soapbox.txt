@@ -73,7 +73,6 @@
 - When +1 steps past a radical, the radical goes to the back of that very long cycle. This works the same no matter what set of primes you choose to look at.
 - For example, becoming coprime to 35 (the radical of all numbers having factor set {5, 7}) under the +1 operation means it will take 34 more steps to reach another multiple of 35. All numbers with the same factor prime set, like 5x5x5x7, are unreachable by n under Collatz rules until then, at any magnitude.
 - We know that at n-35 and n+35, we will not find a number with the factor set {5, 7}, that is, any multiple of 35. That radical (factor set) is *forbidden* at those offsets from n, until a full cycle completes.
-- Very common/
 - As Collatz iterates, and coprimality is gained with more cursor radicals, these prohibitions on factorization accumulate, because +1 runs strictly in natural order, and +1 systematically moves each radical encountered to the back of its cycle.
 - Low magnitude n are "immune" to the presence of higher factors in natural cycle order. Their reduced space of factor sets (reachable radicals) cycles more quickly. Large numbers cycle a large space of potential factors. Small numbers have fewer potential factors. 
 - This is the case at every scale. The set of potential factors monotonically increases, but numbers are usually "behind" the maximum for whatever subcycle they are in.
@@ -177,9 +176,3 @@
 This is work in progress and of course proves nothing about anything; standard disclaimers apply.
 - Stuart Riffle, July 2025
 
-
-
-
-(9, 6), (289, 1) -> (27 4:1 217)
-
-(9, 6, 289, 1) -> (27, 4, 217, 1)

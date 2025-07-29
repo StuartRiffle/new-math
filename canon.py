@@ -3,9 +3,12 @@ from automaton import *
 
 import argparse
 arg = argparse.ArgumentParser()
+arg.add_argument("--cols", type=string, default='oc,k,dist,factors'
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
 arg.add_argument("--odds", action="store_true")
+arg.add_argument("--header", action="store_true")
+arg.add_argument("--unpadded", action="store_true")
 arg = arg.parse_args()
 
 def calc_primes(n):
@@ -131,7 +134,7 @@ def chart():
         if arg.odds and n % 2 == 0:
             continue
 
-def get_n_values(n, cols = []):
+def calc_n_values(n):
     val = {}
     val['n'] = n
 
@@ -202,6 +205,16 @@ def get_n_values(n, cols = []):
     val['automaton'] = t
 
     return val
+
+n_cache = {}
+def get_n_values(n):
+    global n_cache
+    if n in n_cache:
+        return n_cache[n]
+    val = calc_n_values(n, cols)
+    n_cache[n] = val
+    return val
+
 
 
 if __name__ == "__main__":
