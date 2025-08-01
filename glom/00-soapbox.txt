@@ -25,7 +25,7 @@
 [pauses to sip water]
 
 <soapbox>
-- Define the "natural" order of prime factor sets to be the one arising as you simply increment integers, the successor operation: {}, {2}, {3}, {2}, {5}, {2,3}, {7}, {2}, {3}, {2,5}, and so on.
+- Define the "natural" order of prime factor sets to be the one arising as you simply increment integers, the "successor" operation: {}, {2}, {3}, {2}, {5}, {2,3}, {7}, {2}, {3}, {2,5}, and so on.
 - Natural ordering is a constrained mapping: consecutive integers share no factors.
 - The +1 operation is a permutation on all prime integer rings, at once.
 - The sequence is cyclical modulo the product of primes.
@@ -67,7 +67,7 @@
 - That's the radical for that set of primes, and the radical has that property whatever set of primes you choose: exactly one instance per cycle.
 </soapbox>
 
-[stop to catch his breath, now visibly perspiring]
+[stops to catch his breath, now visibly perspiring]
 
 <soapbox>
 - When +1 steps past a radical, the radical goes to the back of that very long cycle. This works the same no matter what set of primes you choose to look at.
@@ -168,6 +168,11 @@
 - A prime p can only be a potential common factor of both n-d and n+d if p is a prime factor of 2n itself. For any sieving prime r that does not divide 2n, it is structurally impossible for n-d and n+d to be simultaneously divisible by r.
 - As d increases, the set of its prime factors rad(d) changes. The primality of n-d requires that rad(n-d) and rad(d) must be disjoint. This imposes a powerful, dynamic constraint: d is forced to be composed of primes that are not currently factors of n-d.
 - The simplest implementation of this dual sieve: let D = {1 <= d < n}, and for each prime r <= sqrt(2n), remove from D the d such that n-d ≡ 0 mod r, or n+d ≡ 0 (mod r). By inclusion/exclusion and the CRT, the number of surviving d is at least n ∏_{p ≤ √(2n)} (1 - 2/p). For finite n, this number is positive, meaning there is always a surviving d such that n-d and n+d are coprime to all p≤2n, and therefore themselves prime.
+
+
+
+
+
 </soapbox>
 
 [collapses gasping]
