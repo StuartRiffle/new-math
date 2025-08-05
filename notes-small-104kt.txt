@@ -4860,6 +4860,132 @@ oc,k,dist,m3,m5,m7,m11,m13,m17,m19,m23,m29,m31
 999,0,15,0,4,5,9,11,13,11,10,13,7
 125,3,39,2,0,6,4,8,6,11,10,9,1
 
+# Bit mutation
+
+This is a look at how the *3 and /2 operations change the bits of a number.
+
+In general, multiplying by 3:
+
+- Changes 1 bit into 2:   1 ->   11
+- Changes 2 bits into 4: 11 -> 1001
+- Does it again on those two individual 1 bits: 1001 -> 11011
+- Now it goes to hell: both 11 turn to 1001, but overlap, giving -> 1010001. The middle bit has been pushed one left.
+
+Starting at a random power of two:
+
+            100000    32
+           1100000    *3
+         100100000    *3
+        1101100000    *3
+      101000100000    *3
+     1111001100000    *3
+   101101100100000    *3
+ 10001000101100000    *3
+110011010000100000    *3
+
+Now 3 itself. Note the bit pattern is the same, but shifted right.
+
+                11    3
+              1001    *3
+             11011    *3
+           1010001    *3
+          11110011    *3
+        1011011001    *3
+      100010001011    *3
+     1100110100001    *3
+   100110011100011    *3
+  1110011010101001    *3
+101011001111111011    *3
+
+The influence of *3 never goes _lower_ than the lowest bit it starts from.
+
+From the MSB POV it looks like this:
+
+11
+1001
+11011
+1010001
+11110011
+1011011001
+100010001011
+1100110100001
+100110011100011
+1110011010101001
+101011001111111011
+
+It's like a generator, pushing a mutating wavefront of bits to the right.
+
+Split the bits now, one at 32 and one at 1:
+
+            100001    33
+           1100011    *3
+         100101001    *3
+        1101111011    *3
+      101001110001    *3
+     1111101010011    *3
+   101110111111001    *3
+ 10001100111101011    *3
+110100110111000001    *3
+
+Note the 11s in step 2 changed into 1001 instead of 1010. The influence of the LSB collided with the MSB already.
+
+Let's try with a different high bit, 64+1:
+
+            1000001   65
+           11000011   *3
+         1001001001   *3
+        11011011011   *3
+      1010010010001   *3
+     11110110110011   *3
+   1011100100011001   *3
+ 100010101101001011   *3
+1101000000111100001   *3
+
+Low and high bits stay in sync until 11011 before colliding, same phenomenon after.
+
+Back to 33, doing 3n+1 but without /2 normalization:
+
+            100001    33
+           1100100    *3+1
+         100101101    *3+1
+        1110001000    *3+1
+      101010011001    *3+1
+     1111111001100    *3+1
+   101111101100101    *3+1
+ 10001111000110000    *3+1
+110101101010010001    *3+1
+
+Low and high diverge immediately. The +1 turns the low 11 into 100, which then spawns another 11 etc.
+
+From just 3:
+
+        11
+      1010
+     11111
+   1011110
+ 100011011
+1101010010
+
+
+The full Collatz odd-to-odd step:
+
+            100001    33
+             11001    *3+1  /2s
+             10011    *3+1  /2s
+             11101    *3+1  /2s
+              1011    *3+1  /2s
+             10001    *3+1  /2s
+              1101    *3+1  /2s
+               101    *3+1  /2s
+                 1    *3+1  /2s
+
+No correlation once the zeros are normalized every iteration, LSB and MSB interfere with each other immediately.
+What we seem to have is the MSB pushing changes right (once normalized, because the old MSB is replaced every iteration and walks away), and the LSB pushing them left. They collide in the middle.
+The nature of carry propagation doubles up the MSB, then splits it, leaving a gap, which is sniped from behind.
+Eventually the carry from the LSB reaches the MSB in one iteration, flipping it to a power of two.
+The MSB tries to escape as quickly as it can: 1, 11, split, repeat, self-interfere (does this block the LSB?), repeat.
+
+
 # automaton.py - Collatz odd-to-odd map as a "blind" counter machine.
 # Stuart Riffle
 #

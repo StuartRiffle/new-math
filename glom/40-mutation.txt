@@ -1,0 +1,79 @@
+# Bit mutation
+
+This is a look at how the *3 and /2 operations change the bits of a number.
+
+In general, multiplying by 3:
+
+- Changes 1 bit into 2:   1 ->   11
+- Changes 2 bits into 4: 11 -> 1001
+- Does it again on those two individual 1 bits: 1001 -> 11011
+- Now it goes to hell: both 11 turn to 1001, but overlap, giving -> 1010001. The middle bit has been pushed one left
+
+ 1                  1   1 -> 11  
+*3                 11   11 -> 1001
+*3               1001   1001 -> 1 0 01 -> 11 0 11 
+*3              11011   11011 -> 1001000 + 1001 -> 1010 001
+*3            1010001    
+*3           11110011    
+*3         1011011001    
+*3       100010001011    
+*3      1100110100001    
+*3    100110011100011    
+*3   1110011010101001    
+*3 101011001111111011    
+
+Now tarting at a random power of two. Note the bit pattern is the same, but shifted left.
+The influence of *3 never goes _lower_ than the lowest bit it starts from.
+
+32                  100000      
+*3                 1100000     
+*3               100100000     
+*3              1101100000     
+*3            101000100000     
+*3           1111001100000     
+*3         101101100100000     
+*3       10001000101100000     
+*3      110011010000100000     
+*3    10011001110001100000 
+*3   111001101010100100000 
+*3 10101100111111101100000 
+
+Now one bit at 1 and one at 32. The influence of MSB and LSB collides quicklly.
+
+33                  100001    
+*3                 1100011    
+*3               100101001    
+*3              1101111011    
+*3            101001110001    
+*3           1111101010011    
+*3         101110111111001    
+*3       10001100111101011    
+*3      110100110111000001    
+
+Doing 3n+1 but without /2 normalization, low and high diverge immediately. The +1 turns the low 11 into 100, which then spawns another 11 etc,
+
+33                  100001    
+*3+1               1100100    
+*3+1             100101101    
+*3+1            1110001000    
+*3+1          101010011001    
+*3+1         1111111001100    
+*3+1       101111101100101    
+*3+1     10001111000110000    
+*3+1    110101101010010001    
+
+
+The full Collatz odd-to-odd step:
+
+33                  100001    
+*3+1  /2s            11001    
+*3+1  /2s            10011    
+*3+1  /2s            11101    
+*3+1  /2s             1011    
+*3+1  /2s            10001    
+*3+1  /2s             1101    
+*3+1  /2s              101    
+*3+1  /2s                1    
+
+No correlation once the bits are offset, they interfere with each other immediately.
+

@@ -22,6 +22,7 @@ def get_factors(n):
     for p in primes:
         if n % p == 0:
             factors.append(p)
+        
     return factors
 
 gaps = []

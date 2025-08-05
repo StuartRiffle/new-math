@@ -62,22 +62,31 @@ def create_automaton(n):
 def step_automaton(t):
     (ocl, kl, ocr, kr) = t
 
+    n = peek_automaton(t)
+    next = collatz_odd_next(n)
+    correct = create_automaton(next)
+
     if t == TERMINAL_STATE:
         return t
 
     if kl >= 3 and kr == 1:
-        return (3 * ocl, kl - 2, ocr, 1)
+        wrong = (3 * ocl, kl - 2, -1, -1)
+        return wrong
 
     if kr >= 2 and kl == 1:
-        return (ocl, 1, 3 * ocr, kr - 1)
+        return (-1, -1, 3 * ocr, kr - 1)
 
     # The low bits in 3*ocl predict the k drop of 3n+1
 
+# 01010001 81
+# 00111101 61
+
+
+
+
     m  = 3 * ocl
     k  = count_low_1(m)
-
-
-    
+   
     m -= (1 << k)
     nl = (m >> k) + 1
     kl = 2 - ((nl >> 1) & 1)

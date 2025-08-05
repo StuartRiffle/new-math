@@ -206,11 +206,20 @@
 - The MSB and LSB protect the internal payload
 - Rolling over the MSB means you have reached a power of two, terminating the sequence
 - The LSB functions as a backstop for normalization
+- The value of n is a pointer
+
+## Information flow
+
+- The odd-to-odd Collatz map can be defined as ternary/binary shifts and +1
+- Shuffling zeroes in any base is reversible, so no information is lost.
+- The binary avalanche caused by +1 is the only meaningful change of state.
+- The number of bits flipped in the avalanche is k.
+
 
 ## Factor set cursor
 - 3n and /2 only affect those factors, higher prime factors not added/removed
 
-[Visualization showing zeroes in residue vectors unchanging under scaling by 2 or 3]
+[Visualization showing zeroes in residue vectors unchanged under scaling by 2 or 3]
 
 - Explain chaos inveriance
 - Explain cursor metaphor
@@ -223,37 +232,41 @@
 ## Coprimality
 
 - Explain that +1 breaks alignment
+- Explain how this enumerates cursor radicals
 
 [Visualization of the orbit of 27 in Collatz order (top half of page) then sorted by piano roll (bottom half) to demonstrate that nontrivial factor sets don't repeat]
+
+## The persistent state is the CRT
 
 - Explain how the CRT keeps track long term despite constant 3n and /2
 - Show the "scrambled" residues preserve misalignment
 
 [Visualization of residue vector relationship?]
 
+## Argument for termination by cursor walk
+
 - Show convergence at only powers of two
 - Argument for termination
 
-## Information flow
 
-- The odd-to-odd Collatz map can be defined as ternary/binary shifts and +1
-- Shuffling zeroes in any base is reversible, so no information is lost.
-- The binary avalanche caused by +1 is the only meaningful change of state.
-- The number of bits flipped in the avalanche is k.
+## Carry propagation
 
 - Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
 - The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
 
+##Dissection of orbit 27
+
 [Symbolic binary/ternary visualization showing rectangles corresponding to up-runs]
+
+- Show systematic elimination of radicals
+- Trace constraints leading to convergence
 
 ## Ergodicity
 
 - Integers have a finite MSB, so a carry avalanche is guaranteed to terminate, but 2-adic values are infinite bit strings, and sensitive to the low order bits instead. 
 - A pure 2-adic representation does not sieve radicals, so it can't make progress, and exhibits ergodic behavior.
 
-## Carry propagation
-
-[Case study: trace one odd-to-odd step of Minsky's two-tag machine, show that it's an unrolled carry-propagator isomorphic to the Collatz arithmetic]
+TODO: argue for termination through loss of entropy?
 
 ## Local environment fingerprint
 
@@ -278,9 +291,7 @@
 
 [Case study: astronomical values]
 
-- Argument for termination based on power-of-two convergence
-
-## Automaton 
+## Automaton implementation
 
 - The fingerprint of even n must have k-values (2-adic valuations) that follow one of two patterns: (>1, 1, >1, 1) or (1, >1, 1, >1).
 - For odd n, it will be one of (>1, 1, 1, >1) or (1, >1, >1, 1).
@@ -292,15 +303,16 @@
 - Explain predicting avalanche using neighbor low bits
 
 [Empirical data: automaton transition statistics]
-- Argument for termination
 
-## Semigroup Action
-- Or wreath product analysis?
+- Argument for termination by automaton
 
-## Sieve analysis
-- Hyperbolic CRT lattice (billiard?)
+## Symbolic analysis
 
-## Markov chain modeled
+- Explain payload extraction
+- Explain isomorphism to arithmetic
+
+[Case study: trace one odd-to-odd step of Minsky's two-tag machine, show that it's an unrolled carry-propagator isomorphic to the Collatz arithmetic]
+
 
 
 
@@ -379,7 +391,6 @@ Case study: walkthrough of n eliminating a radical:
 - 
 - Show that /2 does not destroy odd coprimality
 - Explain accumulation of diffused odd prime information in the dyadic hierarchy
-- Show the MSB rolling over and irreversibly destroying information
 
 - Define the "natural" order of prime factor sets to be the one arising as you simply increment integers, the successor operation: {}, {2}, {3}, {2}, {5}, {2,3}, {7}, {2}, {3}, {2,5}, and so on.
 
@@ -504,7 +515,6 @@ Case study: walkthrough of n eliminating a radical:
 - Long orbits can pass through small values of n and recover. That requires indirection. A handful of bits can't hold enough state to support the complex long term behavior observed; n must represent something more than itself.
 - Accumulating modular constraint is the reason n seems to find so many prime numbers: it has no choice. As n becomes coprime with common factor sets, composite numbers become unreachable.
 
-
 - The orbit of Collatz is an intersection of constraint systems.
 - The value of n also sits in a web of modular constraints with its neighbors on the number line.
   - The neighboring evens share no factors.
@@ -559,15 +569,12 @@ Case study: walkthrough of n eliminating a radical:
 - The complete lowest-k root walk across the odd-core connectivity graph (n -> seed -> 1) uniquely identifies n.
 - But let's talk about something different.
 
-
-
 - The *Goldbach* conjecture is that every even integer 2n above two can be expressed as the sum of two primes p1 and p2. It can be restated this way: for every integer n > 1, there exists an offset d (0 <= d < n) such that both n-d and n+d are prime.
 - For this to be true, they must both survive the Sieve of Eratosthenes, meaning for any prime r < sqrt(n+d), neither n-d nor n+d can be divisible by r.
 - The process can be seen as a double-sieve, every prime r knocking out values of d that would make either n-d or n+d composite.
 - The Goldbach conjecture then is that for any n > 1, there exists an offset d which survives this sieve, and the numbers at both offsets are prime, and sum to 2n.
 - The constraints of the Collatz process accumulate the opposite way, with coprimality *preventing* symmetrical radicals at radical offsets, while in Goldbach we're searching for a pre-existing state of coprimality.
 - The value of n in Goldbach sits at the intersection of two symmetrical sequences in natural order, one ascending from 1, the other descending from 2n-1, corresponding to pairs of integers n-d (representing p1) and n+d (representing p2). 
-
 
 - The odd core fingerprint of n-d (p1) is the pair of 2-adic valuations (odd core and k) of p1-1 and p1+1, and the fingerprint on the other side the valuations of p2-1 and p2+1.
 - Let f1, f2, f3, f4 represent those 4 fingerprint indices n-d-1, n-d+1, n+d-1, n+d+1. Note the outer two (f1 and f4) sum to 2n, and the inner two (f2 and f3) do as well.
@@ -576,7 +583,6 @@ Case study: walkthrough of n eliminating a radical:
 - For even 2n > 2 and offset d < n, if the fingerprints of n-d and n+d have symmetric k-values (i.e., k(f1) = k(f3) and k(f2) = k(f4)), then n-d and n+d are coprime to each other and to all primes p dividing the difference 2d.
 
 - Euler's totient theorem shows that nested prime cyles are "gappy", and new primes have plenty of opportunity to slip through.
-
 
 - Natural order cycles radicals in both directions, but these sequences are _not_ symmetrical.
 - The odd-core connectivity graph is inherently unbalanced. Half of primes appear on either side, but the spacing of primes varies, so they all have a different local relationship to the tree topology. Visually it looks like a sort of twisting of branches against each other.
