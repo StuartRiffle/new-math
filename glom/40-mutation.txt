@@ -22,7 +22,7 @@ In general, multiplying by 3:
 *3   1110011010101001    
 *3 101011001111111011    
 
-Now tarting at a random power of two. Note the bit pattern is the same, but shifted left.
+Now starting at a random power of two. Note the bit pattern is the same, but shifted left.
 The influence of *3 never goes _lower_ than the lowest bit it starts from.
 
 32                  100000      
@@ -38,7 +38,7 @@ The influence of *3 never goes _lower_ than the lowest bit it starts from.
 *3   111001101010100100000 
 *3 10101100111111101100000 
 
-Now one bit at 1 and one at 32. The influence of MSB and LSB collides quicklly.
+Now one bit at 1 and one at 32. The influence of MSB and LSB collides quickly.
 
 33                  100001    
 *3                 1100011    
@@ -75,5 +75,5 @@ The full Collatz odd-to-odd step:
 *3+1  /2s              101    
 *3+1  /2s                1    
 
-No correlation once the bits are offset, they interfere with each other immediately.
+No correlation seen once the bits are offset, they interfere with each other immediately.
 

@@ -1,0 +1,23 @@
+
+- The *Goldbach* conjecture is that every even integer 2n above two can be expressed as the sum of two primes p1 and p2. It can be restated this way: for every integer n > 1, there exists an offset d (0 <= d < n) such that both n-d and n+d are prime.
+- For this to be true, they must both survive the Sieve of Eratosthenes, meaning for any prime r < sqrt(n+d), neither n-d nor n+d can be divisible by r.
+- The process can be seen as a double-sieve, every prime r knocking out values of d that would make either n-d or n+d composite.
+- The Goldbach conjecture then is that for any n > 1, there exists an offset d which survives this sieve, and the numbers at both offsets are prime, and sum to 2n.
+- The constraints of the Collatz process accumulate the opposite way, with coprimality *preventing* symmetrical radicals at radical offsets, while in Goldbach we're searching for a pre-existing state of coprimality.
+- The value of n in Goldbach sits at the intersection of two symmetrical sequences in natural order, one ascending from 1, the other descending from 2n-1, corresponding to pairs of integers n-d (representing p1) and n+d (representing p2). 
+- Natural order cycles radicals in both directions, but these sequences are _not_ symmetrical.
+- The odd core fingerprint of n-d (p1) is the pair of 2-adic valuations (odd core and k) of p1-1 and p1+1, and the fingerprint on the other side the valuations of p2-1 and p2+1.
+- Let f1, f2, f3, f4 represent those 4 fingerprint indices n-d-1, n-d+1, n+d-1, n+d+1. Note the outer two (f1 and f4) sum to 2n, and the inner two (f2 and f3) do as well.
+- The space of integer odd cores is self-similar with nested binary topology, and n-d and n+d are at different levels in this hierarchy. The properties of their fingerprints cycle with powers of two, not just with binary cycling, but fractal  and define the landscape that d traverses in two directions while sampling radicals, which are all coprime to two. This is like "grinding" prime numbers against the dyadic hierarchy, exploring all combinations of relationships.
+- If the k-values for the outer pair f1 and f4 don't match, the valuation of 2n will be the minimum of them. Likewise the inner pair f2 and f3: 2n's valuation will match the lower of theirs. This is a structural property of the odd core mapping, and applies at any magnitude. 
+- For even 2n > 2 and offset d < n, if the fingerprints of n-d and n+d have symmetric k-values (i.e., k(f1) = k(f3) and k(f2) = k(f4)), then n-d and n+d are coprime to each other and to all primes p dividing the difference 2d.
+- Euler's totient theorem shows that nested prime cyles are "gappy", and new primes have plenty of opportunity to slip through.
+- The odd-core connectivity graph is inherently unbalanced. Half of primes appear on either side, but the spacing of primes varies, so they all have a different local relationship to the tree topology. Visually it looks like a sort of twisting of branches against each other.
+- At every step d and n cycle relationships in steps of 1, n-d and n+d cycle relationships in steps of 2, 2n's local neighbors cycle relationships against n-d and n+d independently, it's a grinder of rotating congruences.
+- n-d and n+d therefore also cycle relationships in steps of 4, in addition to 2.
+- A prime p can only be a potential common factor of both n-d and n+d if p is a prime factor of 2n itself. For any sieving prime r that does not divide 2n, it is structurally impossible for n-d and n+d to be simultaneously divisible by r.
+- As d increases, the set of its prime factors rad(d) changes. The primality of n-d requires that rad(n-d) and rad(d) must be disjoint. This imposes a powerful, dynamic constraint: d is forced to be composed of primes that are not currently factors of n-d.
+- The simplest implementation of this dual sieve: let D = {1 <= d < n}, and for each prime r <= sqrt(2n), remove from D the d such that n-d ≡ 0 mod r, or n+d ≡ 0 (mod r). By inclusion/exclusion and the CRT, the number of surviving d is at least n ∏_{p ≤ √(2n)} (1 - 2/p). For finite n, this number is positive, meaning there is always a surviving d such that n-d and n+d are coprime to all p≤2n, and therefore themselves prime.
+
+
+

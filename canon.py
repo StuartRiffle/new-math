@@ -4,7 +4,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 import argparse
 arg = argparse.ArgumentParser()
-arg.add_argument("--cols", type=str, default='oc,k,dist,factors')
+arg.add_argument("--cols", type=str, default='oc,k,dist,factors,orbit')
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
 arg.add_argument("--odds", action="store_true")
@@ -27,17 +27,19 @@ arg.add_argument("--burn-lead", type=int, default=1)
 arg.add_argument("--burn-base", type=int, default=2)
 arg.add_argument("--burn-symbols", type=str, default='░█')
 arg.add_argument("--burn-reverse", action="store_true")
+arg.add_argument("--count-factors", action="store_true")
+arg.add_argument("--radical-only", action="store_true")
 arg = arg.parse_args()
 
 
-arg.command = 'burndown'
+arg.command = 'twins'
 
 arg.max = 1000
 arg.n = 33
 #arg.cols = 'n,base2,base3,factors,dist,nl,ocldist,nr,ocrdist,orbit_back'
-arg.cols = 'n,base2,base3,mech,mech_next'
-#arg.sort_by = 'orbit_back'
-arg.odds = True
+arg.cols = '-n,-base3,-symbol3,-base2,-symbol2,factors'
+#arg.sort_by = 'dist'
+#arg.odds = True
 arg.column_info = True
 arg.header_line = True
 #arg.pad = True
@@ -46,6 +48,8 @@ arg.factor_braces = True
 arg.residues = 6
 arg.pad = True
 arg.csv = True
+#arg.count_factors = True
+#arg.radical_only = True
 
 def calc_primes(n):
     sieve = [True] * n
@@ -55,13 +59,13 @@ def calc_primes(n):
             sieve[i*i::i] = [False] * len(sieve[i*i::i])
     return [i for i in range(n) if sieve[i]]
 
-PRIMES = calc_primes(10000)
+PRIMES = calc_primes(100000)
 ODD_PRIMES = PRIMES[1:]
 
 
 symbol_map = {
-    2: '-O',
-    3: '-|O',
+    2: '░█',
+    3: '░▒█',
 }
 
 mask_map = '-X'
@@ -150,8 +154,35 @@ def get_str_in_radix(n, base):
         n //= base
     return digits[::-1]
 
+def get_radical(n):
+    rad = 1
+    for p in get_prime_factors(n):
+        rad *= p
+    return rad
+
+
+def align_delimeters(items, delim=','):
+    col_width = {}
+    for item in enumerate(items):
+        elems = item.split(delim)
+        for i, elem in enumerate(elems):
+            if i not in col_width:
+                col_width[i] = 0
+            col_width[i] = max(col_width[i], len(elem))
+    aligned_items = []
+    for item in items:
+        elems = item.split(delims)
+        aligned_item = ''
+        for i, elem in enumerate(elems):
+            if i > 0:
+                aligned_item += delim
+            aligned_item += elem.rjust(col_width[i])
+        aligned_items.append(aligned_item)
+    return aligned_items
+
 
 col_desc = {}
+unique_factor_sets = {}
 
 
 def radix_name(radix):
@@ -218,10 +249,10 @@ def calc_n_values(n):
         val['base' + str(radix)] = in_radix
 
     for radix in [2, 3]:
-        symbol = get_str_in_radix(param, 2)
+        symbol = get_str_in_radix(param, radix)
         remap = symbol_map[radix]
         for i, char in enumerate(remap):
-            symbol = symbol.replace(char, remap[i])
+            symbol = symbol.replace(str(i), char)
 
         delimiter_desc = ''
         symbol_name = 'symbol' + str(radix)
@@ -243,6 +274,9 @@ def calc_n_values(n):
     if 'factors' in arg.cols or 'rad' in arg.cols or 'mask' in arg.cols:
         all_factors = get_prime_factors(param)
         factors_str = ', '.join([str(f) for f in all_factors])
+        if factors_str not in unique_factor_sets:
+            unique_factor_sets[factors_str] = 0
+        unique_factor_sets[factors_str] += 1
 
         cursor_factors = get_prime_factors(param)
         for exclude in [2, 3]:
@@ -364,11 +398,12 @@ def print_ns(ns):
         else:
             col_headers.append(col_raw)
 
+    header_line = ''
     cells = {}
     for col in col_headers:
         cells[col] = []
-        if arg.header_line:
-            cells[col].append(col + sep)
+        #if arg.header_line:
+        #    cells[col].append(col + sep)
 
     for n in ns:
         n_vals = get_n_values(n)
@@ -387,12 +422,22 @@ def print_ns(ns):
             col_width = max(col_width, len(col))
             col_width += len(sep)
             justified = []
+            rjust = ('-' + col) in arg.cols
             for cellval in cells[col]:
-                if ('-' + col) in arg.cols:
+                if rjust:
                     justified.append(cellval.rjust(col_width))
                 else:
                     justified.append(cellval.ljust(col_width))
             cells[col] = justified
+            if arg.header_line:
+                if arg.pad and header_line:
+                    header_line += ' '
+                if rjust:
+                    header_line += (col + sep).rjust(col_width)
+                else:
+                    header_line += (col + sep).ljust(col_width)
+                
+
 
     if arg.column_info:
         longest_name = max(len(name) for name in col_info.keys())
@@ -406,20 +451,18 @@ def print_ns(ns):
     if arg.sort_by in cells.keys():
         sortlist = []
         for idx, item in enumerate(cells[arg.sort_by]):
-            if idx == 0 and arg.header_line:
-                continue
             sortlist.append((item, idx))
         sortlist.sort(key=lambda x: x[0])
 
         sorted_order = []
-        if arg.header_line:
-            sorted_order.append(0)
         for item, idx in sortlist:
             sorted_order.append(idx)
     else:
         for n in range(len(ns)):
             sorted_order.append(n)
 
+    if arg.header_line:
+        output_lines.append(header_line.rstrip(' ' + sep))
 
 #    for nn in range(len(ns)):
 #        n = ns[sorted_order[nn]]
@@ -427,6 +470,8 @@ def print_ns(ns):
         line = ''
         for col in col_headers:
             line += cells[col][n]
+            if arg.pad:
+                line += ' '
         line = line.rstrip()
         if line[-1] == sep.strip():
             if not arg.trailing_comma:
@@ -448,6 +493,23 @@ def print_table():
 def print_orbit():
     ns = collatz_orbit_list(arg.n)
     print_ns(ns)
+
+def print_twins():
+    ns = []
+    for i in range(len(PRIMES) - 1):
+        if PRIMES[i] + 2 == PRIMES[i + 1]:
+            val = PRIMES[i] + 1
+            if arg.radical_only:
+                if val != get_radical(val):
+                    continue
+            ns.append(val)
+    print_ns(ns)
+
+    if arg.count_factors:
+        for factors_str in sorted(unique_factor_sets.keys()):
+            count = unique_factor_sets[factors_str]
+            print(f'{factors_str}: {count}')
+
 
 def print_burndown():
     output_lines = []
@@ -478,6 +540,6 @@ if __name__ == "__main__":
         print_orbit()
     elif arg.command == "burndown":
         print_burndown()
-
-
+    elif arg.command == "twins":
+        print_twins()
 

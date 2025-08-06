@@ -58,7 +58,4 @@ It appears to continue like this. The distance groups seem to be something like 
 
 It appears that simply following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed. If that pattern holds, it would make determining stopping distance for *any* n a matter of solving just these seed values, an astronomically smaller problem.
 
-The lowest-k traversal does not correspond to stopping distance below the seed. The value of n jumps through other distance groups on the way. They do not appear correlated, but I do not know.
-
-(But something else I just saw: 71 has stopping distance 37, and 73 points directly to n=37. That is to say: dist(71) = oc(71+3). It may be coincidence, but it's an awfully suspicious one, and suggests there may be clues not just in n's immediate neighbors, but the next ones along. I see no other examples at a glance, but there seem no random numbers here).
 

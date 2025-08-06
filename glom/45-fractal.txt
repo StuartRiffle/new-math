@@ -77,8 +77,8 @@ MSB                                       (1 << 100) + 1                        
 █░░██░█░░░░██░░░░█░░█░░██░░░██░░█░█░█░░░██░░█░██░█░███░░███████░░██░░██
 ███░░███░░█░░█░░░██░███░░█░█░░█░██████░█░░██░░░█░░░░█░██░█████░██░░██░█
 █░█░██░█░█░██░██░█░█░░█░█░█████░░░████░████░░█░░██░░█░░░█░░████░░░██░█
-█░░░░░█░░░░░░█░░░██████░░░░░███░█░█░███░░██░█░███░░█░██░░███░██░█░█░█
-...
+█░░░░░█░░░░░░█░░░██████░░░░░███░█░█░███░░██░█░███░░█░██░░███░██░█░█░█ 
+...the burning continues...
 
 - When the LSB catches a white triangle, this corresponds to an up-run in Collatz, with no k-drops, just one /2 per iteration
 - 1.5x growth quickly increases the magnitude of n, and as the MSB "pushes down" the MSB the white triangle bleeds right.
@@ -110,8 +110,4 @@ MSB                                       (1 << 100) + 1                        
 █░░█░░█░█░░█░░██░█░█░░██░██░██░█░░██░░███░░░█░░█░█
 ██░██░████░███░░██████░█░░█░░░████░░██░█░█░░███
 ...
-
-
-What we have here is a CA fractal evolving to the right while carry propagation burns the lowest run of bits at every step, to advance left.
-In the long term as we 
 

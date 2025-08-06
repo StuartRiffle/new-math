@@ -5,6 +5,8 @@
 # arithmetic on n. It carries the 2-adic valuations (odd core and k) of n's immediate 
 # even neighbors n-1 and n+1, which completely determine the evolution of n itself. That
 # 4-tuple of integers can model the Collatz map without simulating the binary avalanche.
+#
+# Under construction!
 
 TERMINAL_STATE = (0, 0), (1, 1) # 1
 
@@ -31,8 +33,6 @@ def count_low_1(n):
     while n & (1 << k):
         k += 1
     return k
-
-
 
 def collatz_odd_next(n):
     n = 3 * n + 1
@@ -70,23 +70,19 @@ def step_automaton(t):
         return t
 
     if kl >= 3 and kr == 1:
-        wrong = (3 * ocl, kl - 2, -1, -1)
-        return wrong
+        ocl, kl = 3 * ocl, kl - 2
+        ocr, kr = odd_core((3 * ocr + 1) >> 1) # FIXME - recalculate directly (without reconstructing n)
+        return (ocl, kl, ocr, kr)
 
     if kr >= 2 and kl == 1:
-        return (-1, -1, 3 * ocr, kr - 1)
+        ocr, kr = 3 * ocr, kr - 1
+        ocl, kl = odd_core(3 * ocl + 1) # FIXME - recalculate directly (without reconstructing n)
+        return (ocl, kl, ocr, kr)
 
     # The low bits in 3*ocl predict the k drop of 3n+1
 
-# 01010001 81
-# 00111101 61
-
-
-
-
     m  = 3 * ocl
     k  = count_low_1(m)
-   
     m -= (1 << k)
     nl = (m >> k) + 1
     kl = 2 - ((nl >> 1) & 1)
