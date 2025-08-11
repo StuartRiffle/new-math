@@ -6,262 +6,51 @@ Successive numbers share no factors, which amounts to an information-preserving 
 
 The two prime factors (2 and 3) cycle with period 6. The first two columns represent the presence of prime factors 2 and 3:
 
-00 (1)  
-10 (2)
-01 (3)
-10 (4)
-00 (5)
-11 (6)
+00 (1)  {}
+10 (2)  {2}
+01 (3)  {3}
+10 (4)  {2}
+00 (5)  {}
+11 (6)  {2,3}
 
 Values repeat because they have higher prime factors (like 5 here) that are not shown.
 
-The first 3 prime factors appear with period (2 * 3 * 5) = 30. The existing 6-cycle repeats 5 times, the new 5-cycle repeats 6 times alongside it, so touching every unique combination of 3 factors takes 30 steps. It looks like this:
+The first 3 prime factors appear with period (2 * 3 * 5) = 30.
+The existing 6-cycle repeats 5 times, the new 5-cycle repeats 6 times alongside it, so touching every unique combination of 3 factors takes 30 steps.
+It looks like this:
 
-000
-100
-010
-100
-001
-110
-000
-100
-010
-101
-000
-110
-000
-100
-011
-100
-000
-110
-000
-101
-010
-100
-000
-110
-001
-100
-010
-100
-000
-111
+000 100 010 100 001 110
+000 100 010 101 000 110
+000 100 011 100 000 110
+000 101 010 100 000 110
+001 100 010 100 000 111
 
 The first 4 factors appear in a cycle with period (2 * 3 * 5 * 7) = 210:
 
-0000
-1000
-0100
-1000
-0010
-1100
-0001
-1000
-0100
-1010
-0000
-1100
-0000
-1001
-0110
-1000
-0000
-1100
-0000
-1010
-0101
-1000
-0000
-1100
-0010
-1000
-0100
-1001
-0000
-1110
-0000
-1000
-0100
-1000
-0011
-1100
-0000
-1000
-0100
-1010
-0000
-1101
-0000
-1000
-0110
-1000
-0000
-1100
-0001
-1010
-0100
-1000
-0000
-1100
-0010
-1001
-0100
-1000
-0000
-1110
-0000
-1000
-0101
-1000
-0010
-1100
-0000
-1000
-0100
-1011
-0000
-1100
-0000
-1000
-0110
-1000
-0001
-1100
-0000
-1010
-0100
-1000
-0000
-1101
-0010
-1000
-0100
-1000
-0000
-1110
-0001
-1000
-0100
-1000
-0010
-1100
-0000
-1001
-0100
-1010
-0000
-1100
-0000
-1000
-0111
-1000
-0000
-1100
-0000
-1010
-0100
-1001
-0000
-1100
-0010
-1000
-0100
-1000
-0001
-1110
-0000
-1000
-0100
-1000
-0010
-1101
-0000
-1000
-0100
-1010
-0000
-1100
-0001
-1000
-0110
-1000
-0000
-1100
-0000
-1011
-0100
-1000
-0000
-1100
-0010
-1000
-0101
-1000
-0000
-1110
-0000
-1000
-0100
-1001
-0010
-1100
-0000
-1000
-0100
-1010
-0001
-1100
-0000
-1000
-0110
-1000
-0000
-1101
-0000
-1010
-0100
-1000
-0000
-1100
-0011
-1000
-0100
-1000
-0000
-1110
-0000
-1001
-0100
-1000
-0010
-1100
-0000
-1000
-0101
-1010
-0000
-1100
-0000
-1000
-0110
-1001
-0000
-1100
-0000
-1010
-0100
-1000
-0001
-1100
-0010
-1000
-0100
-1000
-0000
-1111
+0000 1000 0100 1000 0010 1100 0001 1000 0100 1010 
+0000 1100 0000 1001 0110 1000 0000 1100 0000 1010
+0101 1000 0000 1100 0010 1000 0100 1001 0000 1110
+0000 1000 0100 1000 0011 1100 0000 1000 0100 1010
+0000 1101 0000 1000 0110 1000 0000 1100 0001 1010
+0100 1000 0000 1100 0010 1001 0100 1000 0000 1110
+0000 1000 0101 1000 0010 1100 0000 1000 0100 1011
+0000 1100 0000 1000 0110 1000 0001 1100 0000 1010
+0100 1000 0000 1101 0010 1000 0100 1000 0000 1110
+0001 1000 0100 1000 0010 1100 0000 1001 0100 1010 
+0000 1100 0000 1000 0111 1000 0000 1100 0000 1010
+0100 1001 0000 1100 0010 1000 0100 1000 0001 1110 
+0000 1000 0100 1000 0010 1101 0000 1000 0100 1010
+0000 1100 0001 1000 0110 1000 0000 1100 0000 1011
+0100 1000 0000 1100 0010 1000 0101 1000 0000 1110
+0000 1000 0100 1001 0010 1100 0000 1000 0100 1010
+0001 1100 0000 1000 0110 1000 0000 1101 0000 1010
+0100 1000 0000 1100 0011 1000 0100 1000 0000 1110
+0000 1001 0100 1000 0010 1100 0000 1000 0101 1010
+0000 1100 0000 1000 0110 1001 0000 1100 0000 1010
+0100 1000 0001 1100 0010 1000 0100 1000 0000 1111
 
-Some states appear much more often than others, but all combinations of factors are represented at least once. Numbers having no factors among {2, 3, 5, 7} (0000) appear 48/210 times, and the full factor set {2, 3, 5, 7} = 210 (1111) appears only once, at the very end. 
+Some states appear much more often than others, but all combinations of factors are represented at least once.
+Numbers having no factors among {2, 3, 5, 7} (0000) appear 48/210 times, and the full factor set {2, 3, 5, 7} = 210 (1111) appears only once, at the very end. 
 
 0000 * 48 (0)
 1000 * 48 (2)
@@ -280,6 +69,8 @@ Some states appear much more often than others, but all combinations of factors 
 0111 * 1  (105)
 1111 * 1  (210)
 
+Euler's totient theorem can calculate this distribution.
+
 Including new prime factors for large values of n quickly explodes the length of an exhaustive cycle:
 
 Factor  Length
@@ -289,7 +80,6 @@ Factor  Length
 19      9699690
 
 Subcycles still happen at the same rate, and note that prime factors higher than n at any given time "don't count". 
-
 
 # Factor set visualization
 

@@ -77,3 +77,4 @@ The full Collatz odd-to-odd step:
 
 No correlation seen once the bits are offset, they interfere with each other immediately.
 
+

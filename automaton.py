@@ -69,12 +69,12 @@ def step_automaton(t):
     if t == TERMINAL_STATE:
         return t
 
-    if kl >= 3 and kr == 1:
+    if kl > 2 and kr == 1:
         ocl, kl = 3 * ocl, kl - 2
         ocr, kr = odd_core((3 * ocr + 1) >> 1) # FIXME - recalculate directly (without reconstructing n)
         return (ocl, kl, ocr, kr)
 
-    if kr >= 2 and kl == 1:
+    if kr > 1 and kl == 1:
         ocr, kr = 3 * ocr, kr - 1
         ocl, kl = odd_core(3 * ocl + 1) # FIXME - recalculate directly (without reconstructing n)
         return (ocl, kl, ocr, kr)

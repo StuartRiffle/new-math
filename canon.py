@@ -16,40 +16,46 @@ arg.add_argument("--pad", action="store_true")
 arg.add_argument("--autocompare", action="store_true")
 arg.add_argument("--factor-braces", action="store_true")
 arg.add_argument("--residues", type=int, default=0)
+arg.add_argument("--residue-two", action="store_true", help="Use 2 as the first residue prime, not 3")
 arg.add_argument("--odd-core-info", action="store_true")
 arg.add_argument("--odd-core-info-only", action="store_true")
 arg.add_argument("--no-delimiters", action="store_true")
 arg.add_argument("--csv", action="store_true")
 arg.add_argument("--sort-by", type=str, default=None)
 arg.add_argument("--n", type=int, default=27)
-arg.add_argument("--burn-span", type=int, default=200)
+arg.add_argument("--burn-span", type=int, default=1000)
 arg.add_argument("--burn-lead", type=int, default=1)
 arg.add_argument("--burn-base", type=int, default=2)
 arg.add_argument("--burn-symbols", type=str, default='░█')
 arg.add_argument("--burn-reverse", action="store_true")
 arg.add_argument("--count-factors", action="store_true")
 arg.add_argument("--radical-only", action="store_true")
+arg.add_argument("--mask-limit", type=int, default=80)
 arg = arg.parse_args()
 
 
-arg.command = 'twins'
+arg.command = 'orbit'
 
-arg.max = 1000
-arg.n = 33
+arg.max = 100000
+arg.n = 871
 #arg.cols = 'n,base2,base3,factors,dist,nl,ocldist,nr,ocrdist,orbit_back'
-arg.cols = '-n,-base3,-symbol3,-base2,-symbol2,factors'
-#arg.sort_by = 'dist'
-#arg.odds = True
+arg.cols = '-dist,-n,factors,-ocldist,-nl,ofactorsl,-ocrdist,-nr,ofactorsr,-tcn,-base2,-base3,-base5,-base7,m*,-pre_total'
+arg.sort_by = 'pre_total'
+arg.odds = True
 arg.column_info = True
 arg.header_line = True
 #arg.pad = True
 #arg.autocompare = True
 arg.factor_braces = True
-arg.residues = 6
+arg.residues = 12
 arg.pad = True
 arg.csv = True
 #arg.count_factors = True
 #arg.radical_only = True
+
+
+from sympy import primerange, nextprime, isprime
+from sympy.ntheory import factorint
 
 def calc_primes(n):
     sieve = [True] * n
@@ -59,8 +65,7 @@ def calc_primes(n):
             sieve[i*i::i] = [False] * len(sieve[i*i::i])
     return [i for i in range(n) if sieve[i]]
 
-PRIMES = calc_primes(100000)
-ODD_PRIMES = PRIMES[1:]
+PRIMES = calc_primes(10000)
 
 
 symbol_map = {
@@ -115,24 +120,20 @@ def collatz_orbit_list(n):
         orbit.append(n)
     return orbit
 
-def collatz_orbit_str(n, sep = ' ->'):
-    return sep.join(map(str, collatz_orbit_list(n)))
+def collatz_orbit_str(n, sep = ' ->', count = None):
+    suffix = ''
+    elements = collatz_orbit_list(n)
+    if count is not None and len(elements) > count:
+        elements = elements[:count]
+        suffix = '...'
+    return sep.join(map(str, elements)) + suffix
 
 def collatz_orbit_str_backwards(n, sep = '<- '):
     return sep.join(map(str, reversed(collatz_orbit_list(n))))
 
 def get_prime_factors(n):
-    if n == 1367:
-        print('')
-
-    factors = set()
-    for p in PRIMES:
-        while n % p == 0:
-            factors.add(p)
-            n = n // p
-        if p > n:
-            break
-    return sorted(list(factors))
+    factorization = factorint(n)
+    return sorted(list(factorization.keys()))
 
 def get_factor_mask(n):
     mask = ''
@@ -143,6 +144,8 @@ def get_factor_mask(n):
             mask += mask_map[1]
         else:
             mask += mask_map[0]
+        if len(mask) >= arg.mask_limit:
+            break
     return mask
 
 def get_str_in_radix(n, base):
@@ -160,6 +163,8 @@ def get_radical(n):
         rad *= p
     return rad
 
+def reverse_string(s):
+    return s[::-1]
 
 def align_delimeters(items, delim=','):
     col_width = {}
@@ -171,7 +176,7 @@ def align_delimeters(items, delim=','):
             col_width[i] = max(col_width[i], len(elem))
     aligned_items = []
     for item in items:
-        elems = item.split(delims)
+        elems = item.split(delim)
         aligned_item = ''
         for i, elem in enumerate(elems):
             if i > 0:
@@ -181,8 +186,71 @@ def align_delimeters(items, delim=','):
     return aligned_items
 
 
+def get_prime_ring_cycles(p):
+
+    fixed = (p - 1) // 2
+    index = {fixed: 0}
+    
+    idx = 1
+    n = 0
+    while len(index.keys()) < p:
+        if n in index:
+            idx += 1
+            n = 1
+            while n in index:
+                n += 1
+            # set n to the lowest value not yet in cycle_index
+
+        index[n] = idx
+        n = (3 * n + 1) % p
+
+    return index
+
+prime_cycles = {}
+
+def get_prime_ring_cycle(p, n):
+    global prime_cycles
+    if p not in prime_cycles:
+        prime_cycles[p] = get_prime_ring_cycles(p)
+    cycles = prime_cycles[p]
+    return cycles[n]
+
+
+def get_odd_to_odd_predecessors(n, count = 4):
+    preimages = []
+    if n % 3 != 0:
+        while len(preimages) < count:
+            n *= 2
+            if (n - 1) % 3 == 0:
+                preimages.append((n - 1) // 3)
+    return preimages
+
+
+indirect_preimages = {}
+def calc_indirect_preimages(ns):
+    global indirect_preimages
+
+    indirect_preimages = {}
+
+    for n in ns:
+        i = n
+        while True:
+            i = collatz_odd(i)
+            if i not in indirect_preimages:
+                indirect_preimages[i] = 0
+            indirect_preimages[i] += 1
+            if i == 1:
+                break
+
+
+
+
+
+
 col_desc = {}
 unique_factor_sets = {}
+
+
 
 
 def radix_name(radix):
@@ -215,6 +283,12 @@ def calc_n_values(n):
     tc3, v3 = padic(n, base=3)
     val['tc'] = tc3
 
+    col_desc['tcn'] = f'the nearest "ternary core", among {n-1, n, n+1}, after dividing out powers of three'
+    tcn = (n - 1) if (n - 1) % 3 == 0 else n if n % 3 == 0 else (n + 1)
+    tcn3, vn3 = padic(tcn, base=3)
+    val['tcn'] = tcn3
+
+
     col_desc['v3'] = f'the 3-adic valuation of n, such that n = tc * 3^v3'
     val['v3'] = v3
 
@@ -225,6 +299,13 @@ def calc_n_values(n):
         paramname = 'n'
         param = n
 
+    col_desc['pre'] = f'the preimages of {paramname} under the odd-to-odd Collatz map'
+    preimages = get_odd_to_odd_predecessors(param)
+    val['pre'] = '{' + (', '.join([str(i) for i in preimages]) + '...' if preimages else '') + '}'
+
+    col_desc['pre_total'] = f'the total number of preimages of {paramname} under the odd-to-odd Collatz map'
+    val['pre_total'] = indirect_preimages.get(param, 0)
+
     col_desc['dist'] = f'the number of odd-to-odd Collatz for {paramname} steps to reach 1'
     val['dist'] = collatz_odd_dist(param)
 
@@ -234,19 +315,31 @@ def calc_n_values(n):
     col_desc['orbit'] = f'the remaining orbit of {paramname} under the odd-to-odd Collatz map, all the way to 1'
     val['orbit'] = collatz_orbit_str(param)
 
-    col_desc['orbit_back'] = f'the remaining orbit of {paramname} under the odd-to-odd Collatz map, bacwards from 1'
+    col_desc['orbit_back'] = f'the remaining orbit of {paramname} under the odd-to-odd Collatz map, backwards from 1'
     val['orbit_back'] = collatz_orbit_str_backwards(param)
 
+    col_desc['orbitpeek'] = f'the next steps in the orbit of {paramname} under the odd-to-odd Collatz map'
+    val['orbitpeek'] = collatz_orbit_str(param, count=7)
+
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
+    col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
+    col_desc['cyc*'] = f'the prime ring cycles of {paramname}'
+    residue_offset = 0 if arg.residue_two else 1
     if arg.residues > 0:
         for r in range(arg.residues):
-            p = PRIMES[r]
+            p = PRIMES[r + residue_offset]
             val['m' + str(p)] = param % p
+            val['sm' + str(p)] = (param % p) - p if (param % p) > p // 2 else (param % p)
+            val['cyc' + str(p)] = get_prime_ring_cycle(p, param % p)
 
     for radix in [2, 3, 5, 7, 11]:
         col_desc['base' + str(radix)] = f'the {radix_name(radix)} representation of {paramname}'
         in_radix = get_str_in_radix(param, radix)
         val['base' + str(radix)] = in_radix
+
+        col_desc['base' + str(radix) + 'rev'] = f'the {radix_name(radix)} representation of {paramname}, reversed'
+        val['base' + str(radix) + 'rev'] = reverse_string(in_radix)
+
 
     for radix in [2, 3]:
         symbol = get_str_in_radix(param, radix)
@@ -271,48 +364,69 @@ def calc_n_values(n):
         col_desc[symbol_name] = f'symbolic representation{delimiter_desc} of the {radix_name(radix)} encoding of {paramname} ({key_desc})'
         val[symbol_name] = symbol
 
-    if 'factors' in arg.cols or 'rad' in arg.cols or 'mask' in arg.cols:
-        all_factors = get_prime_factors(param)
-        factors_str = ', '.join([str(f) for f in all_factors])
-        if factors_str not in unique_factor_sets:
-            unique_factor_sets[factors_str] = 0
-        unique_factor_sets[factors_str] += 1
+    all_factors = get_prime_factors(param)
+    factors_str = ', '.join([str(f) for f in all_factors])
+    if factors_str not in unique_factor_sets:
+        unique_factor_sets[factors_str] = 0
+    unique_factor_sets[factors_str] += 1
 
-        cursor_factors = get_prime_factors(param)
-        for exclude in [2, 3]:
-            if exclude in cursor_factors:
-                cursor_factors.remove(exclude)
-        cursor_factor_str = ', '.join([str(f) for f in cursor_factors])
+    cursor_factors = get_prime_factors(param)
+    for exclude in [2, 3]:
+        if exclude in cursor_factors:
+            cursor_factors.remove(exclude)
+    cfactors_str = ', '.join([str(f) for f in cursor_factors])
 
-        if arg.factor_braces:
-            factors_str = '{' + factors_str + '}'
-            cursor_factor_str = '{' + cursor_factor_str + '}'
+    factorsl_str = ', '.join([str(f) for f in get_prime_factors(param - 1)])
+    factorsr_str = ', '.join([str(f) for f in get_prime_factors(param + 1)])
 
-        col_desc['factors'] = f'the prime factors of {paramname}'
-        val['factors'] = factors_str
+    ofactorsl_str = ', '.join([str(f) for f in get_prime_factors(param - 1) if f % 2 == 1])
+    ofactorsr_str = ', '.join([str(f) for f in get_prime_factors(param + 1) if f % 2 == 1])
 
-        col_desc['cfactors'] = f'the prime factors above 3 of {paramname}'
-        val['cfactors'] = cursor_factor_str
+    if arg.factor_braces:
+        factors_str = '{' + factors_str + '}'
+        cfactors_str = '{' + cfactors_str + '}'
+        factorsl_str = '{' + factorsl_str + '}'
+        factorsr_str = '{' + factorsr_str + '}'
+        ofactorsl_str = '{' + ofactorsl_str + '}'
+        ofactorsr_str = '{' + ofactorsr_str + '}'
 
-        col_desc['rad'] = f'the radical of {paramname}, the product of its unique prime factors'
-        rad = 1
-        for p in all_factors:
-            rad *= p
-        val['rad'] = rad
+    col_desc['factors'] = f'the prime factors of {paramname}'
+    val['factors'] = factors_str
 
-        col_desc['crad'] = f'the Collatz "cursor radical" of {paramname}, the product of its prime factors above 3'
-        crad = 1
-        for p in cursor_factors:
-            crad *= p
-        val['crad'] = crad
+    col_desc['factorsl'] = f'the prime factors of {paramname}-1'
+    val['factorsl'] = factorsl_str
 
-        col_desc['mask'] = f'the mask of prime factors (radical) of {paramname}, as a string'
-        mask = get_factor_mask(param)
-        val['mask'] = mask
+    col_desc['ofactorsl'] = f'the odd prime factors of {paramname}-1'
+    val['ofactorsl'] = ofactorsl_str
 
-        col_desc['cmask'] = f'mask of Collatz "cursor radical" of {paramname}, as a string'
-        cmask = mask[2::]
-        val['cmask'] = cmask
+    col_desc['factorsr'] = f'the prime factors of {paramname}+1'
+    val['factorsr'] = factorsr_str
+
+    col_desc['ofactorsr'] = f'the odd prime factors of {paramname}+1'
+    val['ofactorsr'] = ofactorsr_str
+
+    col_desc['cfactors'] = f'the prime factors above 3 of {paramname}'
+    val['cfactors'] = cfactors_str
+
+    col_desc['rad'] = f'the radical of {paramname}, the product of its unique prime factors'
+    rad = 1
+    for p in all_factors:
+        rad *= p
+    val['rad'] = rad
+
+    col_desc['crad'] = f'the Collatz "cursor radical" of {paramname}, the product of its prime factors above 3'
+    crad = 1
+    for p in cursor_factors:
+        crad *= p
+    val['crad'] = crad
+
+    col_desc['mask'] = f'the mask of prime factors (radical) of {paramname}, as a string'
+    mask = get_factor_mask(param)
+    val['mask'] = mask
+
+    col_desc['cmask'] = f'mask of Collatz "cursor radical" of {paramname}, as a string'
+    cmask = mask[2::]
+    val['cmask'] = cmask
 
     t = create_automaton(n)
     ocl, kl, ocr, kr = t
@@ -330,20 +444,30 @@ def calc_n_values(n):
     col_desc['fingerprint'] = f'the fingerprint of the Collatz automaton of n, as a pair of 2-adic values'
     val['fingerprint'] = f'({ocl}, {kl}) ({ocr}, {kr})'
 
+    col_desc['ocl'] = f'the odd core of n-1 (the even number to the left of odd n)'
+    val['ocl'] = ocl
+    col_desc['kl'] = f'the k value n-1 (the even number to the left of odd n)'
+    val['kl'] = kl
+    col_desc['ocr'] = f'the odd core of n+1 (the even number to the right of odd n)'
+    val['ocr'] = ocr
+    col_desc['kr'] = f'the k value n+1 (the even number to the right of odd n)'
+    val['kr'] = kr
+
     oclo, klo = (ocl, kl) if kl < kr else (ocr, kr)
     ochi, khi = (ocr, kr) if kl < kr else (ocl, kl)
 
-    col_desc['ocl'] = f'the odd core of n-1 (the even number to the left of odd n)'
-    val['ocl'] = oclo
-    col_desc['kl'] = f'the k value n-1 (the even number to the left of odd n)'
-    val['kl'] = klo
-    col_desc['ocr'] = f'the odd core of n+1 (the even number to the right of odd n)'
-    val['ocr'] = ochi
-    col_desc['kr'] = f'the k value n+1 (the even number to the right of odd n)'
-    val['kr'] = khi
-    col_desc['nl'] = f'the odd core valuation of the even number to the left of odd n'
+    col_desc['oclo'] = f'the odd core of the even number n-1 to the left of odd n, with lowest k value'
+    val['oclo'] = oclo
+    col_desc['ochi'] = f'the odd core of the even number n+1 to the right of odd n, with highest k value'
+    val['ochi'] = ochi
+    col_desc['klo'] = f'the k value of the odd core of the even number n-1 to the left of odd n, with lowest k value'
+    val['klo'] = klo
+    col_desc['khi'] = f'the k value of the odd core of the even number n+1 to the right of odd n, with highest k value'
+    val['khi'] = khi
+
+    col_desc['nl'] = f'the odd core valuation of the even number n-1 to the left of odd n'
     val['nl'] = f'({ocl}, {kl})'
-    col_desc['nr'] = f'the odd core valuation of the even number to the right of odd n'
+    col_desc['nr'] = f'the odd core valuation of the even number n+1 to the right of odd n'
     val['nr'] = f'({ocr}, {kr})'
 
     col_desc['ocldist'] = f'the Collatz odd-to-odd distance of the odd core of n-1'
@@ -377,9 +501,12 @@ def print_output(output_lines):
             print(line)
 
 
+
 def print_ns(ns):
     output_lines = []
     calc_n_values(1) # populate col_desc
+
+    calc_indirect_preimages(ns)
 
     sep = ','
 
@@ -391,10 +518,12 @@ def print_ns(ns):
         col_raw = col.lstrip('-')
         col_info[col_raw] = col_desc[col_raw]
 
-        if col_raw == 'm*':
+        if col_raw == 'm*' or col_raw == 'sm*' or col_raw == 'cyc*':
             if arg.residues > 0:
+                residue_offset = 0 if arg.residue_two else 1
+                prefix = col_raw[:-1]
                 for r in range(arg.residues):
-                    col_headers.append('m' + str(PRIMES[r]))
+                    col_headers.append(prefix + str(PRIMES[r + residue_offset]))
         else:
             col_headers.append(col_raw)
 

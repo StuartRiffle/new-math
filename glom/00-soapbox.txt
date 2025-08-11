@@ -4,12 +4,13 @@
 
 <soapbox>
 - The odd-to-odd Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
-- Both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
+- Wait, where are you going? Collatz is not Turing complete, so it's still on the table, fair and square. I have a bullet point list and a wall of numbers, stay with me here.
+- Anyway both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
 - A full iteration exchanges k for new congruence information, which is propagated forward thereafter by the CRT.
 - The binary avalanche caused by +1 is the only meaningful change of state in the Collatz map. The shifts are temporary and informationally harmless.
 - The number of bits flipped in the avalanche is k.
 - The per-step information evolution of Collatz is proportional to k. The nature of it is isomorphic to the rules of carry propagation.
-- (As an aside, this is why Minsky's two-tag machine traces Collatz: it's a cleverly obfuscated carry-propagator).
+- (As an aside, this is why Minsky's two-tag machine traces Collatz: it's a cleverly obfuscated carry-propagator, unrolled bit by bit).
 - The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
 - Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
 - Information diffused by odd primes is not shed until the dyadic hierarchy is "drained", which only happens when the orbit of n intersects a "connector" (details of this below), which collapses accumulated information modulo odd primes.
@@ -150,4 +151,5 @@
 --------------------------------------------------------------------------------------
 This is work in progress and of course proves nothing about anything; standard disclaimers apply.
 - Stuart Riffle, July 2025
+
 
