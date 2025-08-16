@@ -66,6 +66,7 @@ You can see the | "channels" highlighted that higher primes can pass through.
 ## Prime symmetry around radicals
 
 Note the overlap, many primes (like 101) are symmetrically reachable from multiple radicals.
+This is just an artifact of coprimality, the primes could not be elsewhere.
 
 -11   31
  -5   37
@@ -107,28 +108,6 @@ Note the overlap, many primes (like 101) are symmetrically reachable from multip
 +28  193
 +34  199
 
-
-
-                                     ║
-                <──────(n-d)──────── n ────────(n+d)──────>
-                         │           ║           │                  
-                         │           ║     :     │                       :     :     :     :
-7 ───■──────■──────■─────│■──────■───║──■──│───■─│────■──────■──────■────│─■───│──■──│───■─│────■────── 7
-5 █────■────■────■────■──│─■────█────║────■│───■─│──■────■────█────■────■│───■─│──■──│─■───│█────■────■ 5
-3 █──■──█──■──█──■──█──■─│█──■──█──■─║█──■─│█──■─│█──■──█──■──█──■──█──■─│█──■─│█──■─│█──■─│█──■──█──■─ 3
-2 █─■─■─█─■─■─█─■─■─█─■─■│█─■─■─█─■─■║█─■─■│█─■─■│█─■─■─█─■─■─█─■─■─█─■─■│█─■─■│█─■─■│█─■─■│█─■─■─█─■─■ 2
-                                     ║     │     │                       │     │     │     │           
-     From a given number n, step     ║    gap  MATCH                    gap   gap   gap   gap    
-     the same distance d in both     ║     │     │                       │     │     │     │           
-     directions. The same pattern    ║───■─│────■│─────■──────■──────■───│──■──│───■─│────■│─────■───── 7
-     of gaps in any prime cycle      ║────█│───■─│──■────■────■────■────█│───■─│──■──│─■───│■────■────█ 5
-     will reappear, but backwards,   ║─■──█│─■──█│─■──█──■──█──■──█──■──█│─■──█│─■──█│─■──█│─■──█──■──█ 3
-     and offset by a multiple of 2.  ║■─■─█│■─■─█│■─■─█─■─■─█─■─■─█─■─■─█│■─■─█│■─■─█│■─■─█│■─■─█─■─■─█ 2
-     Some gaps will not match up,    ║     :     │                       :     :     :     :
-     but one or more always will.    ║           │                       
-                                     n ────────(n-d)──────>
-                                     ║       BACKWARDS
-                                          
 
 
 
@@ -257,6 +236,28 @@ ofs                                                                             
 
 Empirically at least 15 gaps remain when the prime cycle of 210 is masked against its anti-cycle, at any relative phase.
 
+
+
+                                     ║
+                <──────(n-d)──────── n ────────(n+d)──────>
+                         │           ║           │                  
+                         │           ║     :     │                       :     :     :     :
+7 ───■──────■──────■─────│■──────■───║──■──│───■─│────■──────■──────■────│─■───│──■──│───■─│────■────── 7
+5 █────■────■────■────■──│─■────█────║────■│───■─│──■────■────█────■────■│───■─│──■──│─■───│█────■────■ 5
+3 █──■──█──■──█──■──█──■─│█──■──█──■─║█──■─│█──■─│█──■──█──■──█──■──█──■─│█──■─│█──■─│█──■─│█──■──█──■─ 3
+2 █─■─■─█─■─■─█─■─■─█─■─■│█─■─■─█─■─■║█─■─■│█─■─■│█─■─■─█─■─■─█─■─■─█─■─■│█─■─■│█─■─■│█─■─■│█─■─■─█─■─■ 2
+                                     ║     │     │                       │     │     │     │           
+     From a given number n, step     ║    gap  MATCH                    gap   gap   gap   gap    
+     the same distance d in both     ║     │     │                       │     │     │     │           
+     directions. The same pattern    ║───■─│────■│─────■──────■──────■───│──■──│───■─│────■│─────■───── 7
+     of gaps in any prime cycle      ║────█│───■─│──■────■────■────■────█│───■─│──■──│─■───│■────■────█ 5
+     will reappear, but backwards,   ║─■──█│─■──█│─■──█──■──█──■──█──■──█│─■──█│─■──█│─■──█│─■──█──■──█ 3
+     and offset by a multiple of 2.  ║■─■─█│■─■─█│■─■─█─■─■─█─■─■─█─■─■─█│■─■─█│■─■─█│■─■─█│■─■─█─■─■─█ 2
+     Some gaps will not match up,    ║     :     │                       :     :     :     :
+     but one or more always will.    ║           │                       
+                                     n ────────(n-d)──────>
+                                     ║       BACKWARDS
+                                          
 
 
 		

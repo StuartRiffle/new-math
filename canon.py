@@ -33,6 +33,8 @@ arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
 arg = arg.parse_args()
 
+list_of_characters_like_exponents_of_2_and_3_for_squared_and_cubed_etc = '⁰¹²³⁴⁵⁶⁷⁸⁹'
+
 
 arg.command = 'orbit'
 
@@ -83,7 +85,7 @@ def padic(n, base = 2):
             k += 1
     return n, k
 
-def odd_core(n):
+def odd_val(n):
     return padic(n, base=2)
 
 def oc(n):
@@ -268,7 +270,7 @@ def calc_n_values(n):
     col_desc['n'] = f'a positive{" odd" if arg.odds else ""} integer'
     val['n'] = n
 
-    oc, k = odd_core(n)
+    oc, k = odd_val(n)
 
     col_desc['oc'] = f'the "odd core" of positive integer n, after dividing out powers of two'
     val['oc'] = oc

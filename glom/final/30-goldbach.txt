@@ -1,4 +1,9 @@
 
+# Coda
+
+[rubs eyes and stands, disoriented]
+
+<soapbox>
 - The *Goldbach* conjecture is that every even integer 2n above two can be expressed as the sum of two primes p1 and p2. It can be restated this way: for every integer n > 1, there exists an offset d (0 <= d < n) such that both n-d and n+d are prime.
 - For this to be true, they must both survive the Sieve of Eratosthenes, meaning for any prime r < sqrt(n+d), neither n-d nor n+d can be divisible by r.
 - The process can be seen as a double-sieve, every prime r knocking out values of d that would make either n-d or n+d composite.
@@ -18,6 +23,5 @@
 - A prime p can only be a potential common factor of both n-d and n+d if p is a prime factor of 2n itself. For any sieving prime r that does not divide 2n, it is structurally impossible for n-d and n+d to be simultaneously divisible by r.
 - As d increases, the set of its prime factors rad(d) changes. The primality of n-d requires that rad(n-d) and rad(d) must be disjoint. This imposes a powerful, dynamic constraint: d is forced to be composed of primes that are not currently factors of n-d.
 - The simplest implementation of this dual sieve: let D = {1 <= d < n}, and for each prime r <= sqrt(2n), remove from D the d such that n-d ≡ 0 mod r, or n+d ≡ 0 (mod r). By inclusion/exclusion and the CRT, the number of surviving d is at least n ∏_{p ≤ √(2n)} (1 - 2/p). For finite n, this number is positive, meaning there is always a surviving d such that n-d and n+d are coprime to all p≤2n, and therefore themselves prime.
-
-
+</soapbox>
 

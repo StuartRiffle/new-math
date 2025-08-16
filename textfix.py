@@ -2,6 +2,15 @@
 import argparse
 from collections import deque, Counter
 from typing import List, Tuple, Optional, Dict
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+from pathlib import Path
+
+try:
+    from PIL import Image, ImageColor
+except ImportError as e:
+    Image = None
+    ImageColor = None
 
 Coord = Tuple[int, int]
 
@@ -15,14 +24,37 @@ DIRS8: List[Coord] = [
     (1, -1),  (1, 0),  (1, 1),
 ]
 
-def read_grid(path: str) -> List[List[str]]:
+# Sentinel for argparse "was the option provided?"
+_ARG_SENTINEL = object()
+
+# ---------- I/O helpers (now line-aware) ----------
+
+def read_lines(path: str) -> List[str]:
+    """Read raw lines (without trailing newlines) from file."""
     with open(path, "r", encoding="utf-8") as f:
-        lines = f.read().splitlines()
+        return f.read().splitlines()
+
+def lines_to_grid(lines: List[str]) -> List[List[str]]:
+    """Convert a list of lines to a rectangular grid (space-padded)."""
     width = max((len(line) for line in lines), default=0)
     return [list(line.ljust(width)) for line in lines]
 
+def read_grid(path: str) -> List[List[str]]:
+    """Backward-compat: read file straight into a rectangular char grid."""
+    return lines_to_grid(read_lines(path))
+
 def grid_size(grid: List[List[str]]) -> Tuple[int, int]:
     return (len(grid), len(grid[0]) if grid else 0)
+
+def write_grid(grid: List[List[str]], strip_trailing: bool = True) -> str:
+    """Join rows back to lines. By default strips trailing whitespace per line."""
+    out_lines: List[str] = []
+    for row in grid:
+        s = "".join(row)
+        if strip_trailing:
+            s = s.rstrip()
+        out_lines.append(s)
+    return "\n".join(out_lines)
 
 def in_bounds(r: int, c: int, R: int, C: int) -> bool:
     return 0 <= r < R and 0 <= c < C
@@ -38,6 +70,63 @@ def neighbors8(r: int, c: int, R: int, C: int):
         nr, nc = r + dr, c + dc
         if in_bounds(nr, nc, R, C):
             yield nr, nc
+
+# ---------- New line-level transforms ----------
+
+def apply_replacements(lines: List[str], pairs: List[Tuple[str, str]]) -> List[str]:
+    if not pairs:
+        return lines
+    out = []
+    for line in lines:
+        s = line
+        for before, after in pairs:
+            if before == "":
+                continue
+            s = s.replace(before, after)
+        out.append(s)
+    return out
+
+def apply_strip_like(lines: List[str], which: str, chars_opt):
+    """
+    which ∈ {'strip','lstrip','rstrip'}
+    chars_opt: _ARG_SENTINEL (not requested), None (use whitespace), or str (the char set)
+    """
+    if chars_opt is _ARG_SENTINEL:
+        return lines  # option not provided
+    use_whitespace = (chars_opt is None)
+    out = []
+    for s in lines:
+        if which == "strip":
+            out.append(s.strip() if use_whitespace else s.strip(chars_opt))
+        elif which == "lstrip":
+            out.append(s.lstrip() if use_whitespace else s.lstrip(chars_opt))
+        elif which == "rstrip":
+            out.append(s.rstrip() if use_whitespace else s.rstrip(chars_opt))
+        else:
+            out.append(s)
+    return out
+
+def reverse_lines(lines: List[str]) -> List[str]:
+    return [s[::-1] for s in lines]
+
+def right_justify_lines(lines: List[str]) -> List[str]:
+    """Right-justify each line to the length of the longest line."""
+    width = max((len(s) for s in lines), default=0)
+    return [s.rjust(width) for s in lines]
+
+def rpad_lines(lines: List[str]) -> List[str]:
+    """Pad lines with spaces on the right to match the longest line."""
+    width = max((len(s) for s in lines), default=0)
+    return [s.ljust(width) for s in lines]
+
+def count_chars_in_lines(lines: List[str]) -> Counter:
+    """Count characters in provided lines (newlines excluded)."""
+    cnt: Counter[str] = Counter()
+    for s in lines:
+        cnt.update(s)
+    return cnt
+
+# ---------- Existing grid algorithms ----------
 
 def flood_fill_from_seed(grid: List[List[str]], seed: Coord, target_char: str, replace_char: str) -> None:
     """Fill the connected region of target_char containing seed with replace_char (4-connectivity)."""
@@ -197,23 +286,15 @@ def do_melt(grid: List[List[str]], chars: str, threshold: int = 5) -> int:
                 first_seen: Dict[str, int] = {}
                 for idx, (dr, dc) in enumerate(DIRS8):
                     nr, nc = r + dr, c + dc
-                    if not in_bounds(nr, nc, R, C):
-                        # We skip edges anyway, so all 8 will exist, but keep guard
-                        continue
                     v = grid[nr][nc]
                     cnt[v] += 1
                     if v not in first_seen:
                         first_seen[v] = idx
 
-                if not cnt:
-                    continue
-
                 max_count = max(cnt.values())
-                # Need at least `threshold` neighbors agreeing
                 if max_count < threshold:
                     continue
 
-                # Among the tied max neighbors, pick the one seen earliest in DIRS8
                 tied = [k for k, v in cnt.items() if v == max_count]
                 chosen_neighbor = min(tied, key=lambda ch2: first_seen[ch2])
 
@@ -227,22 +308,176 @@ def do_melt(grid: List[List[str]], chars: str, threshold: int = 5) -> int:
 
     return total_changes
 
-def write_grid(grid: List[List[str]]) -> str:
-    # Keep lines ragged on output (strip trailing spaces for readability)
-    return "\n".join("".join(row).rstrip() for row in grid)
+# ---------- Bitmap export ----------
+
+def _parse_color(color_str: str) -> Tuple[int, int, int, int]:
+    if ImageColor is None:
+        raise RuntimeError("Pillow is required for --bitmap (pip install Pillow).")
+    try:
+        # Returns RGBA for names and hex (including #RRGGBBAA)
+        return ImageColor.getcolor(color_str, "RGBA")
+    except Exception as e:
+        raise ValueError(f"Invalid color {color_str!r}: {e}") from e
+
+def _parse_bitmap_map(spec: str) -> Dict[str, Tuple[int, int, int, int]]:
+    """
+    Parse "a=red,0=#00ff00" into { 'a': (r,g,b,a), '0': (...)}.
+    Keys should be single characters. Special keys: 'space' -> ' ', 'tab' -> '\\t'.
+    """
+    mapping: Dict[str, Tuple[int, int, int, int]] = {}
+    if not spec:
+        return mapping
+    pairs = [p for p in spec.split(",") if p]
+    for pair in pairs:
+        if "=" not in pair:
+            raise ValueError(f"--bitmap mapping entry must be CHAR=COLOR, got {pair!r}")
+        key, color = pair.split("=", 1)
+        key = key.strip()
+        color = color.strip()
+        if key.lower() == "space":
+            ch = " "
+        elif key.lower() == "tab":
+            ch = "\t"
+        else:
+            if len(key) != 1:
+                raise ValueError(f"--bitmap mapping keys must be single characters (or 'space'/'tab'); got {key!r}")
+            ch = key
+        mapping[ch] = _parse_color(color)
+    return mapping
+
+_DEFAULT_PALETTE = [
+    "#000000", "#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
+    "#ffff33", "#a65628", "#f781bf", "#999999", "#66c2a5", "#fc8d62",
+    "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3",
+]
+
+def write_bitmap_png(grid: List[List[str]], map_spec: str, out_path: Path, bg_color_str: str) -> None:
+    if Image is None:
+        raise RuntimeError("Pillow is required for --bitmap (pip install Pillow).")
+
+    R, C = grid_size(grid)
+    if R == 0 or C == 0:
+        # Nothing to write; create a 1x1 transparent image.
+        img = Image.new("RGBA", (1, 1), (255, 255, 255, 0))
+        img.save(out_path)
+        return
+
+    user_map = _parse_bitmap_map(map_spec) if map_spec else {}
+    bg_rgba = _parse_color(bg_color_str)
+
+    # Build color map in appearance order for any characters not explicitly mapped.
+    palette_iter = iter(_parse_color(c) for c in _DEFAULT_PALETTE)
+    auto_map: Dict[str, Tuple[int, int, int, int]] = {}
+
+    img = Image.new("RGBA", (C, R), bg_rgba)
+    px = img.load()
+
+    for r in range(R):
+        for c in range(C):
+            ch = grid[r][c]
+            if ch == " " and " " not in user_map:
+                rgba = bg_rgba  # background for padding/space
+            elif ch in user_map:
+                rgba = user_map[ch]
+            else:
+                if ch not in auto_map:
+                    try:
+                        rgba = next(palette_iter)
+                    except StopIteration:
+                        # If we run out, start over (still deterministic)
+                        palette_iter = iter(_parse_color(c) for c in _DEFAULT_PALETTE)
+                        rgba = next(palette_iter)
+                    auto_map[ch] = rgba
+                else:
+                    rgba = auto_map[ch]
+            px[c, r] = rgba
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path)
+
+# ---------- CLI ----------
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Flood fill, despeckle/melt, and pathfinding over a text map."
+        description="Flood fill, despeckle/melt, pathfinding, line transforms, and bitmap export over a text map."
     )
     parser.add_argument("file", help="Input text file")
+
+    # Existing ops
     parser.add_argument("--despeckle", dest="despeckle", default="", help="Characters to despeckle (e.g., '░█')")
     parser.add_argument("--melt", dest="melt", default="", help="Characters for fuzzy despeckle, processed in order (e.g., '░█░')")
     parser.add_argument("--fill", dest="fill", default="", help="Characters to use for flood fill (e.g., 'xyz')")
     parser.add_argument("--path", dest="path", default="", help="Characters for vertical pathfinding (e.g., 'abcd')")
+
+    # Reporting
+    parser.add_argument("--countchars", action="store_true",
+                        help="List each unique character and its count (after line-level transforms), then exit.")
+
+    # Line transforms
+    parser.add_argument("--revline", action="store_true",
+                        help="Reverse characters in every line (left-to-right).")
+    parser.add_argument("--rjust", action="store_true",
+                        help="Right-justify all lines to the longest line (pads on the left).")
+    parser.add_argument("--rpad", action="store_true",
+                        help="Pad lines with spaces on the right so all have equal length (preserves trailing spaces on output).")
+
+    parser.add_argument("--strip", nargs="?", const=None, default=_ARG_SENTINEL, metavar="CHARS",
+                        help="Strip characters from both ends. With no CHARS, strips whitespace; with CHARS, strips those characters.")
+    parser.add_argument("--lstrip", nargs="?", const=None, default=_ARG_SENTINEL, metavar="CHARS",
+                        help="Strip characters from the left. With no CHARS, strips whitespace; with CHARS, strips those characters.")
+    parser.add_argument("--rstrip", nargs="?", const=None, default=_ARG_SENTINEL, metavar="CHARS",
+                        help="Strip characters from the right. With no CHARS, strips whitespace; with CHARS, strips those characters.")
+
+    parser.add_argument("--replace", action="append", default=[], metavar="BEFORE=AFTER",
+                        help="Simple string replacement (literal). May be repeated; applied in order per line.")
+
+    # Bitmap export
+    parser.add_argument("--bitmap", nargs="?", const="", metavar="MAP",
+                        help="Write a PNG where each character is one pixel. "
+                             "Optionally provide MAP like \"0=black,1=red,A=#00ff00\". "
+                             "If MAP omitted, colors are auto-assigned.")
+    parser.add_argument("--bitmap-out", default=None, metavar="PATH",
+                        help="Output PNG path (defaults to <input_stem>.png).")
+    parser.add_argument("--bgcolor", default="#ffffff00", metavar="COLOR",
+                        help="Background color for spaces (named or #RRGGBB[#AA]). Default transparent white.")
+
     args = parser.parse_args()
 
-    grid = read_grid(args.file)
+    # --- Read raw lines and apply line-level transforms ---
+    lines = read_lines(args.file)
+
+    # Parse replacements BEFORE other transforms.
+    if args.replace:
+        pairs: List[Tuple[str, str]] = []
+        for spec in args.replace:
+            if "=" not in spec:
+                parser.error(f"--replace expects BEFORE=AFTER, got {spec!r}")
+            before, after = spec.split("=", 1)
+            pairs.append((before, after))
+        lines = apply_replacements(lines, pairs)
+
+    # Stripping
+    lines = apply_strip_like(lines, "lstrip", args.lstrip)
+    lines = apply_strip_like(lines, "rstrip", args.rstrip)
+    lines = apply_strip_like(lines, "strip",  args.strip)
+
+    # Justify / reverse / pad
+    if args.rjust:
+        lines = right_justify_lines(lines)
+    if args.revline:
+        lines = reverse_lines(lines)
+    if args.rpad:
+        lines = rpad_lines(lines)
+
+    # --- Reporting-only mode ---
+    if args.countchars:
+        cnt = count_chars_in_lines(lines)
+        for ch, n in sorted(cnt.items(), key=lambda kv: (-kv[1], ord(kv[0]))):
+            print(f"{repr(ch)}\t{n}")
+        return
+
+    # --- Convert to grid and run grid-level algorithms ---
+    grid = lines_to_grid(lines)  # pads with spaces to max width (background)
 
     # Order: clean first, then mutate, then route
     if args.despeckle:
@@ -257,7 +492,18 @@ def main():
     if args.path:
         do_paths(grid, args.path)
 
-    print(write_grid(grid))
+    # Bitmap export (after all mutations)
+    if args.bitmap is not None:
+        # Decide output path
+        out_path = Path(args.bitmap_out) if args.bitmap_out else Path(args.file).with_suffix(".png")
+        try:
+            write_bitmap_png(grid, map_spec=args.bitmap, out_path=out_path, bg_color_str=args.bgcolor)
+        except Exception as e:
+            parser.error(str(e))
+
+    # Preserve trailing spaces if user intentionally padded with --rpad
+    strip_trailing = not args.rpad
+    print(write_grid(grid, strip_trailing=strip_trailing))
 
 if __name__ == "__main__":
     main()

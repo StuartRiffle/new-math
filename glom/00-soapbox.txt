@@ -4,7 +4,7 @@
 
 <soapbox>
 - The odd-to-odd Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
-- Wait, where are you going? Collatz is not Turing complete, so it's still on the table, fair and square. I have a bullet point list and a wall of numbers, stay with me here.
+- Wait, where are you going? Collatz isn't Turing complete, so it's still on the table, fair and square. I brought a bullet point list and a wall of numbers, stay with me here.
 - Anyway both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
 - A full iteration exchanges k for new congruence information, which is propagated forward thereafter by the CRT.
 - The binary avalanche caused by +1 is the only meaningful change of state in the Collatz map. The shifts are temporary and informationally harmless.
@@ -15,7 +15,7 @@
 - Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
 - Information diffused by odd primes is not shed until the dyadic hierarchy is "drained", which only happens when the orbit of n intersects a "connector" (details of this below), which collapses accumulated information modulo odd primes.
 
-- The LSB of n under the odd-to-odd map is always 1 (because it's odd). The must also be an MSB _somewhere_ (because we're still playing Collatz, so n > 1).
+- The LSB of n under the odd-to-odd map is always 1 (because it's odd). There must also be an MSB _somewhere_ (because we're still playing Collatz, so n > 1).
 - These can be considered delimiters without informational value then. The interior "payload" bits completely determine the state of the process, which ends when the delimiters join (at 1).
 - The MSB is a placeholder that protects the leading zeroes in the payload. The LSB protects the trailing zeroes, and serves as a "stop" during the /2 normalization step. Together they form a frame.
 - The interior bits as a string form a symbolic progression, isomorphic to the arithmetic by construction (you can always wrap the string in delimiters again to recover n, so a 1:1 mapping).
@@ -44,12 +44,14 @@
 - Many small values of n share factor sets that differ only in their exponents. These are a "jackpot" of coprimality, because the entire radical equivalence class of composite numbers is sieved out together.
 
 - The prime numbers 3 (click) and 2 (bang) are the functional machinery of Collatz. 
-- Define the "cursor primes" to be all the *rest* of them, the set of odd primes above 3. Their presence/absence is the persistent state that allows n to walk unique factor sets.
+- Define the "cursor primes" to be all the rest of them: the set of odd primes above 3. Their presence/absence is the persistent state that allows n to walk unique factor sets.
 - Cursor primes cycle.
 - The +1 operation steps cursor primes through this cycle, unimpeded by the 3n and /2 steps (because they only change n by factors of 3 or 2), making the set of cursor primes Collatz-invariant.
 - The 3n and /2 operations are permutations over all prime rings. They hop n to another number, but always with the *same* cursor radical. The +1 step in natural order (nested prime cycles) is made from there. 
 - For example, 41 is a prime number. In natural order, it successor is 2x3x7 = 42, and incrementing 41 would normally change the set of cursor primes from {41} to {7}. However, the 3n operation jumps to 41x3 = 123, making the cursor primes the factor set above 3 {41}, then steps in natural order from there, to 124, which has factors 2x2x31, or cursor prime set {31}, which will pass unmodified through the following /2 steps. 
-- Collatz then is a permutation of the natural order of succession of cursor prime factor sets. 3n has full coverage over prime rings (it just has to go around them 3 times), the sequence cycles modulo the product of primes, and the +1 operation is applied in shuffled but deterministic order.
+- To put it another way, we're still following natural order, but the sequence of numbers in each radical class has been internally shuffled.
+- Collatz then is a permutation of the natural order of succession of cursor-prime-factor-sets, technically a wreath product.
+- 3n has full coverage over prime rings (it just has to go around them 3 times), the sequence cycles modulo the product of primes, and the +1 operation is applied in shuffled but deterministic order.
 
 - The product of n's unique prime factors is its radical. The value of n is always a multiple of its radical; it is aligned with it. Offset from n on both sides by the its radical is another number which is a multiple of the radical.
 - Every combination of factors represents a radical, if you multiply them all together. There is a 1:1 correspondence between factor sets and radicals, because prime numbers are all coprime to each other, so every uniqe combination of prime factors has a unique product.
