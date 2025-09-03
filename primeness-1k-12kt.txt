@@ -1,0 +1,1005 @@
+# `n`             a positive integer
+# `factorization` the prime factorization of n, including exponents
+# `primeness`     notes if n is a prime, prime power, radical, radical power, or primorial
+
+    n, factorization, primeness
+    1, 1,             
+    2, 2,             
+    3, 3,             prime
+    4, 2²,            prime power
+    5, 5,             prime
+    6, 2 3,           primorial
+    7, 7,             prime
+    8, 2³,            prime power
+    9, 3²,            prime power
+   10, 2 5,           radical
+   11, 11,            prime
+   12, 2² 3,          
+   13, 13,            prime
+   14, 2 7,           radical
+   15, 3 5,           radical
+   16, 2⁴,            prime power
+   17, 17,            prime
+   18, 2 3²,          
+   19, 19,            prime
+   20, 2² 5,          
+   21, 3 7,           radical
+   22, 2 11,          radical
+   23, 23,            prime
+   24, 2³ 3,          
+   25, 5²,            prime power
+   26, 2 13,          radical
+   27, 3³,            prime power
+   28, 2² 7,          
+   29, 29,            prime
+   30, 2 3 5,         primorial
+   31, 31,            prime
+   32, 2⁵,            prime power
+   33, 3 11,          radical
+   34, 2 17,          radical
+   35, 5 7,           radical
+   36, 2² 3²,         radical power
+   37, 37,            prime
+   38, 2 19,          radical
+   39, 3 13,          radical
+   40, 2³ 5,          
+   41, 41,            prime
+   42, 2 3 7,         radical
+   43, 43,            prime
+   44, 2² 11,         
+   45, 3² 5,          
+   46, 2 23,          radical
+   47, 47,            prime
+   48, 2⁴ 3,          
+   49, 7²,            prime power
+   50, 2 5²,          
+   51, 3 17,          radical
+   52, 2² 13,         
+   53, 53,            prime
+   54, 2 3³,          
+   55, 5 11,          radical
+   56, 2³ 7,          
+   57, 3 19,          radical
+   58, 2 29,          radical
+   59, 59,            prime
+   60, 2² 3 5,        
+   61, 61,            prime
+   62, 2 31,          radical
+   63, 3² 7,          
+   64, 2⁶,            prime power
+   65, 5 13,          radical
+   66, 2 3 11,        radical
+   67, 67,            prime
+   68, 2² 17,         
+   69, 3 23,          radical
+   70, 2 5 7,         radical
+   71, 71,            prime
+   72, 2³ 3²,         
+   73, 73,            prime
+   74, 2 37,          radical
+   75, 3 5²,          
+   76, 2² 19,         
+   77, 7 11,          radical
+   78, 2 3 13,        radical
+   79, 79,            prime
+   80, 2⁴ 5,          
+   81, 3⁴,            prime power
+   82, 2 41,          radical
+   83, 83,            prime
+   84, 2² 3 7,        
+   85, 5 17,          radical
+   86, 2 43,          radical
+   87, 3 29,          radical
+   88, 2³ 11,         
+   89, 89,            prime
+   90, 2 3² 5,        
+   91, 7 13,          radical
+   92, 2² 23,         
+   93, 3 31,          radical
+   94, 2 47,          radical
+   95, 5 19,          radical
+   96, 2⁵ 3,          
+   97, 97,            prime
+   98, 2 7²,          
+   99, 3² 11,         
+  100, 2² 5²,         radical power
+  101, 101,           prime
+  102, 2 3 17,        radical
+  103, 103,           prime
+  104, 2³ 13,         
+  105, 3 5 7,         radical
+  106, 2 53,          radical
+  107, 107,           prime
+  108, 2² 3³,         
+  109, 109,           prime
+  110, 2 5 11,        radical
+  111, 3 37,          radical
+  112, 2⁴ 7,          
+  113, 113,           prime
+  114, 2 3 19,        radical
+  115, 5 23,          radical
+  116, 2² 29,         
+  117, 3² 13,         
+  118, 2 59,          radical
+  119, 7 17,          radical
+  120, 2³ 3 5,        
+  121, 11²,           prime power
+  122, 2 61,          radical
+  123, 3 41,          radical
+  124, 2² 31,         
+  125, 5³,            prime power
+  126, 2 3² 7,        
+  127, 127,           prime
+  128, 2⁷,            prime power
+  129, 3 43,          radical
+  130, 2 5 13,        radical
+  131, 131,           prime
+  132, 2² 3 11,       
+  133, 7 19,          radical
+  134, 2 67,          radical
+  135, 3³ 5,          
+  136, 2³ 17,         
+  137, 137,           prime
+  138, 2 3 23,        radical
+  139, 139,           prime
+  140, 2² 5 7,        
+  141, 3 47,          radical
+  142, 2 71,          radical
+  143, 11 13,         radical
+  144, 2⁴ 3²,         
+  145, 5 29,          radical
+  146, 2 73,          radical
+  147, 3 7²,          
+  148, 2² 37,         
+  149, 149,           prime
+  150, 2 3 5²,        
+  151, 151,           prime
+  152, 2³ 19,         
+  153, 3² 17,         
+  154, 2 7 11,        radical
+  155, 5 31,          radical
+  156, 2² 3 13,       
+  157, 157,           prime
+  158, 2 79,          radical
+  159, 3 53,          radical
+  160, 2⁵ 5,          
+  161, 7 23,          radical
+  162, 2 3⁴,          
+  163, 163,           prime
+  164, 2² 41,         
+  165, 3 5 11,        radical
+  166, 2 83,          radical
+  167, 167,           prime
+  168, 2³ 3 7,        
+  169, 13²,           prime power
+  170, 2 5 17,        radical
+  171, 3² 19,         
+  172, 2² 43,         
+  173, 173,           prime
+  174, 2 3 29,        radical
+  175, 5² 7,          
+  176, 2⁴ 11,         
+  177, 3 59,          radical
+  178, 2 89,          radical
+  179, 179,           prime
+  180, 2² 3² 5,       
+  181, 181,           prime
+  182, 2 7 13,        radical
+  183, 3 61,          radical
+  184, 2³ 23,         
+  185, 5 37,          radical
+  186, 2 3 31,        radical
+  187, 11 17,         radical
+  188, 2² 47,         
+  189, 3³ 7,          
+  190, 2 5 19,        radical
+  191, 191,           prime
+  192, 2⁶ 3,          
+  193, 193,           prime
+  194, 2 97,          radical
+  195, 3 5 13,        radical
+  196, 2² 7²,         radical power
+  197, 197,           prime
+  198, 2 3² 11,       
+  199, 199,           prime
+  200, 2³ 5²,         
+  201, 3 67,          radical
+  202, 2 101,         radical
+  203, 7 29,          radical
+  204, 2² 3 17,       
+  205, 5 41,          radical
+  206, 2 103,         radical
+  207, 3² 23,         
+  208, 2⁴ 13,         
+  209, 11 19,         radical
+  210, 2 3 5 7,       primorial
+  211, 211,           prime
+  212, 2² 53,         
+  213, 3 71,          radical
+  214, 2 107,         radical
+  215, 5 43,          radical
+  216, 2³ 3³,         radical power
+  217, 7 31,          radical
+  218, 2 109,         radical
+  219, 3 73,          radical
+  220, 2² 5 11,       
+  221, 13 17,         radical
+  222, 2 3 37,        radical
+  223, 223,           prime
+  224, 2⁵ 7,          
+  225, 3² 5²,         radical power
+  226, 2 113,         radical
+  227, 227,           prime
+  228, 2² 3 19,       
+  229, 229,           prime
+  230, 2 5 23,        radical
+  231, 3 7 11,        radical
+  232, 2³ 29,         
+  233, 233,           prime
+  234, 2 3² 13,       
+  235, 5 47,          radical
+  236, 2² 59,         
+  237, 3 79,          radical
+  238, 2 7 17,        radical
+  239, 239,           prime
+  240, 2⁴ 3 5,        
+  241, 241,           prime
+  242, 2 11²,         
+  243, 3⁵,            prime power
+  244, 2² 61,         
+  245, 5 7²,          
+  246, 2 3 41,        radical
+  247, 13 19,         radical
+  248, 2³ 31,         
+  249, 3 83,          radical
+  250, 2 5³,          
+  251, 251,           prime
+  252, 2² 3² 7,       
+  253, 11 23,         radical
+  254, 2 127,         radical
+  255, 3 5 17,        radical
+  256, 2⁸,            prime power
+  257, 257,           prime
+  258, 2 3 43,        radical
+  259, 7 37,          radical
+  260, 2² 5 13,       
+  261, 3² 29,         
+  262, 2 131,         radical
+  263, 263,           prime
+  264, 2³ 3 11,       
+  265, 5 53,          radical
+  266, 2 7 19,        radical
+  267, 3 89,          radical
+  268, 2² 67,         
+  269, 269,           prime
+  270, 2 3³ 5,        
+  271, 271,           prime
+  272, 2⁴ 17,         
+  273, 3 7 13,        radical
+  274, 2 137,         radical
+  275, 5² 11,         
+  276, 2² 3 23,       
+  277, 277,           prime
+  278, 2 139,         radical
+  279, 3² 31,         
+  280, 2³ 5 7,        
+  281, 281,           prime
+  282, 2 3 47,        radical
+  283, 283,           prime
+  284, 2² 71,         
+  285, 3 5 19,        radical
+  286, 2 11 13,       radical
+  287, 7 41,          radical
+  288, 2⁵ 3²,         
+  289, 17²,           prime power
+  290, 2 5 29,        radical
+  291, 3 97,          radical
+  292, 2² 73,         
+  293, 293,           prime
+  294, 2 3 7²,        
+  295, 5 59,          radical
+  296, 2³ 37,         
+  297, 3³ 11,         
+  298, 2 149,         radical
+  299, 13 23,         radical
+  300, 2² 3 5²,       
+  301, 7 43,          radical
+  302, 2 151,         radical
+  303, 3 101,         radical
+  304, 2⁴ 19,         
+  305, 5 61,          radical
+  306, 2 3² 17,       
+  307, 307,           prime
+  308, 2² 7 11,       
+  309, 3 103,         radical
+  310, 2 5 31,        radical
+  311, 311,           prime
+  312, 2³ 3 13,       
+  313, 313,           prime
+  314, 2 157,         radical
+  315, 3² 5 7,        
+  316, 2² 79,         
+  317, 317,           prime
+  318, 2 3 53,        radical
+  319, 11 29,         radical
+  320, 2⁶ 5,          
+  321, 3 107,         radical
+  322, 2 7 23,        radical
+  323, 17 19,         radical
+  324, 2² 3⁴,         
+  325, 5² 13,         
+  326, 2 163,         radical
+  327, 3 109,         radical
+  328, 2³ 41,         
+  329, 7 47,          radical
+  330, 2 3 5 11,      radical
+  331, 331,           prime
+  332, 2² 83,         
+  333, 3² 37,         
+  334, 2 167,         radical
+  335, 5 67,          radical
+  336, 2⁴ 3 7,        
+  337, 337,           prime
+  338, 2 13²,         
+  339, 3 113,         radical
+  340, 2² 5 17,       
+  341, 11 31,         radical
+  342, 2 3² 19,       
+  343, 7³,            prime power
+  344, 2³ 43,         
+  345, 3 5 23,        radical
+  346, 2 173,         radical
+  347, 347,           prime
+  348, 2² 3 29,       
+  349, 349,           prime
+  350, 2 5² 7,        
+  351, 3³ 13,         
+  352, 2⁵ 11,         
+  353, 353,           prime
+  354, 2 3 59,        radical
+  355, 5 71,          radical
+  356, 2² 89,         
+  357, 3 7 17,        radical
+  358, 2 179,         radical
+  359, 359,           prime
+  360, 2³ 3² 5,       
+  361, 19²,           prime power
+  362, 2 181,         radical
+  363, 3 11²,         
+  364, 2² 7 13,       
+  365, 5 73,          radical
+  366, 2 3 61,        radical
+  367, 367,           prime
+  368, 2⁴ 23,         
+  369, 3² 41,         
+  370, 2 5 37,        radical
+  371, 7 53,          radical
+  372, 2² 3 31,       
+  373, 373,           prime
+  374, 2 11 17,       radical
+  375, 3 5³,          
+  376, 2³ 47,         
+  377, 13 29,         radical
+  378, 2 3³ 7,        
+  379, 379,           prime
+  380, 2² 5 19,       
+  381, 3 127,         radical
+  382, 2 191,         radical
+  383, 383,           prime
+  384, 2⁷ 3,          
+  385, 5 7 11,        radical
+  386, 2 193,         radical
+  387, 3² 43,         
+  388, 2² 97,         
+  389, 389,           prime
+  390, 2 3 5 13,      radical
+  391, 17 23,         radical
+  392, 2³ 7²,         
+  393, 3 131,         radical
+  394, 2 197,         radical
+  395, 5 79,          radical
+  396, 2² 3² 11,      
+  397, 397,           prime
+  398, 2 199,         radical
+  399, 3 7 19,        radical
+  400, 2⁴ 5²,         
+  401, 401,           prime
+  402, 2 3 67,        radical
+  403, 13 31,         radical
+  404, 2² 101,        
+  405, 3⁴ 5,          
+  406, 2 7 29,        radical
+  407, 11 37,         radical
+  408, 2³ 3 17,       
+  409, 409,           prime
+  410, 2 5 41,        radical
+  411, 3 137,         radical
+  412, 2² 103,        
+  413, 7 59,          radical
+  414, 2 3² 23,       
+  415, 5 83,          radical
+  416, 2⁵ 13,         
+  417, 3 139,         radical
+  418, 2 11 19,       radical
+  419, 419,           prime
+  420, 2² 3 5 7,      
+  421, 421,           prime
+  422, 2 211,         radical
+  423, 3² 47,         
+  424, 2³ 53,         
+  425, 5² 17,         
+  426, 2 3 71,        radical
+  427, 7 61,          radical
+  428, 2² 107,        
+  429, 3 11 13,       radical
+  430, 2 5 43,        radical
+  431, 431,           prime
+  432, 2⁴ 3³,         
+  433, 433,           prime
+  434, 2 7 31,        radical
+  435, 3 5 29,        radical
+  436, 2² 109,        
+  437, 19 23,         radical
+  438, 2 3 73,        radical
+  439, 439,           prime
+  440, 2³ 5 11,       
+  441, 3² 7²,         radical power
+  442, 2 13 17,       radical
+  443, 443,           prime
+  444, 2² 3 37,       
+  445, 5 89,          radical
+  446, 2 223,         radical
+  447, 3 149,         radical
+  448, 2⁶ 7,          
+  449, 449,           prime
+  450, 2 3² 5²,       
+  451, 11 41,         radical
+  452, 2² 113,        
+  453, 3 151,         radical
+  454, 2 227,         radical
+  455, 5 7 13,        radical
+  456, 2³ 3 19,       
+  457, 457,           prime
+  458, 2 229,         radical
+  459, 3³ 17,         
+  460, 2² 5 23,       
+  461, 461,           prime
+  462, 2 3 7 11,      radical
+  463, 463,           prime
+  464, 2⁴ 29,         
+  465, 3 5 31,        radical
+  466, 2 233,         radical
+  467, 467,           prime
+  468, 2² 3² 13,      
+  469, 7 67,          radical
+  470, 2 5 47,        radical
+  471, 3 157,         radical
+  472, 2³ 59,         
+  473, 11 43,         radical
+  474, 2 3 79,        radical
+  475, 5² 19,         
+  476, 2² 7 17,       
+  477, 3² 53,         
+  478, 2 239,         radical
+  479, 479,           prime
+  480, 2⁵ 3 5,        
+  481, 13 37,         radical
+  482, 2 241,         radical
+  483, 3 7 23,        radical
+  484, 2² 11²,        radical power
+  485, 5 97,          radical
+  486, 2 3⁵,          
+  487, 487,           prime
+  488, 2³ 61,         
+  489, 3 163,         radical
+  490, 2 5 7²,        
+  491, 491,           prime
+  492, 2² 3 41,       
+  493, 17 29,         radical
+  494, 2 13 19,       radical
+  495, 3² 5 11,       
+  496, 2⁴ 31,         
+  497, 7 71,          radical
+  498, 2 3 83,        radical
+  499, 499,           prime
+  500, 2² 5³,         
+  501, 3 167,         radical
+  502, 2 251,         radical
+  503, 503,           prime
+  504, 2³ 3² 7,       
+  505, 5 101,         radical
+  506, 2 11 23,       radical
+  507, 3 13²,         
+  508, 2² 127,        
+  509, 509,           prime
+  510, 2 3 5 17,      radical
+  511, 7 73,          radical
+  512, 2⁹,            prime power
+  513, 3³ 19,         
+  514, 2 257,         radical
+  515, 5 103,         radical
+  516, 2² 3 43,       
+  517, 11 47,         radical
+  518, 2 7 37,        radical
+  519, 3 173,         radical
+  520, 2³ 5 13,       
+  521, 521,           prime
+  522, 2 3² 29,       
+  523, 523,           prime
+  524, 2² 131,        
+  525, 3 5² 7,        
+  526, 2 263,         radical
+  527, 17 31,         radical
+  528, 2⁴ 3 11,       
+  529, 23²,           prime power
+  530, 2 5 53,        radical
+  531, 3² 59,         
+  532, 2² 7 19,       
+  533, 13 41,         radical
+  534, 2 3 89,        radical
+  535, 5 107,         radical
+  536, 2³ 67,         
+  537, 3 179,         radical
+  538, 2 269,         radical
+  539, 7² 11,         
+  540, 2² 3³ 5,       
+  541, 541,           prime
+  542, 2 271,         radical
+  543, 3 181,         radical
+  544, 2⁵ 17,         
+  545, 5 109,         radical
+  546, 2 3 7 13,      radical
+  547, 547,           prime
+  548, 2² 137,        
+  549, 3² 61,         
+  550, 2 5² 11,       
+  551, 19 29,         radical
+  552, 2³ 3 23,       
+  553, 7 79,          radical
+  554, 2 277,         radical
+  555, 3 5 37,        radical
+  556, 2² 139,        
+  557, 557,           prime
+  558, 2 3² 31,       
+  559, 13 43,         radical
+  560, 2⁴ 5 7,        
+  561, 3 11 17,       radical
+  562, 2 281,         radical
+  563, 563,           prime
+  564, 2² 3 47,       
+  565, 5 113,         radical
+  566, 2 283,         radical
+  567, 3⁴ 7,          
+  568, 2³ 71,         
+  569, 569,           prime
+  570, 2 3 5 19,      radical
+  571, 571,           prime
+  572, 2² 11 13,      
+  573, 3 191,         radical
+  574, 2 7 41,        radical
+  575, 5² 23,         
+  576, 2⁶ 3²,         
+  577, 577,           prime
+  578, 2 17²,         
+  579, 3 193,         radical
+  580, 2² 5 29,       
+  581, 7 83,          radical
+  582, 2 3 97,        radical
+  583, 11 53,         radical
+  584, 2³ 73,         
+  585, 3² 5 13,       
+  586, 2 293,         radical
+  587, 587,           prime
+  588, 2² 3 7²,       
+  589, 19 31,         radical
+  590, 2 5 59,        radical
+  591, 3 197,         radical
+  592, 2⁴ 37,         
+  593, 593,           prime
+  594, 2 3³ 11,       
+  595, 5 7 17,        radical
+  596, 2² 149,        
+  597, 3 199,         radical
+  598, 2 13 23,       radical
+  599, 599,           prime
+  600, 2³ 3 5²,       
+  601, 601,           prime
+  602, 2 7 43,        radical
+  603, 3² 67,         
+  604, 2² 151,        
+  605, 5 11²,         
+  606, 2 3 101,       radical
+  607, 607,           prime
+  608, 2⁵ 19,         
+  609, 3 7 29,        radical
+  610, 2 5 61,        radical
+  611, 13 47,         radical
+  612, 2² 3² 17,      
+  613, 613,           prime
+  614, 2 307,         radical
+  615, 3 5 41,        radical
+  616, 2³ 7 11,       
+  617, 617,           prime
+  618, 2 3 103,       radical
+  619, 619,           prime
+  620, 2² 5 31,       
+  621, 3³ 23,         
+  622, 2 311,         radical
+  623, 7 89,          radical
+  624, 2⁴ 3 13,       
+  625, 5⁴,            prime power
+  626, 2 313,         radical
+  627, 3 11 19,       radical
+  628, 2² 157,        
+  629, 17 37,         radical
+  630, 2 3² 5 7,      
+  631, 631,           prime
+  632, 2³ 79,         
+  633, 3 211,         radical
+  634, 2 317,         radical
+  635, 5 127,         radical
+  636, 2² 3 53,       
+  637, 7² 13,         
+  638, 2 11 29,       radical
+  639, 3² 71,         
+  640, 2⁷ 5,          
+  641, 641,           prime
+  642, 2 3 107,       radical
+  643, 643,           prime
+  644, 2² 7 23,       
+  645, 3 5 43,        radical
+  646, 2 17 19,       radical
+  647, 647,           prime
+  648, 2³ 3⁴,         
+  649, 11 59,         radical
+  650, 2 5² 13,       
+  651, 3 7 31,        radical
+  652, 2² 163,        
+  653, 653,           prime
+  654, 2 3 109,       radical
+  655, 5 131,         radical
+  656, 2⁴ 41,         
+  657, 3² 73,         
+  658, 2 7 47,        radical
+  659, 659,           prime
+  660, 2² 3 5 11,     
+  661, 661,           prime
+  662, 2 331,         radical
+  663, 3 13 17,       radical
+  664, 2³ 83,         
+  665, 5 7 19,        radical
+  666, 2 3² 37,       
+  667, 23 29,         radical
+  668, 2² 167,        
+  669, 3 223,         radical
+  670, 2 5 67,        radical
+  671, 11 61,         radical
+  672, 2⁵ 3 7,        
+  673, 673,           prime
+  674, 2 337,         radical
+  675, 3³ 5²,         
+  676, 2² 13²,        radical power
+  677, 677,           prime
+  678, 2 3 113,       radical
+  679, 7 97,          radical
+  680, 2³ 5 17,       
+  681, 3 227,         radical
+  682, 2 11 31,       radical
+  683, 683,           prime
+  684, 2² 3² 19,      
+  685, 5 137,         radical
+  686, 2 7³,          
+  687, 3 229,         radical
+  688, 2⁴ 43,         
+  689, 13 53,         radical
+  690, 2 3 5 23,      radical
+  691, 691,           prime
+  692, 2² 173,        
+  693, 3² 7 11,       
+  694, 2 347,         radical
+  695, 5 139,         radical
+  696, 2³ 3 29,       
+  697, 17 41,         radical
+  698, 2 349,         radical
+  699, 3 233,         radical
+  700, 2² 5² 7,       
+  701, 701,           prime
+  702, 2 3³ 13,       
+  703, 19 37,         radical
+  704, 2⁶ 11,         
+  705, 3 5 47,        radical
+  706, 2 353,         radical
+  707, 7 101,         radical
+  708, 2² 3 59,       
+  709, 709,           prime
+  710, 2 5 71,        radical
+  711, 3² 79,         
+  712, 2³ 89,         
+  713, 23 31,         radical
+  714, 2 3 7 17,      radical
+  715, 5 11 13,       radical
+  716, 2² 179,        
+  717, 3 239,         radical
+  718, 2 359,         radical
+  719, 719,           prime
+  720, 2⁴ 3² 5,       
+  721, 7 103,         radical
+  722, 2 19²,         
+  723, 3 241,         radical
+  724, 2² 181,        
+  725, 5² 29,         
+  726, 2 3 11²,       
+  727, 727,           prime
+  728, 2³ 7 13,       
+  729, 3⁶,            prime power
+  730, 2 5 73,        radical
+  731, 17 43,         radical
+  732, 2² 3 61,       
+  733, 733,           prime
+  734, 2 367,         radical
+  735, 3 5 7²,        
+  736, 2⁵ 23,         
+  737, 11 67,         radical
+  738, 2 3² 41,       
+  739, 739,           prime
+  740, 2² 5 37,       
+  741, 3 13 19,       radical
+  742, 2 7 53,        radical
+  743, 743,           prime
+  744, 2³ 3 31,       
+  745, 5 149,         radical
+  746, 2 373,         radical
+  747, 3² 83,         
+  748, 2² 11 17,      
+  749, 7 107,         radical
+  750, 2 3 5³,        
+  751, 751,           prime
+  752, 2⁴ 47,         
+  753, 3 251,         radical
+  754, 2 13 29,       radical
+  755, 5 151,         radical
+  756, 2² 3³ 7,       
+  757, 757,           prime
+  758, 2 379,         radical
+  759, 3 11 23,       radical
+  760, 2³ 5 19,       
+  761, 761,           prime
+  762, 2 3 127,       radical
+  763, 7 109,         radical
+  764, 2² 191,        
+  765, 3² 5 17,       
+  766, 2 383,         radical
+  767, 13 59,         radical
+  768, 2⁸ 3,          
+  769, 769,           prime
+  770, 2 5 7 11,      radical
+  771, 3 257,         radical
+  772, 2² 193,        
+  773, 773,           prime
+  774, 2 3² 43,       
+  775, 5² 31,         
+  776, 2³ 97,         
+  777, 3 7 37,        radical
+  778, 2 389,         radical
+  779, 19 41,         radical
+  780, 2² 3 5 13,     
+  781, 11 71,         radical
+  782, 2 17 23,       radical
+  783, 3³ 29,         
+  784, 2⁴ 7²,         
+  785, 5 157,         radical
+  786, 2 3 131,       radical
+  787, 787,           prime
+  788, 2² 197,        
+  789, 3 263,         radical
+  790, 2 5 79,        radical
+  791, 7 113,         radical
+  792, 2³ 3² 11,      
+  793, 13 61,         radical
+  794, 2 397,         radical
+  795, 3 5 53,        radical
+  796, 2² 199,        
+  797, 797,           prime
+  798, 2 3 7 19,      radical
+  799, 17 47,         radical
+  800, 2⁵ 5²,         
+  801, 3² 89,         
+  802, 2 401,         radical
+  803, 11 73,         radical
+  804, 2² 3 67,       
+  805, 5 7 23,        radical
+  806, 2 13 31,       radical
+  807, 3 269,         radical
+  808, 2³ 101,        
+  809, 809,           prime
+  810, 2 3⁴ 5,        
+  811, 811,           prime
+  812, 2² 7 29,       
+  813, 3 271,         radical
+  814, 2 11 37,       radical
+  815, 5 163,         radical
+  816, 2⁴ 3 17,       
+  817, 19 43,         radical
+  818, 2 409,         radical
+  819, 3² 7 13,       
+  820, 2² 5 41,       
+  821, 821,           prime
+  822, 2 3 137,       radical
+  823, 823,           prime
+  824, 2³ 103,        
+  825, 3 5² 11,       
+  826, 2 7 59,        radical
+  827, 827,           prime
+  828, 2² 3² 23,      
+  829, 829,           prime
+  830, 2 5 83,        radical
+  831, 3 277,         radical
+  832, 2⁶ 13,         
+  833, 7² 17,         
+  834, 2 3 139,       radical
+  835, 5 167,         radical
+  836, 2² 11 19,      
+  837, 3³ 31,         
+  838, 2 419,         radical
+  839, 839,           prime
+  840, 2³ 3 5 7,      
+  841, 29²,           prime power
+  842, 2 421,         radical
+  843, 3 281,         radical
+  844, 2² 211,        
+  845, 5 13²,         
+  846, 2 3² 47,       
+  847, 7 11²,         
+  848, 2⁴ 53,         
+  849, 3 283,         radical
+  850, 2 5² 17,       
+  851, 23 37,         radical
+  852, 2² 3 71,       
+  853, 853,           prime
+  854, 2 7 61,        radical
+  855, 3² 5 19,       
+  856, 2³ 107,        
+  857, 857,           prime
+  858, 2 3 11 13,     radical
+  859, 859,           prime
+  860, 2² 5 43,       
+  861, 3 7 41,        radical
+  862, 2 431,         radical
+  863, 863,           prime
+  864, 2⁵ 3³,         
+  865, 5 173,         radical
+  866, 2 433,         radical
+  867, 3 17²,         
+  868, 2² 7 31,       
+  869, 11 79,         radical
+  870, 2 3 5 29,      radical
+  871, 13 67,         radical
+  872, 2³ 109,        
+  873, 3² 97,         
+  874, 2 19 23,       radical
+  875, 5³ 7,          
+  876, 2² 3 73,       
+  877, 877,           prime
+  878, 2 439,         radical
+  879, 3 293,         radical
+  880, 2⁴ 5 11,       
+  881, 881,           prime
+  882, 2 3² 7²,       
+  883, 883,           prime
+  884, 2² 13 17,      
+  885, 3 5 59,        radical
+  886, 2 443,         radical
+  887, 887,           prime
+  888, 2³ 3 37,       
+  889, 7 127,         radical
+  890, 2 5 89,        radical
+  891, 3⁴ 11,         
+  892, 2² 223,        
+  893, 19 47,         radical
+  894, 2 3 149,       radical
+  895, 5 179,         radical
+  896, 2⁷ 7,          
+  897, 3 13 23,       radical
+  898, 2 449,         radical
+  899, 29 31,         radical
+  900, 2² 3² 5²,      radical power
+  901, 17 53,         radical
+  902, 2 11 41,       radical
+  903, 3 7 43,        radical
+  904, 2³ 113,        
+  905, 5 181,         radical
+  906, 2 3 151,       radical
+  907, 907,           prime
+  908, 2² 227,        
+  909, 3² 101,        
+  910, 2 5 7 13,      radical
+  911, 911,           prime
+  912, 2⁴ 3 19,       
+  913, 11 83,         radical
+  914, 2 457,         radical
+  915, 3 5 61,        radical
+  916, 2² 229,        
+  917, 7 131,         radical
+  918, 2 3³ 17,       
+  919, 919,           prime
+  920, 2³ 5 23,       
+  921, 3 307,         radical
+  922, 2 461,         radical
+  923, 13 71,         radical
+  924, 2² 3 7 11,     
+  925, 5² 37,         
+  926, 2 463,         radical
+  927, 3² 103,        
+  928, 2⁵ 29,         
+  929, 929,           prime
+  930, 2 3 5 31,      radical
+  931, 7² 19,         
+  932, 2² 233,        
+  933, 3 311,         radical
+  934, 2 467,         radical
+  935, 5 11 17,       radical
+  936, 2³ 3² 13,      
+  937, 937,           prime
+  938, 2 7 67,        radical
+  939, 3 313,         radical
+  940, 2² 5 47,       
+  941, 941,           prime
+  942, 2 3 157,       radical
+  943, 23 41,         radical
+  944, 2⁴ 59,         
+  945, 3³ 5 7,        
+  946, 2 11 43,       radical
+  947, 947,           prime
+  948, 2² 3 79,       
+  949, 13 73,         radical
+  950, 2 5² 19,       
+  951, 3 317,         radical
+  952, 2³ 7 17,       
+  953, 953,           prime
+  954, 2 3² 53,       
+  955, 5 191,         radical
+  956, 2² 239,        
+  957, 3 11 29,       radical
+  958, 2 479,         radical
+  959, 7 137,         radical
+  960, 2⁶ 3 5,        
+  961, 31²,           prime power
+  962, 2 13 37,       radical
+  963, 3² 107,        
+  964, 2² 241,        
+  965, 5 193,         radical
+  966, 2 3 7 23,      radical
+  967, 967,           prime
+  968, 2³ 11²,        
+  969, 3 17 19,       radical
+  970, 2 5 97,        radical
+  971, 971,           prime
+  972, 2² 3⁵,         
+  973, 7 139,         radical
+  974, 2 487,         radical
+  975, 3 5² 13,       
+  976, 2⁴ 61,         
+  977, 977,           prime
+  978, 2 3 163,       radical
+  979, 11 89,         radical
+  980, 2² 5 7²,       
+  981, 3² 109,        
+  982, 2 491,         radical
+  983, 983,           prime
+  984, 2³ 3 41,       
+  985, 5 197,         radical
+  986, 2 17 29,       radical
+  987, 3 7 47,        radical
+  988, 2² 13 19,      
+  989, 23 43,         radical
+  990, 2 3² 5 11,     
+  991, 991,           prime
+  992, 2⁵ 31,         
+  993, 3 331,         radical
+  994, 2 7 71,        radical
+  995, 5 199,         radical
+  996, 2² 3 83,       
+  997, 997,           prime
+  998, 2 499,         radical
+  999, 3³ 37,         
+ 1000, 2³ 5³,         radical power

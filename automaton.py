@@ -3,7 +3,7 @@
 #
 # This is a one-register automaton that performs the Collatz transform without performing
 # arithmetic on n. It carries the 2-adic valuations (odd core and k) of n's immediate 
-# even neighbors nl to the left (n-1), and nr to the right (n+1), as state
+# even neighbors nl to the left (n-1), and nr to the right (n+1), as state.
 #
 # Under construction!
 
@@ -31,7 +31,8 @@ def is_odd(n):
     return n & 1
 
 def collatz_odd_next(n):
-    assert(is_odd(n))
+    if not is_odd(n):
+        n = odd_core(n)
     return odd_core(3 * n + 1)
 
 def collatz_odd_dist(n):
@@ -47,19 +48,22 @@ def create_automaton(n):
     return (ocl, kl, ocr, kr)
 
 def validate_automaton(t):
-    assert(t)
-    assert(len(t) == 4)
     if t == TERMINATOR_AT_ONE:
         return
 
+    assert(t)
+    assert(len(t) == 4)
+
     ocl, kl, ocr, kr = t
-    nl = ocl << kl
-    nr = ocr << kr
 
     assert(ocl > 0 and ocr > 0)
     assert(is_odd(ocl) and is_odd(ocr))
     assert(min(kl, kr) == 1)
     assert(max(kl, kr) > 1)
+
+    nl = ocl << kl
+    nr = ocr << kr
+    
     assert(nl + 1 == nr - 1)
 
 def peek_automaton(t):
@@ -157,7 +161,7 @@ def step_automaton(t):
         ocl, kl = odd_val(3 * ocl + 1) # FIXME - recalculate directly (without reconstructing n)
         return (ocl, kl, ocr, kr)
 
-    assert(kl == 2 and kr == 1)
+    #assert(kl == 2 and kr == 1)
 
     # CASE C (?)
 
@@ -193,5 +197,6 @@ if __name__ == "__main__":
         
 
                                                                                     
+
 
 

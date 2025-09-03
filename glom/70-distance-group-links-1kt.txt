@@ -1,0 +1,55 @@
+# Stopping distance groups
+
+Each odd number in the stopping group listing is given with a pair of 2-adic "odd core" valuations for its immediate even neighbors.
+
+This pair of vectors {oc(n-1), oc(n+1)} is like a "fingerprint" of a number's local arithmetic environment.
+It is *self-similar* and correlated with arithmetic properties in general, and Collatz evolution specifically.
+Within some distance groups, there are doublings with apparently recursive structure.
+It seems like they are part of the same graph but spilled across a wide range of numbers.
+There is strong order here, in fact most of it looks boilerplate.
+
+For example, look at distance group 42.
+We start with n=73, the lowest in magnitude, and valuations of neighbors 72 and 74, respectively:
+
+`n`   - an odd integer
+`ocl` - odd core of n's even neighbor to the left (n-1)
+`ocr` - odd core of n's even neighbor to the right (n+1)
+
+n, ocl,  cr
+73,(9 3),(37 1)
+
+(75 follows 73 and is referenced later in the structure, but is not part of this distance group, it has distance 3).
+
+The "seed" number 73 has a doubled presence at 145 and 147. They share neighbor 146 in the middle.
+Their core values all match or point to the seed number 73. This part looks deterministic.
+
+145,  (9 4), (73 1)     # shared middle neighbor 146 links both to 73
+147, (73 1), (37 2)     # "uplink" to 37 (?)
+
+(149 follows 147 and is referenced later in the structure, but is not part of this distance group, it has distance 6).
+
+There is now a re-doubling, which links back to the first doubled presence around 146. The shared middle neighbor 292 again links to 73.
+
+291, (145 1),  (73 2)   # link back to first doubled (145)
+293,  (73 2), (147 1)   # link back to secobd doubled (147)
+
+(295 follows 293 and is referenced later in the structure, but is not part of this distance group, it has distance 18).
+
+Just past the redoubling we have this "connector".
+It's not clear why this appears at 299, except that it's similar to a re-doubling of 75, which is adjacent to the original seed 73 (?)
+
+299, (149 1), (75, 2) # 149 is after the doubled presence, 75 follows the original 73
+
+But now we double a *third* time, sort of. The structure has grown more complex, but still ordered.
+
+581, (145 2), (291 1)   # link back to first doubled (145) and first redoubled (291)
+                        # skipping 2 odd numbers, 584 in center, which has odd core 73
+587, (293 1), (147 2)   # link back to second redoubled (293) and second doubled (147)
+589, (147 2), (295 1)   # shared middle neighbor 588 links back to 147, and 295, just _after_ the second redoubled
+                        # skipping 2 odd numbers, 594 in center, which has odd core 297
+599, (299 1), (75 3)    # link back to the previous connector, after the re-doubling, and (like it) back to 75
+
+It continues like this. The distance groups seem to be something like a handful of seed values in an infinite hall of mirrors.
+
+It appears that following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed.
+

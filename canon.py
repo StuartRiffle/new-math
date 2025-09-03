@@ -1,9 +1,12 @@
 from automaton import *
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
+import re
+
 
 import argparse
 arg = argparse.ArgumentParser()
+arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins'], help="The command to run")
 arg.add_argument("--cols", type=str, default='oc,k,dist,factors,orbit')
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
@@ -15,6 +18,8 @@ arg.add_argument("--trailing-comma", action="store_true")
 arg.add_argument("--pad", action="store_true")
 arg.add_argument("--autocompare", action="store_true")
 arg.add_argument("--factor-braces", action="store_true")
+arg.add_argument("--factor-exponents", action="store_true")
+arg.add_argument("--factor-dots", action="store_true")
 arg.add_argument("--residues", type=int, default=0)
 arg.add_argument("--residue-two", action="store_true", help="Use 2 as the first residue prime, not 3")
 arg.add_argument("--odd-core-info", action="store_true")
@@ -33,25 +38,28 @@ arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
 arg = arg.parse_args()
 
-list_of_characters_like_exponents_of_2_and_3_for_squared_and_cubed_etc = '⁰¹²³⁴⁵⁶⁷⁸⁹'
 
+#arg.command = 'table'
+#arg.cols = 'factors'
 
-arg.command = 'orbit'
-
-arg.max = 100000
-arg.n = 871
-#arg.cols = 'n,base2,base3,factors,dist,nl,ocldist,nr,ocrdist,orbit_back'
-arg.cols = '-dist,-n,factors,-ocldist,-nl,ofactorsl,-ocrdist,-nr,ofactorsr,-tcn,-base2,-base3,-base5,-base7,m*,-pre_total'
-arg.sort_by = 'pre_total'
-arg.odds = True
-arg.column_info = True
-arg.header_line = True
-#arg.pad = True
-#arg.autocompare = True
-arg.factor_braces = True
-arg.residues = 12
-arg.pad = True
-arg.csv = True
+#arg.max = 1000
+#arg.n = 871
+##arg.cols = 'n,base2,base3,factors,dist,nl,ocldist,nr,ocrdist,orbit_back'
+##arg.cols = '-dist,-n,factors,-ocldist,-nl,ofactorsl,-ocrdist,-nr,ofactorsr,-tcn,-base2,-base3,-base5,-base7,m*,-pre_total'
+#arg.cols='-n,pclass,factors'
+##arg.trailing_comma = True
+##arg.sort_by = 'factors'
+##arg.odds = True
+#arg.column_info = True
+#arg.header_line = True
+##arg.pad = True
+##arg.autocompare = True
+#arg.factor_braces = True
+#arg.factor_exponents = True
+#arg.factor_dots = True
+#arg.residues = 10
+##arg.pad = True
+#arg.csv = True
 #arg.count_factors = True
 #arg.radical_only = True
 
@@ -133,9 +141,41 @@ def collatz_orbit_str(n, sep = ' ->', count = None):
 def collatz_orbit_str_backwards(n, sep = '<- '):
     return sep.join(map(str, reversed(collatz_orbit_list(n))))
 
-def get_prime_factors(n):
+def get_superscript(digits):
+    sup = '⁰¹²³⁴⁵⁶⁷⁸⁹'
+    result = ''
+    for digit in str(digits):
+        if digit.isdigit():
+            result += sup[int(digit)]
+        else:
+            result += digit
+    return result
+
+def left_digits(s):
+    digits = ''
+    for c in s:
+        if c.isdigit():
+            digits += c
+        else:
+            break
+    return digits
+
+def get_prime_factor_list(n):
     factorization = factorint(n)
     return sorted(list(factorization.keys()))
+
+def get_prime_factors(n):
+    factorization = factorint(n)
+    result = []
+    for p, exp in factorization.items():
+        pstr = str(p)
+        if arg.factor_exponents and exp > 1:
+            pstr += get_superscript(exp)
+        result.append(pstr)
+    return result
+
+
+
 
 def get_factor_mask(n):
     mask = ''
@@ -161,7 +201,7 @@ def get_str_in_radix(n, base):
 
 def get_radical(n):
     rad = 1
-    for p in get_prime_factors(n):
+    for p in get_prime_factor_list(n):
         rad *= p
     return rad
 
@@ -244,10 +284,97 @@ def calc_indirect_preimages(ns):
             if i == 1:
                 break
 
+def is_primorial(n):
+    if n < 2:
+        return False
+    
+    factors = get_prime_factors(n)
+    if len(factors) == 0 or factors[0] != 2:
+        return False
+    
+    for i in range(1, len(factors)):
+        if factors[i] != nextprime(factors[i - 1]):
+            return False
+    
+    return True
 
 
+def get_prime_specialness(n, verbose = True):
+    if n > 2:
+        factors = get_prime_factor_list(n)
+
+        if len(factors) == 1:
+            if n == factors[0]:
+                if isprime(n-2) or isprime(n+2):
+                    return 'prime twin' if verbose else 'pt'
+                
+                return 'prime' if verbose else 'p'
+            else:
+                return 'prime power' if verbose else 'pp'
+            
+        radical = get_radical(n)
+        if radical == n:
+            if is_primorial(n):
+                return 'primorial' if verbose else 'm'
+            else:
+                return 'radical' if verbose else 'r'
+
+        nr = n
+        while nr % radical == 0:
+            nr //= radical
+            if nr == 1:
+                if is_primorial(radical):
+                    return 'primorial power' if verbose else 'mp'
+                else:
+                    return 'radical power' if verbose else 'rp'
+    
+    return ''
+    
+def get_symmetric_primes(n, limit = 5, range = 30):
+    d = 1
+    result = []
+    while d <= range:
+        if isprime(n - d) and isprime(n + d):
+            result.append(d)
+            if len(result) >= limit:
+                break
+        d += 1
+    return result
 
 
+def get_goldbach_pairs(n):
+    pairs = []
+    if n % 2 == 0 and n > 2:
+        for p in primerange(2, n // 2 + 1):
+            q = n - p
+            if isprime(q):
+                pairs.append((p, q))
+    return pairs
+
+def get_goldbach_pair_string(n):
+    pairs = get_goldbach_pairs(n)
+    if pairs:
+        pair_strs = [f'{q}+{p}' for p, q in pairs]
+        return ' '.join(pair_strs)
+    else:
+        return ''
+
+
+def get_closest_prime(n):
+    if n < 2:
+        return 2
+    if isprime(n):
+        return n
+    lower = n - 1
+    while lower > 1 and not isprime(lower):
+        lower -= 1
+    upper = n + 1
+    while not isprime(upper):
+        upper += 1
+    if n - lower <= upper - n:
+        return lower
+    else:
+        return upper
 
 col_desc = {}
 unique_factor_sets = {}
@@ -323,6 +450,24 @@ def calc_n_values(n):
     col_desc['orbitpeek'] = f'the next steps in the orbit of {paramname} under the odd-to-odd Collatz map'
     val['orbitpeek'] = collatz_orbit_str(param, count=7)
 
+    col_desc['primeness'] = f'notes if {paramname} is a prime, prime power, prime twin, radical, radical power, primorial, or primorial power'
+    val['primeness'] = get_prime_specialness(param)
+
+    col_desc['pclass'] = f'notes if {paramname} is a prime (p), prime power (pp), prime twin (pt), radical (r), radical power (rp), primorial (m), or primorial power (mp)'
+    val['pclass'] = get_prime_specialness(param, verbose=False)
+
+    col_desc['psym'] = f'the symmetric primes at equal offsets around {paramname}'
+    val['psym'] = get_symmetric_primes(param, limit=8, range=100)
+
+    col_desc['psymext'] = f'the symmetric primes p=n-d and q=n+d in the immediate vicinity of {paramname}, given as p:q(d)'
+    psymnext = ''
+    for d in val['psym']:
+        psymnext += f'{param - d}:{param + d}({d}) '
+    val['psymext'] = psymnext.strip()
+
+    col_desc['gbpairs'] = f'the Goldbach prime pairs that sum to {paramname}, if {paramname} is even and greater than 4'
+    val['gbpairs'] = get_goldbach_pair_string(param) if param % 2 == 0 and param > 4 else ''
+
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
     col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
     col_desc['cyc*'] = f'the prime ring cycles of {paramname}'
@@ -367,7 +512,12 @@ def calc_n_values(n):
         val[symbol_name] = symbol
 
     all_factors = get_prime_factors(param)
-    factors_str = ', '.join([str(f) for f in all_factors])
+
+    facsep = ', '
+    if arg.factor_dots:
+        facsep = '⋅'
+
+    factors_str = facsep.join([str(f) for f in all_factors])
     if factors_str not in unique_factor_sets:
         unique_factor_sets[factors_str] = 0
     unique_factor_sets[factors_str] += 1
@@ -376,13 +526,12 @@ def calc_n_values(n):
     for exclude in [2, 3]:
         if exclude in cursor_factors:
             cursor_factors.remove(exclude)
-    cfactors_str = ', '.join([str(f) for f in cursor_factors])
 
-    factorsl_str = ', '.join([str(f) for f in get_prime_factors(param - 1)])
-    factorsr_str = ', '.join([str(f) for f in get_prime_factors(param + 1)])
-
-    ofactorsl_str = ', '.join([str(f) for f in get_prime_factors(param - 1) if f % 2 == 1])
-    ofactorsr_str = ', '.join([str(f) for f in get_prime_factors(param + 1) if f % 2 == 1])
+    cfactors_str =  facsep.join([str(f) for f in cursor_factors])
+    factorsl_str =  facsep.join([str(f) for f in get_prime_factors(param - 1)])
+    factorsr_str =  facsep.join([str(f) for f in get_prime_factors(param + 1)])
+    ofactorsl_str = facsep.join([str(f) for f in get_prime_factors(param - 1) if str(f)[0] != '2'])
+    ofactorsr_str = facsep.join([str(f) for f in get_prime_factors(param + 1) if str(f)[0] != '2'])
 
     if arg.factor_braces:
         factors_str = '{' + factors_str + '}'
@@ -394,6 +543,13 @@ def calc_n_values(n):
 
     col_desc['factors'] = f'the prime factors of {paramname}'
     val['factors'] = factors_str
+
+    col_desc['factorzig'] = f'the prime factors of {paramname}, indented by distance from the nearest prime'
+    closest = get_closest_prime(param)
+    dist = abs(param - closest)
+    val['factorzig'] = ' ' * dist + factors_str
+
+
 
     col_desc['factorsl'] = f'the prime factors of {paramname}-1'
     val['factorsl'] = factorsl_str
@@ -412,14 +568,15 @@ def calc_n_values(n):
 
     col_desc['rad'] = f'the radical of {paramname}, the product of its unique prime factors'
     rad = 1
-    for p in all_factors:
+    for p in get_prime_factor_list(param):
         rad *= p
     val['rad'] = rad
 
     col_desc['crad'] = f'the Collatz "cursor radical" of {paramname}, the product of its prime factors above 3'
     crad = 1
-    for p in cursor_factors:
-        crad *= p
+    for p in get_prime_factor_list(param):
+        if p > 3:
+            crad *= p   
     val['crad'] = crad
 
     col_desc['mask'] = f'the mask of prime factors (radical) of {paramname}, as a string'
@@ -493,6 +650,25 @@ def get_n_values(n):
     val = calc_n_values(n)
     n_cache[n] = val
     return val
+
+
+_SUPERS = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+_SUP_TO_NORMAL = str.maketrans(_SUPERS, "0123456789")
+_PAIR_RE = re.compile(r"([0-9]+)([⁰¹²³⁴⁵⁶⁷⁸⁹]*)")
+
+def parse_factorization(s: str):
+    # "{2⁴ 3 5²³}" → [2, 4, 3, 1, 5, 23]
+    terms = []
+    for base, sup in _PAIR_RE.findall(s):
+        terms.append(int(base))
+        terms.append(int(sup.translate(_SUP_TO_NORMAL)) if sup else 1)
+    return terms
+
+def factorization_sort_key(s: str):
+    return parse_factorization(s)
+
+
+
 
 def print_output(output_lines):
     if arg.output_file:
@@ -583,7 +759,11 @@ def print_ns(ns):
         sortlist = []
         for idx, item in enumerate(cells[arg.sort_by]):
             sortlist.append((item, idx))
-        sortlist.sort(key=lambda x: x[0])
+
+        if 'factors' in arg.sort_by:
+            sortlist.sort(key=lambda x: factorization_sort_key(x[0]))
+        else:
+            sortlist.sort(key=lambda x: x[0])
 
         sorted_order = []
         for item, idx in sortlist:
@@ -604,7 +784,7 @@ def print_ns(ns):
             if arg.pad:
                 line += ' '
         line = line.rstrip()
-        if line[-1] == sep.strip():
+        if len(line) > 0 and line[-1] == sep.strip():
             if not arg.trailing_comma:
                 line = line[:-1]
         output_lines.append(line)
