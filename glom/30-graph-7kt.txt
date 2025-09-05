@@ -12,6 +12,7 @@ Of odd numbers 1 - 63 inclusive, only 27, 45, and 63 are not primes or radicals.
 Increasing depth, we see composites at 75, 81, 99, 117, 125. These are higher powers of small primes, and a multiple of their radicals.
 There is great regularity in the graph, but because individual primes are unevenly spaced on the number line, they are also so in the hierarchy, exploring the space of relative positions.
 
+```
 digraph G {
   rankdir=TB;
   node [fontsize=30 style=filled fillcolor=white];
@@ -409,6 +410,7 @@ digraph G {
   255 -> 127;
   255 -> 1;
 }
+```
 
 
 # Odd core graph of stopping times
@@ -426,6 +428,7 @@ So we know one thing at least, stopping times are disjoint between sides at the 
 The pattern of radicals etc, is not symmetrical, neither are the clumps of stopping times. 
 From the bottom, the first surprisingly large stopping time is 41 (corresponds to 3x3x3=27).
 
+```
 digraph G {
   rankdir=TB;
   node [fontsize=30 style=filled fillcolor=white];
@@ -823,4 +826,6 @@ digraph G {
   255 -> 127;
   255 -> 1;
 }
+```
+
 

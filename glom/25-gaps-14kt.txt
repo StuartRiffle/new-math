@@ -3,7 +3,8 @@
 This shows the alignment of countercycles +/1 offsets from the radical for an odd cycle length (3*5 = 15).
 There is no center element of the cycle, but you can see in the middle they meet with a gap of 2 regardless.
 So with an odd cycle length, the gaps neccessarily align at constant offsets from the radical.
-
+    
+```
      1            15 
      |             | 
  3: X--X--X--X--X--X
@@ -12,12 +13,13 @@ So with an odd cycle length, the gaps neccessarily align at constant offsets fro
 -3  X--X--X--X--X--X
     |             | 
    -15           -1
-
+```
 
 Adding a factor of 2, to get an even cycle length, displays a similar pattern.
 The center element is radical 3*5 = 15, so 3 and 5 reflect around that point, and 2 does not align with them, blocking that gap.
 The factor of 2 also blocks half (ish?) of the gap channels by being coprime. The rest survive.
 
+```
      1            15             30 
      |             |              | 
  2: X-X-X-X-X-X-X-X-X-X-X-X-X-X-X-X
@@ -28,6 +30,7 @@ The factor of 2 also blocks half (ish?) of the gap channels by being coprime. Th
 -2: X-X-X-X-X-X-X-X-X-X-X-X-X-X-X-X
     |              |             | 
    -30            -15           -1
+```
 
 
 For clarity: the factor sets in the cycle do *not* repeat going backwards, but the _gaps_ line up going in opposite directions, aligned on the radical.
@@ -47,7 +50,7 @@ The gaps (0000) appear at these positions in the cycle:
 The pattern is symmetrical around the midpoint of the cycle, and the radical, exactly as demonstrated above.
 You can see the | "channels" highlighted that higher primes can pass through.
 
-        
+```
         1  -->                                                                                          (natural order) -->                                                                                            209
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
@@ -64,6 +67,7 @@ You can see the | "channels" highlighted that higher primes can pass through.
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
  <--  -209                                                                                           <-- (reversed order)                                                                                              -1
+```
 
 
 ## Prime symmetry around radicals
@@ -71,6 +75,7 @@ You can see the | "channels" highlighted that higher primes can pass through.
 Note the overlap, many primes (like 101) are symmetrically reachable from multiple radicals, marked here with an asterisk.
 This is an artifact of coprimality with the factors of that radical, primes could not be elsewhere.
 
+```
 -11   31
  -5   37
  -1   41
@@ -86,10 +91,12 @@ This is an artifact of coprimality with the factors of that radical, primes coul
  +2  107
  +4  109*
  +8  113*
+```
 
 Note 3 symmetrical primes around 120 here (offsets 11, 17, 19) which overlay the power-of two sequence (2, 4, 8) of prime offsets around 105.
 It doesn't cover all of them: 105-8 = 97 = 120-23, but 120+23 = 143, composite.
 
+```
 -19  101*
 -17  103*
 -11  109*
@@ -99,11 +106,13 @@ It doesn't cover all of them: 105-8 = 97 = 120-23, but 120+23 = 143, composite.
 +11  131*
 +17  137*
 +19  139*
+```
 
 The same is the case here for 149: symmetrical around 120 would be 91, composite.
 But similarly again, 120*7 = 127 is not symmetrical around 165, because 165+38 = 203, composite.
 The overlapping factors at 131, 137, 139 are not power of two offsets from 165 and are clearly stolen from 120.
 
+```
 -34  131*
 -28  137*
 -26  139*
@@ -117,6 +126,7 @@ The overlapping factors at 131, 137, 139 are not power of two offsets from 165 a
 +26  191
 +28  193
 +34  199
+```
 
 
 
@@ -129,6 +139,7 @@ Symmetrical walks cross forward/back sequences in steps of 2, and the pattern of
 This shows the cycle of 210 against all relative phases of the backwards cycle. The "o" characters mark blocked gaps in the reversed sequence, and "#" indicates gaps which align to permit the existence of higher primes.
 It demonstrates that there is always significant gap alignment at any relative offset for the mirrored sequences. There is a count of them in the right margin for every row.
            
+```
         |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
     2: X|X.X.X.X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X.X|X.X|X.X.X|X.X.X.X|X.X|X|X.X|X|X.X|X.X.X.X|X.X.X|X.X|X.X.X|X|X.X|X.X.X|X|X.X.X|X.X.X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X.X.X.X|X
     3: X|.X..X..X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X..X|.X.|X..X.|X..X..X|.X.|X|.X.|X|.X.|X..X..X|.X..X|.X.|X..X.|X|.X.|X..X.|X|.X..X|.X..X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X..X..X.|X
@@ -243,11 +254,11 @@ ofs                                                                             
 204:    ....o.o...#.#...#.....#.o.....#...o.#...#.....#.....#.o.....#...o.#.....#...o.....#.......o...o.#...#.#...#.......o.....#...o.....#.o...#.....#.o.....#.....#...o.#...#.....#.o.....#...o.#...#.#.........o.o.....    30
 206:    ......o.o...#.o...#.....o.o.....o...#.o...#.....o.....o.o.....o...#.o.....o...#.....o.......o...#.o...#.o...#.......o.....o...#.....o.o...#.....o.o.....o.....o...#.o...#.....o.o.....o...#.o...#.o.........o.o...    15
 208:    ........o.#...o.#...o.....o.#.....o...o.#...o.....o.....o.#.....o...o.#.....o...o.....o.......o...o.#...o.#...o.......o.....o...o.....o.#...o.....o.#.....o.....o...o.#...o.....o.#.....o...o.#...o.#.........o.#.    15
+```
 
 Empirically at least 15 gaps remain when the prime cycle of 210 is masked against its anti-cycle, at any relative phase.
 
-
-
+```
                                      ║
                 <──────(n-d)──────── n ────────(n+d)──────>
                          │           ║           │                  
@@ -267,6 +278,7 @@ Empirically at least 15 gaps remain when the prime cycle of 210 is masked agains
      but one or more always will.    ║           │                       
                                      n ────────(n-d)──────>
                                      ║       BACKWARDS
+```
                                           
 
 

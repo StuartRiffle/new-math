@@ -26,6 +26,7 @@ Some things to note:
 
 The orbit of n = 6471:
 
+```csv
 ocldist,          nl, ofactorsl,      dist,        n, factors,       ocrdist,           nr, ofactorsr,         tcn,                   base2,           base3,       base5,     base7, m3, m5, m7, m11, m13, m17, m19, m23, m29, m31, m37, m41
      14,    (3235 1), {5 647},          60,     6471, {3 719},            14,      (809 3), {809},             719,           1100101000111,        22212200,      201341,     24603, 0,  1,  3,  3,   10,  11,  11,  8,   4,   23,  33,  34
      13,    (4853 1), {23 211},         59,     9707, {17 571},           42,     (2427 2), {3 809},          3236,          10010111101011,       111022112,      302312,     40205, 2,  2,  5,  5,   9,   0,   17,  1,   21,  4,   13,  31
@@ -88,10 +89,11 @@ ocldist,          nl, ofactorsl,      dist,        n, factors,       ocrdist,   
       2,       (3 2), {3},               2,       13, {13},                5,        (7 1), {7},                 4,                    1101,             111,          23,        16, 1,  3,  6,  2,   0,   13,  13,  13,  13,  13,  13,  13
       0,       (1 2), {},                1,        5, {5},                 2,        (3 1), {3},                 2,                     101,              12,          10,         5, 2,  0,  5,  5,   5,   5,   5,   5,   5,   5,   5,   5
       0,       (0 0), {},                0,        1, {},                  0,        (1 1), {},                  0,                       1,               1,           1,         1, 1,  1,  1,  1,   1,   1,   1,   1,   1,   1,   1,   1
-
+```
 
 The orbit of n = 27 is below, but first here's a snippet that shows a pattern to watch for:
 
+```
   n, ofactorsl, factors, ofactorsr, m3,  m5,  m7, m11, m13, m17, m19, m23, m29, m31
  91,     {3 5},  {7 13},    {23},   (1), (1), *0,   3,  *0,   6,  15, |22|,  4,  29
 137,      {17},   {137},  {3 23},    2,   2,   4,   5,   7,  (1),  4, |22|, 21,  13   # nr holding 23, nl switches to 17
@@ -100,6 +102,7 @@ The orbit of n = 27 is below, but first here's a snippet that shows a pattern to
 233,      {29},   {233},  {3 13},    2,   3,   2,   2, |12|, 12,   5,   3,  (1), 16   # nr holding 13, nl switches to {29}
 175,    {3 29},   {5 7},    {11},   (1), *0,  *0, |10|,  6,   5,   4,  14,  (1), 20   # nl holding 29, nr switches to 11
 263,     {131},   {263},  {3 11},    2,   3,   4, |10|,  3,   8,  16,  10,   2,  15   # nr holding 11, ml switches to 131
+```
 
 - The power-of-3 scaling behavior of nr holds a set of factors at residue -1, marked in bars here for visibility. For example |22| is -1 mod 23, |12| is -1 mod 13, etc.
 - While this happens, nl aligns prime factors moduli at (1), then rolls them over to 2.
@@ -109,6 +112,7 @@ The orbit of n = 27 is below, but first here's a snippet that shows a pattern to
 
 The full trajectory of 27:
 
+```csv
 ocldist,        nl, ofactorsl,   dist,     n, factors,   ocrdist,        nr, ofactorsr,   tcn,         base2,     base3,  base5,  base7, m3, m5, m7, m11, m13, m17, m19, m23, m29, m31, m37, m41
       2,    (13 1), {13},          41,    27, {3},             5,     (7 2), {7},           1,         11011,      1000,    102,     36, 0,  2,  6,  5,   1,   10,  8,   4,   27,  27,  27,  27
       1,     (5 3), {5},           40,    41, {41},            1,    (21 1), {3 7},        14,        101001,      1112,    131,     56, 2,  1,  6,  8,   2,   7,   3,   18,  12,  10,  4,   0
@@ -152,5 +156,5 @@ ocldist,        nl, ofactorsl,   dist,     n, factors,   ocrdist,        nr, ofa
       2,    (13 2), {13},           2,    53, {53},           41,    (27 1), {3},           2,        110101,      1222,    203,    104, 2,  3,  4,  9,   1,   2,   15,  7,   24,  22,  16,  12
       0,     (1 2), {},             1,     5, {5},             2,     (3 1), {3},           2,           101,        12,     10,      5, 2,  0,  5,  5,   5,   5,   5,   5,   5,   5,   5,   5
       0,     (0 0), {},             0,     1, {},              0,     (1 1), {},            0,             1,         1,      1,      1, 1,  1,  1,  1,   1,   1,   1,   1,   1,   1,   1,   1
-
+```
 

@@ -1,5 +1,4 @@
-
-# Coda
+# Reprise
 
 [rubs eyes and stands, disoriented]
 
@@ -23,31 +22,6 @@
 - A prime p can only be a potential common factor of both n-d and n+d if p is a prime factor of 2n itself. For any sieving prime r that does not divide 2n, it is structurally impossible for n-d and n+d to be simultaneously divisible by r.
 - As d increases, the set of its prime factors rad(d) changes. The primality of n-d requires that rad(n-d) and rad(d) must be disjoint. This imposes a constraint: d is forced to be composed of primes that are not currently factors of n-d.
 - The simplest implementation of this dual sieve: let D = {1 <= d < n}, and for each prime r <= sqrt(2n), remove from D the d such that n-d ≡ 0 mod r, or n+d ≡ 0 (mod r). By inclusion/exclusion and the CRT, the number of surviving d is at least n ∏_{p ≤ √(2n)} (1 - 2/p). For finite n, this number is positive, meaning there is always a surviving d such that n-d and n+d are coprime to all p≤2n, and therefore themselves prime.
-
-- Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set. Establishing this property would work to infinity.
-- If the Goldbach conjecture holds then, we can consider the first *gap* in even additive coverage after the largest prime an upper bound for the location of the next prime: p_{n+1} <= gap - 3. 
-- To stay in the multiplicative domain, let's define "fake addition" as multiplication by a correction factor that produces the correct sum.
-- The fake-add operator for two primes p and q is fa(p, q) = pqk, where k = (1/p + 1/q), which works out such that fa(p, q) = p + q. 
-- The set of pq prime products maps 1:1 with the set of their fake-sums, which in turn maps many-to-one to the set of post-collision sums on the number line.
-- This separation allows us to disambiguate the additive collisions in our collection of primes, and reason about the growing set K of correction values as it evolves with each prime acquired.
-- The matrix of prime products is symmetric (pq=qp), and likewise the one of their fake-sums, because fa(p, q) = fa(q, p).
-- This k-symmetry manifests in a "corridor" of composite numbers between successive primes. It is mirrored around the midpoint of the gap, and on each side is found the same set of new k values, sampling the matrix across the diagonal.
-- The k-value influences the *properties* of the composite number on either side. For example, "rough" numbers tend to have rough counterparts at the mirrored locations, as do smooth numbers, squarefree numbers, and other types. This can be seen by eye in a long table of factorizations.
-- 
-
-- TODO: 
-
-
-Let's define "fake addition" as multiplication by a correction factor that produces the correct sum. The fake-add operator for two primes p and q is fa(p, q) = pqk, where k = (1/p + 1/q), which works out such that fa(p, q) = p + q.
-
-The set of prime products maps 1:1 with the set of their fake-sums, which in turn maps many-to-one to the set of post-collision sums on the number line.
-
-This separation allows us to disambiguate the additive collisions in our collection of primes, and reason about the growing set of correction values as it evolves with each prime acquired.
-
-The symmetry we observe in the corridors between primes corresponds to redundancy in k values. The "matching" composites have the same k.
-
-If you haven't guessed, we're 
-
 </soapbox>
 
 

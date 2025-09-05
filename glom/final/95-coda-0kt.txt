@@ -1,0 +1,17 @@
+# Coda
+
+<soapbox>
+- Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set. Establishing this property would work to infinity.
+- If the Goldbach conjecture holds then, we can consider the first *gap* in even additive coverage after the largest prime an upper bound for the location of the next prime: p_{n+1} <= gap - 3.
+- To stay in the multiplicative domain, let's define "harmonic addition" as multiplication by a correction factor (related to their harmonic mean) that produces the correct sum.
+- The harmonic-add operator for two primes p and q is ha(p, q) = pqk, where k = (1/p + 1/q), which works out such that ha(p, q) = p + q. 
+- The set of pq prime products maps 1:1 with the set of their harmonic sums, which in turn maps many-to-one to the set of post-collision sums on the number line.
+- This separation allows us to disambiguate the additive collisions in our collection of primes, and reason about the growing set K of correction values as it evolves with each prime adjoined.
+- The matrix of prime products is symmetric (pq=qp), and likewise the one of their harmonic sums, because ha(p, q) = ha(q, p).
+- This k-symmetry manifests in a "corridor" of composite numbers between successive primes.
+- A local guarantee that even numbers between primes are covered by additive combinations (i.e. Goldbach partitions) would lift to infinity.
+</soapbox>
+
+[sighs and walks to the next street corner]
+
+

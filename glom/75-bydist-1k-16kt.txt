@@ -7,6 +7,7 @@
 # `base2`   the binary representation of n
 # `factors` the prime factors of n
 
+```csv
 dist,    n,       nl,       nr,       base2, factors
    0,    1,    (0 0),    (1 1),           1, {}
    1,    5,    (1 2),    (3 1),         101, {5}
@@ -508,4 +509,5 @@ dist,    n,       nl,       nr,       base2, factors
   62,  703,  (351 1),   (11 6),  1010111111, {19 37}
   63,  937,  (117 3),  (469 1),  1110101001, {937}
   65,  871,  (435 1),  (109 3),  1101100111, {13 67}
+```
 

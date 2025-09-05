@@ -3,6 +3,8 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 import re
 
+from math import gcd, sqrt
+
 
 import argparse
 arg = argparse.ArgumentParser()
@@ -359,6 +361,16 @@ def get_goldbach_pair_string(n):
     else:
         return ''
 
+def get_goldbach_d_string(n):
+    pairs = get_goldbach_pairs(n)
+    if pairs:
+        pair_strs = []
+        for p, _ in pairs:
+            d = n // 2 - p
+            pair_strs.append(str(d))
+        return ' '.join(reversed(pair_strs))
+    else:
+        return ''
 
 def get_closest_prime(n):
     if n < 2:
@@ -375,6 +387,25 @@ def get_closest_prime(n):
         return lower
     else:
         return upper
+
+
+def get_factor_of_coprimality(n, radicals_only = False):
+    limit = int(sqrt(n))
+    total = 0
+    coprime = 0
+    for r in range(1, limit + 1):
+        if radicals_only and get_radical(r) != r:
+            continue
+        total += 1
+        if gcd(n, r) == 1:
+            coprime += 1
+    if total > 0:
+        return coprime / total
+    else:
+        return 0
+    
+def get_factor_of_radical_coprimality(n):
+    return get_factor_of_coprimality(n, radicals_only=True)
 
 col_desc = {}
 unique_factor_sets = {}
@@ -468,6 +499,18 @@ def calc_n_values(n):
     col_desc['gbpairs'] = f'the Goldbach prime pairs that sum to {paramname}, if {paramname} is even and greater than 4'
     val['gbpairs'] = get_goldbach_pair_string(param) if param % 2 == 0 and param > 4 else ''
 
+    col_desc['gbds'] = f'the offsets of prime pairs around {paramname}/2, which represent Goldbach partitions for n, if {paramname} is even and greater than 4'
+    val['gbds'] = get_goldbach_d_string(param) if param % 2 == 0 and param > 4 else ''
+
+    col_desc['cop'] = f'the factor of coprimality of {paramname} with all integers up to sqrt({paramname})'
+    val['cop'] = f'{get_factor_of_coprimality(param):.3f}'
+
+    col_desc['rcop'] = f'the factor of coprimality of {paramname} with all radicals up to sqrt({paramname})'
+    val['rcop'] = f'{get_factor_of_radical_coprimality(param):.3f}'
+
+
+    
+
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
     col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
     col_desc['cyc*'] = f'the prime ring cycles of {paramname}'
@@ -544,12 +587,38 @@ def calc_n_values(n):
     col_desc['factors'] = f'the prime factors of {paramname}'
     val['factors'] = factors_str
 
+
+    col_desc['facgbds'] = f'factorizations of the offsets of prime pairs around {paramname}/2, which represent Goldbach partitions for n, if {paramname} is even and greater than 4'
+
+    # facgdbs is a list of integers separated by spaces. Replace each integer with its factorization, using facsep
+    facgdbs_list = val['gbds'].split(' ')
+    print(facgdbs_list)
+    facgdbs_factors = []
+    if facgdbs_list and facgdbs_list[0] != '':
+        for dstr in facgdbs_list:
+            d = int(dstr)
+            dfactors = get_prime_factors(d)
+            dfactors_str = facsep.join([str(f) for f in dfactors])
+            if arg.factor_braces:
+                dfactors_str = '{' + dfactors_str + '}'
+            facgdbs_factors.append(dfactors_str)
+    val['facgbds'] = ' '.join(facgdbs_factors)
+
+
     col_desc['factorzig'] = f'the prime factors of {paramname}, indented by distance from the nearest prime'
     closest = get_closest_prime(param)
     dist = abs(param - closest)
     val['factorzig'] = ' ' * dist + factors_str
 
-
+    col_desc['factorzighalf'] = f'the prime factors of {paramname}/2, indented by distance from the nearest prime, for even numbers only'
+    closest = get_closest_prime(param // 2)
+    dist = abs((param // 2) - closest)
+    all_factors_half = get_prime_factors(param // 2)
+    factors_half_str = facsep.join([str(f) for f in all_factors_half])
+    factorzighalf = ' ' * dist + factors_half_str
+    if arg.factor_braces:
+        factorzighalf = '{' + factorzighalf + '}'
+    val['factorzighalf'] = factorzighalf if param % 2 == 0 else ''
 
     col_desc['factorsl'] = f'the prime factors of {paramname}-1'
     val['factorsl'] = factorsl_str

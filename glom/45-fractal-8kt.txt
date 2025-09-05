@@ -9,7 +9,8 @@ This is a Collatz odd-to-odd trace of 1 and a single very high bit set.
 - Once the LSB and fractal meet, carry propagagion begins to "burn" the trailing edge of the fractal.
 
 ## Collatz odd-to-odd orbit of (1 << 100) + 1                                         
-                                                                                    
+
+```
 █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
 ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
 █░░█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
@@ -77,13 +78,14 @@ This is a Collatz odd-to-odd trace of 1 and a single very high bit set.
 █░█░██░█░█░██░██░█░█░░█░█░█████░░░████░████░░█░░██░░█░░░█░░████░░░██░█
 █░░░░░█░░░░░░█░░░██████░░░░░███░█░█░███░░██░█░███░░█░██░░███░██░█░█░█ 
 ...the burning continues...
+```
 
 - When the LSB "catches" a white triangle, this corresponds to an up-run in Collatz, with no k-drops, just one /2 per iteration
 - 1.5x growth quickly increases the magnitude of n, and as the MSB "pushes down" the MSB the white triangle bleeds right.
 - These white triangles are the only defense the MSB has against the approaching wavefront of carry propagation.
 - When the carry eventually reaches the MSB, it will flip to a power of two, ending the game.
 
-...
+```
 ████░░░░█░███░███░░░█░█░░░░██░███░████░████░██░█
 █░██░█░░█░░░██░░█░█░░████░░█░█░░██░░███░░███░░█
 █░░░░███░██░█░░█░█████░██░█░█████░░██░█░██░█░██
@@ -107,37 +109,12 @@ This is a Collatz odd-to-odd trace of 1 and a single very high bit set.
 ██░░░░██░██░████░░░██░░████░░██░███░████░██░░░░██░█
 █░░█░░█░█░░█░░██░█░█░░██░██░██░█░░██░░███░░░█░░█░█
 ██░██░████░███░░██████░█░░█░░░████░░██░█░█░░███
-
-
-   ████░░░░█░███░███░░░█░█░░░░██░███░████░████░██░█
-    █░██░█░░█░░░██░░█░█░░████░░█░█░░██░░███░░███░░█
-    █░░░░███░██░█░░█░█████░██░█░█████░░██░█░██░█░██
-    ██░░█░██░░░████░░░████░░█░░░░███░██░█░░░░█░░░░█
-    █░░██░░░░█░█░██░█░█░██░█░██░░█░██░░░███░░░██░░█
-     ███░░█░░█░░░░░█░░░░░░█░░░░░██░░░░█░█░█░█░█░░██
-    █░█░█░██░██░░░░██░░░░░██░░░█░░█░░░███████████░█
-     █░░░░░░░█░░░█░░█░░█░░░█░░█░░██░██░█░██████████      <-- This is a right triangle being consumed,
-     ██░░░░░░██░░██░██░██░░██░███░█░░█░░░░█████████          temporarily increasing magnitude of n.
-    █░░█░░░░█░░██░█░░█░░░██░█░░█░███░██░░█░████████         Note the shear caused by inflation.
-    ██░██░░░███░░███░██░█░░████░░░██░░░██░░░███████       
-   █░█░░░█░█░█░██░██░░░████░██░█░█░░█░█░░█░█░██████
-   ████░█░░░░░░░█░░░█░█░███░░░█████░█████░░░░░█████
-  █░██░███░░░░░░██░█░░░░░█░█░█░████░░███░█░░░█░████
- █░░░█░░█░█░░░░█░░███░░░█░░░░░░░██░██░█░███░█░░░███
- ██░░██░████░░░███░█░█░░██░░░░░█░█░░█░░░░█░███░█░██  <-- Here the triangle ends, and long term
-█░░██░█░░██░█░█░█░██████░░█░░░░████░██░░█░░░██░░░░█     progress toward reduction of n resumes.
- ███░░████░█░░░░░░░░████░█░██░░█░███░░░█░██░█░░█░░█       
- █░█░██░██░███░░░░░░█░███░░░░░██░░░█░█░█░░░░███░███
-█░░░░░█░░█░░█░█░░░░█░░░█░█░░░█░░█░░██████░░█░██░░██
-██░░░░██░██░████░░░██░░████░░██░███░████░██░░░░██░█
- █░░█░░█░█░░█░░██░█░█░░██░██░██░█░░██░░███░░░█░░█░█
-    ██░██░████░███░░██████░█░░█░░░████░░██░█░█░░███
-
 ...
-
+```
 
 Because the MSB is isolated from +1, and only (mostly) mutating because of 3n, the pristine fractal can be generated closed form: 3^t, for any timestep t. 
 
+```
 1                 =  3^0   (1)
 11                =  3^1   (3)
 1001              =  3^2   (9)
@@ -150,6 +127,7 @@ Because the MSB is isolated from +1, and only (mostly) mutating because of 3n, t
 100110011100011   =  3^9   (19683)
 1110011010101001  =  3^10  (59049)
 ...
+```
 
 Once the carry bit reaches the right edge of the fractal, row-by-row calculation of 3n+1 is needed again, to propagate the differences in the last bits, caused by the carry. But *only* those last bits. 
 Everything to the left of the latest carry event can *still* be found in the top bits of 3^(some value of t), and that will be true all the way to termination.

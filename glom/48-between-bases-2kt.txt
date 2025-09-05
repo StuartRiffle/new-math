@@ -1,13 +1,13 @@
 # Triangles between radices
 
-This is the odd-to-odd run of 27. The binary representation has been made into a symbol (sym2) to aid pattern recognition. (0: ░, 1: ▓)
-The MSB and LSB have been removed for clarity.
-The ternary symbolic representation (sym3) is reversed left-to-right, so least significant trit first. (0: ▒, 1: │, 2: █)
-This shows the triangles moving "down" in base 2 and back "up" in base 3.
-The rows have all been offset a constant amount, because the shear makes the boxes line up for easy visibility.
-Note that the triangles correspond to contiguous up-runs of n.
+- This is the odd-to-odd run of 27. The binary representation has been made into a symbol (sym2) to aid pattern recognition. (0: ░, 1: ▓)
+- The MSB and LSB have been removed for clarity.
+- The ternary symbolic representation (sym3) is reversed left-to-right, so least significant trit first. (0: ▒, 1: │, 2: █)
+- This shows the triangles moving "down" in base 2 and back "up" in base 3.
+- The rows have all been offset a constant amount, because the shear makes the boxes line up for easy visibility.
+- Note that the triangles correspond to contiguous up-runs of n.
 
-
+```
          base2        sym2 sym3         base3 dist    n                                               
          11011         ▓░▓ ▒▒▒│          1000   41    27                                           ▓░▓▒▒▒│                                
         101001        ░▓░░ █│││          1112   40    41                                         ░▓░░█│││                                                    
@@ -51,5 +51,6 @@ Note that the triangles correspond to contiguous up-runs of n.
         110101        ▓░▓░ ███│          1222    2    53   ▓░▓░███│         ███ 53  v
            101           ░ █│              12    1     5     ░█│                                               
              1             │                1    -     1      │              
+```
 
 
