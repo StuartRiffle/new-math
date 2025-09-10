@@ -6,7 +6,7 @@ Note that these are *mirrored* corridors. Number properties like smoothness and 
 
 Define a "midprime" to be the integer half way between two consecutive prime numbers. For example, 9, 12, 15, 18, 21, 26, etc are the first midprimes, at the centerpoints of the first prime gaps. Midprimes are special points of local modular symmetry.
 
-Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127, 181-191, and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is a highly composite multiple of a higher power of two.
+Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127, 181-191, and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is (very often) a highly composite multiple of a power of two.
 
 ```
 113
@@ -191,6 +191,11 @@ Period of 4 (phase +1):   Period of 6 (phase +1):
 ```
 
 So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations.
+
+A metaphor: balls of string do not increase in radius monotonically as you wind them. The winds form ridges and valleys with lumpy distribution, bulging where there are overlaps. In fact, when you roll up string, you have to kind of keep rotating the ball on purpose, to distribute the winding. Sometimes you have no choice and the string is forced to loop over the top of a ridge and make a new local maximum.
+
+That's what the landscape of prime distribution feels like. It's a combination of cycles of mutually coprime things. It cannot roll up. This is the best it can do. It is neccessarily asymmetrical. 
+
 
 An extended listing follows.
 

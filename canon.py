@@ -5,6 +5,10 @@ import re
 
 from math import gcd, sqrt, log, ceil, floor 
 
+import sys
+#sys.argv = "canon.py table --cols n,-factorzig,numdiv,sumdiv,eulertot,carmichael,dedekind,mob,numfacs,totfacs,liouville,mertens,vonmangoldt,rad,m*,-psym --max 1020 --factor-exponents --factor-dots --csv --pad --column-info --header-line --residues 11 --residue-two --column-symbols".split()
+
+
 import argparse
 arg = argparse.ArgumentParser()
 arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins', 'columns' ], help="The command to run")
@@ -39,7 +43,7 @@ arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
 arg.add_argument("--mask-symbols", type=str, default=' X')
 arg.add_argument("--column-symbols", action="store_true")
-arg.add_argument("--psym-limit", type=int, default=8)
+arg.add_argument("--psym-limit", type=int, default=12)
 arg = arg.parse_args()
 
 
@@ -585,12 +589,64 @@ def get_chebyshev_prime_powers(n: int):
     if n < 2:
         return 0
     total = 0
-    N = Integer(n)
     for p in primerange(2, n + 1):
-        kmax = int(floor(log(N, p)))
+        kmax = floor(log(n, p))
         if kmax > 0:
             total += kmax * log(p)
+
     return total
+
+
+from math import log, floor, sqrt
+from sympy import primerange
+
+def get_chebyshev_prime_powers_fast(n: int, rel_tol: float = 1e-3) -> float:
+    """
+    Fast approximation of Chebyshev's psi function:
+        ψ(n) = sum_{p^k ≤ n} log p = sum_{p ≤ n} floor(log_p n) * log p
+
+    Strategy:
+      1) For primes p ≤ √n (where k_max ≥ 2), compute contributions exactly.
+      2) For the big 'k=1' tail (p > √n), approximate θ(x) = sum_{p ≤ x} log p by θ(x) ≈ x.
+         This turns the heavy tail into (n - θ(√n)) ≈ (n - θ_exact(√n)).
+      3) To secure ~3-decimal relative accuracy, correct the last rel_tol·n window exactly,
+         replacing its approximation with the exact sum of log p there.
+
+    rel_tol=1e-3 targets ~0.1% relative error (≈ 3 decimals on ψ(n) ~ n).
+    Returns a float.
+    """
+    if n < 2:
+        return 0.0
+
+    # 1) Exact contributions from small primes (p ≤ √n),
+    #    where k_max = floor(log(n, p)) ≥ 2
+    y = int(sqrt(n))
+    small_sum = 0.0
+    theta_y = 0.0  # exact θ(y) while we're at it
+
+    for p in primerange(2, y + 1):
+        lp = log(p)
+        kmax = int(floor(log(n, p)))  # number of prime-power hits for this p
+        small_sum += kmax * lp
+        theta_y += lp
+
+    # 2) Approximate the large 'k=1' tail by θ(n) - θ(y) ≈ n - θ(y)
+    psi = small_sum + (n - theta_y)
+
+    # 3) Replace the *last* rel_tol·n of that tail by its exact value
+    #    (this keeps the overall error within ~rel_tol · n)
+    m = int(n * (1.0 - rel_tol))
+    if m > y:
+        # remove the approximated chunk length (n - m) we added implicitly,
+        # then add back its exact value: sum_{m < p ≤ n} log p
+        approx_last_window = (n - m)
+        tail_exact = 0.0
+        for p in primerange(m + 1, n + 1):
+            tail_exact += log(p)
+        psi = small_sum + (n - theta_y - approx_last_window) + tail_exact
+
+    return float(psi)
+
 
 def get_dedekind_psi(n: int):
     # Dedekind ψ(n) = n · ∏_{p|n} (1 + 1/p)
@@ -639,6 +695,21 @@ def get_residue_volatility_signed(n):
     return volatility
 
 
+def get_harmonic_sum(n):
+    # sum 1/p for all factors p
+    if n < 2:
+        return 0.0
+    fac =  _factorint(n)
+    total = 0.0
+    for p in fac.keys():
+        total += 1.0 / p
+    return total
+
+def get_harmonic_sum_inv(n):
+    s = get_harmonic_sum(n)
+    if s != 0:
+        return 1.0 / s
+    return 0.0
 
 def estimate_primes_under_n(n):
     if n < 2:
@@ -804,7 +875,7 @@ def calc_n_values(n):
     val['cheby'] = f'{get_chebyshev_primes(param):.3f}'
 
     col_desc['chebypow'] = f'the Chebyshev ψ({paramname}) function, the sum of log p for prime powers p^k ≤ {paramname}'
-    val['chebypow'] = f'{get_chebyshev_prime_powers(param):.3f}'
+    val['chebypow'] = f'{get_chebyshev_prime_powers_fast(param):.3f}'
 
     col_desc['dedekind'] = f'the Dedekind ψ({paramname}) function'
     val['dedekind'] = get_dedekind_psi(param)
@@ -823,6 +894,12 @@ def calc_n_values(n):
 
     col_desc['rvols'] = f'the signed residue volatility of {paramname}, the sum of the signed prime residues of {paramname} weighted by 1/p'
     val['rvols'] = f'{get_residue_volatility_signed(param):.3f}'
+
+    col_desc['hsum'] = f'the harmonic sum, the sum of the reciprocals of the prime factors of {paramname}'
+    val['hsum'] = f'{get_harmonic_sum(param):.5f}'
+
+    col_desc['hsuminv'] = f'inverse of the harmonic sum of {paramname} (the sum of the reciprocals of the prime factors)'
+    val['hsuminv'] = f'{get_harmonic_sum_inv(param):.3f}'
 
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
     col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
