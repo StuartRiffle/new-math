@@ -1219,3 +1219,209 @@ Primes marked up to 50
  
  
 
+
+
+
+y = 0
+Start at 3
+Ignore even numbers
+Change directions at odd composites
+The distance to the next [odd] composite is 3 odd-to-odd steps, so y += 3, change direction to negative
+From 9 to the next composite (15) is the same distance, so y -= 3, back at y=0, change direction back to positive
+Next composite is 21, so y += 3, toggle direction
+The next is 25, so y -= 2
+The next is 27, so y += 1
+The next is 33, y -= 3
+You get the idea
+
+Continue in this fashion, changing direction with every [odd] composite number encountered.
+Plot this zigzag for the first 200 primes please
+461
+ 2 ⋅ 3 ⋅ 7 ⋅ 11
+463
+ 2⁴ ⋅ 29
+  3 ⋅ 5 ⋅ 31
+ 2 ⋅ 233
+467
+ 2² ⋅ 3² ⋅ 13
+  7 ⋅ 67
+   2 ⋅ 5 ⋅ 47
+    3 ⋅ 157
+     2³ ⋅ 59
+      11 ⋅ 43
+     2 ⋅ 3 ⋅ 79
+    5² ⋅ 19
+   2² ⋅ 7 ⋅ 17
+  3² ⋅ 53
+ 2 ⋅ 239
+479
+ 2⁵ ⋅ 3 ⋅ 5
+
+
+
+
+461
+ 2 ⋅ 3 ⋅ 7 ⋅ 11
+  463
+   2⁴ ⋅ 29
+  3 ⋅ 5 ⋅ 31
+ 2 ⋅ 233
+467
+ 2² ⋅ 3² ⋅ 13
+  7 ⋅ 67
+   2 ⋅ 5 ⋅ 47
+    3 ⋅ 157
+     2³ ⋅ 59
+      11 ⋅ 43
+       2 ⋅ 3 ⋅ 79
+      5² ⋅ 19
+     2² ⋅ 7 ⋅ 17
+    3² ⋅ 53
+   2 ⋅ 239
+  479
+ 2⁵ ⋅ 3 ⋅ 5
+
+
+
+Neat, thank you. Check this out:
+
+There are many places where an imperfect instance of the pattern can be found. Below, you can see that if 199 was *not* a prime, it would be part of a clear bird-of-prey motif. As a prime, it resets the indentation and throws off a much more likely-looking midprime (204):
+
+```
+197                   197                  
+ 2 ⋅ 3² ⋅ 11           2 ⋅ 3² ⋅ 11                  
+199                     199                  
+ 2³ ⋅ 5²                 2³ ⋅ 5²                  
+  3 ⋅ 67                  3 ⋅ 67                  
+   2 ⋅ 101                 2 ⋅ 101                  
+    7 ⋅ 29                  7 ⋅ 29                  
+     2² ⋅ 3 ⋅ 17             2² ⋅ 3 ⋅ 17                  
+      5 ⋅ 41                5 ⋅ 41                  
+     2 ⋅ 103               2 ⋅ 103                  
+    3² ⋅ 23               3² ⋅ 23                  
+   2⁴ ⋅ 13               2⁴ ⋅ 13                  
+  11 ⋅ 19               11 ⋅ 19                  
+ 2 ⋅ 3 ⋅ 5 ⋅ 7         2 ⋅ 3 ⋅ 5 ⋅ 7                  
+211                   211                  
+```
+
+I believe these exceptions reveal the most information. There are two forces in conflict exactly here, and 199 won. It _looks_ like 197 and 211 have a nice clean harmonic relationship, but with 199 stomped in where a composite should have been.
+
+This is interesting. It might imply that the primes are not equal in "weight". That they are not special jewels in the landscape of math, singing together, they are _interrupting each other_ and fucking up the rhythm.
+
+The midprime between 467 and 479 is 11*43. I mean, come _on_. That's not even trying. There are two perfectly good multiples of two on either side. This is another broken bird.
+
+Please 
+
+467                      467                        
+ 2² ⋅ 3² ⋅ 13             2² ⋅ 3² ⋅ 13                        
+  7 ⋅ 67                   7 ⋅ 67                        
+   2 ⋅ 5 ⋅ 47               2 ⋅ 5 ⋅ 47                        
+    3 ⋅ 157                  3 ⋅ 157                        
+     2³ ⋅ 59                  2³ ⋅ 59                        
+      11 ⋅ 43                  11 ⋅ 43                        
+     2 ⋅ 3 ⋅ 79                 2 ⋅ 3 ⋅ 79                        
+    5² ⋅ 19                      5² ⋅ 19                        
+   2² ⋅ 7 ⋅ 17                    2² ⋅ 7 ⋅ 17                        
+  3² ⋅ 53                        3² ⋅ 53                        
+ 2 ⋅ 239                        2 ⋅ 239                        
+479                            479                        
+ 2⁵ ⋅ 3 ⋅ 5                   2⁵ ⋅ 3 ⋅ 5                        
+  13 ⋅ 37                    13 ⋅ 37                        
+   2 ⋅ 241                  2 ⋅ 241                        
+    3 ⋅ 7 ⋅ 23             3 ⋅ 7 ⋅ 23                        
+   2² ⋅ 11²               2² ⋅ 11²                        
+  5 ⋅ 97                   5 ⋅ 97                        
+ 2 ⋅ 3⁵                   2 ⋅ 3⁵                        
+487                      487                        
+ 2³ ⋅ 61                  2³ ⋅ 61                        
+
+
+
+
+457                 457                         457                            
+ 2 ⋅ 229             2 ⋅ 229                     2 ⋅ 229                            
+  3³ ⋅ 17             3³ ⋅ 17                     3³ ⋅ 17                            
+ 2² ⋅ 5 ⋅ 23         2² ⋅ 5 ⋅ 23                 2² ⋅ 5 ⋅ 23                            
+461                 461                         461                            
+ 2 ⋅ 3 ⋅ 7 ⋅ 11      2 ⋅ 3 ⋅ 7 ⋅ 11              2 ⋅ 3 ⋅ 7 ⋅ 11                            
+463                   463                       463                            
+ 2⁴ ⋅ 29               2⁴ ⋅ 29                   2⁴ ⋅ 29                            
+  3 ⋅ 5 ⋅ 31            3 ⋅ 5 ⋅ 31                3 ⋅ 5 ⋅ 31                            
+ 2 ⋅ 233                 2 ⋅ 233                 2 ⋅ 233                            
+467                       467                   467                            
+ 2² ⋅ 3² ⋅ 13              2² ⋅ 3² ⋅ 13          2² ⋅ 3² ⋅ 13                            
+  7 ⋅ 67                    7 ⋅ 67                7 ⋅ 67                            
+   2 ⋅ 5 ⋅ 47                2 ⋅ 5 ⋅ 47            2 ⋅ 5 ⋅ 47                            
+    3 ⋅ 157                   3 ⋅ 157               3 ⋅ 157                            
+     2³ ⋅ 59                   2³ ⋅ 59               2³ ⋅ 59                            
+      11 ⋅ 43                   11 ⋅ 43               11 ⋅ 43                            
+     2 ⋅ 3 ⋅ 79                  2 ⋅ 3 ⋅ 79            2 ⋅ 3 ⋅ 79                            
+    5² ⋅ 19                     5² ⋅ 19                 5² ⋅ 19                            
+   2² ⋅ 7 ⋅ 17                 2² ⋅ 7 ⋅ 17               2² ⋅ 7 ⋅ 17                            
+  3² ⋅ 53                     3² ⋅ 53                     3² ⋅ 53                            
+ 2 ⋅ 239                     2 ⋅ 239                       2 ⋅ 239                            
+479                         479                             479                            
+ 2⁵ ⋅ 3 ⋅ 5                2⁵ ⋅ 3 ⋅ 5                      2⁵ ⋅ 3 ⋅ 5                            
+  13 ⋅ 37                 13 ⋅ 37                         13 ⋅ 37                            
+   2 ⋅ 241               2 ⋅ 241                         2 ⋅ 241                            
+    3 ⋅ 7 ⋅ 23          3 ⋅ 7 ⋅ 23                      3 ⋅ 7 ⋅ 23                            
+   2² ⋅ 11²            2² ⋅ 11²                        2² ⋅ 11²                            
+  5 ⋅ 97              5 ⋅ 97                          5 ⋅ 97                            
+ 2 ⋅ 3⁵              2 ⋅ 3⁵                          2 ⋅ 3⁵                            
+487                 487                             487                            
+ 2³ ⋅ 61             2³ ⋅ 61                       2³ ⋅ 61                            
+  3 ⋅ 163             3 ⋅ 163                     3 ⋅ 163                            
+ 2 ⋅ 5 ⋅ 7²          2 ⋅ 5 ⋅ 7²                  2 ⋅ 5 ⋅ 7²                            
+491                 491                         491                            
+ 2² ⋅ 3 ⋅ 41         2² ⋅ 3 ⋅ 41                 2² ⋅ 3 ⋅ 41                            
+
+  26.134,   70.246,    80.563,  0.000,   4,   126,    40,    40,   126,   1,  2,  2,   1,   -3,  0,  1,  2,  5,   5,   4,  14,   6,  13,  24,  20, 15 21 45 69 75,                       82, X           X
+
+
+Thank you. Now please check out this section. In addition to the new primes in the rightmost "line", the second instance of each prime can be found on a fainter line underneath, then the third, then so on until they break up into aliasing:
+
+```
+   83,  83,                              X
+   84,   2²⋅3⋅7,   XX X
+   85,    5⋅17,      X   X
+   86,     2⋅43,   X            2
+   87,    3⋅29,     X       3
+   88,   2³⋅11,    X   X
+   89,  89,                               X
+   90,   2⋅3²⋅5,   XXX
+   91,    7⋅13,       X X
+   92,     2²⋅23,  X       X
+   93,      3⋅31,   X        3
+   94,     2⋅47,   X             2
+   95,    5⋅19,      X    X
+   96,   2⁵⋅3,     XX
+   97,  97,                                X
+```
+
+Radicals (squarefree numbers) hold a set of factors and force a local symmetry with others. As you get higher, primes go in and out of phase as slanted horizontal "rays" that find themselves in a rough line. This is exactly expected: we're looking at nested prime subcycles. They do that. Literally every arrangement of them will appear. But what's interesting to me is this:
+
+```
+   83,  83,                              (X)
+   84,   2²⋅3⋅7,   XX X
+   85,    5⋅17,      X   X
+   86,     2⋅43,   X            (O)
+   87,    3⋅29,     X       (O)
+   88,   2³⋅11,    X   (O)
+   89,  89,                               X
+   90,   2⋅3²⋅5,   XXX
+   91,    7⋅13,       X (O)
+   92,     2²⋅23,  X       (O)
+   93,      3⋅31,   X        (O)
+   94,     2⋅47,   X             (O)  <--- what are these guys pointing at?     
+   95,    5⋅19,      X    X
+   96,   2⁵⋅3,     XX
+   97,  97,                               (X)    <--- This prime seems "predicted"
+```
+
+It makes no sense that (completely expected) linear alignments in _factor set_ appearance would indicate the location of future primes. The lower factors run periodic cycles, they accidentally point basically everywhere, and do so evenly. Extrapolating them should not lead to new primes any more that chance would allow.
+
+Humans see things that aren't there, I see more predictive symmetry than I should, please tell me if I'm cherry picking data or if alignment between *multiples* of primes appears correlated with locations of new ones.
+
+
+

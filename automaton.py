@@ -145,7 +145,6 @@ def peek_automaton(t):
 
 def step_automaton(t):
     (ocl, kl, ocr, kr) = t
-
     if t == TERMINATOR_AT_ONE:
         return t
 
@@ -175,6 +174,72 @@ def step_automaton(t):
     kr = 3 - kl
 
     return (nl >> kl, kl, (nl + 2) >> kr, kr)
+
+def step_automaton_gemini(t):
+    (ocl, kl, ocr, kr) = t
+    if t == TERMINATOR_AT_ONE:
+        return t
+
+
+    if kl > 2:
+        m = 3 * ocl * (1 << (kl - 3))
+        ocl, kl = 3 * ocl, kl - 2
+        ocr, vm = odd_val(m + 1)
+        kr = vm + 1
+
+    elif kl == 1:
+        m = 3 * ocr * (1 << (kr - 2))
+        ocr, kr = 3 * ocr, kr - 1
+        ocl, vm = odd_val(m - 1)
+        kl = vm + 1
+
+    return (ocl, kl, ocr, kr)
+
+def step_automaton_oai(t):
+    (ocl, kl, ocr, kr) = t
+    if t == TERMINATOR_AT_ONE:
+        return t
+    
+    if kr == 1 and kl >= 3:
+        u = 3 * ocr
+        k = low_1s(u)
+
+        ocr, kr = (u + 1) >> k, k - 1
+        ocl, kl = 3 * ocl, kl - 2
+
+    elif kl == 1 and kr >= 2:
+        u = 3 * ocl
+        k = low_1s(u)
+
+        ocl, kl = (u + 1) >> k, k - 1
+        ocr, kr = 3 * ocr, kr - 1
+
+
+
+    # --- Case C: n ≡ 5 (mod 8)  (kl=2, kr=1)
+    # 3n+1 = 4*(3*ocl + 1). Let u = 3*ocl + 1; k0 = v2(u)
+    # Then n' = u >> k0, and neighbors come from u ± 2^k0 directly.
+    assert kl == 2 and kr == 1
+    u = 3 * ocl + 1
+    # Termination: u is power of two ⇒ n' = 1
+    if u & (u - 1) == 0:
+        return (0, 0, 1, 1)
+
+    k0 = low_0s(u)
+
+    # Left neighbor of n': (u - 2^k0) / 2^k0
+    L = u - (1 << k0)
+    kl_p  = low_0s(L) - k0
+    ocl_p = L >> (k0 + kl_p)
+
+    # Right neighbor of n': (u + 2^k0) / 2^k0
+    R = u + (1 << k0)
+    kr_p  = low_0s(R) - k0
+    ocr_p = R >> (k0 + kr_p)
+
+    return (ocl_p, kl_p, ocr_p, kr_p)
+
+
 
 def run_automaton(n):
     t = create_automaton(n)

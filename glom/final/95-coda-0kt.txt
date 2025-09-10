@@ -1,7 +1,7 @@
 # Coda
 
 <soapbox>
-- Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set. Establishing this property would work to infinity.
+- Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set.
 - If the Goldbach conjecture holds then, we can consider the first *gap* in even additive coverage after the largest prime an upper bound for the location of the next prime: p_{n+1} <= gap - 3.
 - To stay in the multiplicative domain, let's define "harmonic addition" as multiplication by a correction factor (related to their harmonic mean) that produces the correct sum.
 - The harmonic-add operator for two primes p and q is ha(p, q) = pqk, where k = (1/p + 1/q), which works out such that ha(p, q) = p + q. 

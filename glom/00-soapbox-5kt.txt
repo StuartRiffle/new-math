@@ -146,6 +146,8 @@
 - The pattern of self-similar odd core connectivity is unavoidable, because even at astronomical values, the rules of 2-adic valuation (remove power of two factors) connect n regularly to much smaller odd core values. The odd cores have unlimited "reach" in this way.
 - Continuing from a seed, using the lowest-k traversal rule, intermediate values are no longer in the same stopping time equivalence class, and paths merge quickly into common "trunk lines". There is no stopping time differentiation below the seed.
 - The complete lowest-k root walk across the odd-core connectivity graph (n -> seed -> 1) uniquely identifies n.
+
+- Also twin prime centers are the opposites of primes.
 </soapbox>
 
 [collapses gasping]

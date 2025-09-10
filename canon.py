@@ -3,12 +3,11 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 import re
 
-from math import gcd, sqrt
-
+from math import gcd, sqrt, log, ceil, floor 
 
 import argparse
 arg = argparse.ArgumentParser()
-arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins'], help="The command to run")
+arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins', 'columns' ], help="The command to run")
 arg.add_argument("--cols", type=str, default='oc,k,dist,factors,orbit')
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
@@ -38,6 +37,9 @@ arg.add_argument("--burn-reverse", action="store_true")
 arg.add_argument("--count-factors", action="store_true")
 arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
+arg.add_argument("--mask-symbols", type=str, default=' X')
+arg.add_argument("--column-symbols", action="store_true")
+arg.add_argument("--psym-limit", type=int, default=8)
 arg = arg.parse_args()
 
 
@@ -48,6 +50,9 @@ arg = arg.parse_args()
 #arg.n = 871
 ##arg.cols = 'n,base2,base3,factors,dist,nl,ocldist,nr,ocrdist,orbit_back'
 ##arg.cols = '-dist,-n,factors,-ocldist,-nl,ofactorsl,-ocrdist,-nr,ofactorsr,-tcn,-base2,-base3,-base5,-base7,m*,-pre_total'
+
+# factorzig,pi,-piest,-mob,-numfacs,-totfacs,-squarepart,-liouville,-numdiv,-sumdiv,-eulertot,-carmichael,-vonmangoldt,-riemannr,-mertens,-cheby,-chebypow,-rad,m
+
 #arg.cols='-n,pclass,factors'
 ##arg.trailing_comma = True
 ##arg.sort_by = 'factors'
@@ -66,8 +71,9 @@ arg = arg.parse_args()
 #arg.radical_only = True
 
 
-from sympy import primerange, nextprime, isprime
-from sympy.ntheory import factorint
+from sympy import mobius, li, log, Integer, floor, primerange, nextprime, isprime
+from sympy.ntheory import divisor_count, divisor_sigma, totient, factorint
+
 
 def calc_primes(n):
     sieve = [True] * n
@@ -84,8 +90,6 @@ symbol_map = {
     2: '░█',
     3: '░▒█',
 }
-
-mask_map = '-X'
 
 def padic(n, base = 2):
     k = 0
@@ -162,12 +166,19 @@ def left_digits(s):
             break
     return digits
 
+factorcache = {}
+def _factorint(n):
+    global factorcache
+    if not n in factorcache:
+        factorcache[n] = factorint(n)
+    return factorcache[n]
+
 def get_prime_factor_list(n):
-    factorization = factorint(n)
+    factorization =  _factorint(n)
     return sorted(list(factorization.keys()))
 
 def get_prime_factors(n):
-    factorization = factorint(n)
+    factorization =  _factorint(n)
     result = []
     for p, exp in factorization.items():
         pstr = str(p)
@@ -185,9 +196,9 @@ def get_factor_mask(n):
         if pidx > n:
             break
         if n % p == 0:
-            mask += mask_map[1]
+            mask += arg.mask_symbols[1]
         else:
-            mask += mask_map[0]
+            mask += arg.mask_symbols[0]
         if len(mask) >= arg.mask_limit:
             break
     return mask
@@ -344,6 +355,15 @@ def get_symmetric_primes(n, limit = 5, range = 30):
     return result
 
 
+def get_symmetric_prime_str(n):
+    dlist = get_symmetric_primes(n, limit=arg.psym_limit + 1, range=n - 1)
+    suffix = ''
+    if len(dlist) > arg.psym_limit:
+        dlist = dlist[:arg.psym_limit]
+        unicode_ellipsis = ' \u2026'
+        suffix = unicode_ellipsis
+    return ', '.join(map(str, dlist)) + suffix
+
 def get_goldbach_pairs(n):
     pairs = []
     if n % 2 == 0 and n > 2:
@@ -352,6 +372,9 @@ def get_goldbach_pairs(n):
             if isprime(q):
                 pairs.append((p, q))
     return pairs
+
+def get_goldbach_pair_count(n):
+    return len(get_goldbach_pairs(n))
 
 def get_goldbach_pair_string(n):
     pairs = get_goldbach_pairs(n)
@@ -388,6 +411,34 @@ def get_closest_prime(n):
     else:
         return upper
 
+def get_dist_to_lower_prime(n):
+    if n < 2:
+        return 2 - n
+    if isprime(n):
+        return 0
+    lower = n - 1
+    while lower > 1 and not isprime(lower):
+        lower -= 1
+    return n - lower
+
+
+
+
+def get_dist_to_higher_prime(n):
+    if n < 2:
+        return 2 - n
+    if isprime(n):
+        return 0
+    upper = n + 1
+    while not isprime(upper):
+        upper += 1
+    return upper - n
+
+def get_dist_to_prime(n):
+    to_lower  = get_dist_to_lower_prime(n)
+    to_higher = get_dist_to_higher_prime(n)
+    return min(to_lower, to_higher)
+
 
 def get_factor_of_coprimality(n, radicals_only = False):
     limit = int(sqrt(n))
@@ -410,8 +461,189 @@ def get_factor_of_radical_coprimality(n):
 col_desc = {}
 unique_factor_sets = {}
 
+def get_mobeius(n):
+    factors =  _factorint(n)
+    for exp in factors.values():
+        if exp > 1:
+            return 0
+    return -1 if len(factors) % 2 else 1
+
+def get_prime_counting(n):
+    count = 0
+    for p in primerange(1, n + 1):
+        count += 1
+    return count
 
 
+
+def get_unique_factor_count(n: int) -> int:
+    # ω(n): number of distinct prime factors
+    return len( _factorint(n))
+
+def get_factor_count_with_multiplicity(n: int) -> int:
+    # Ω(n): total prime factors counting multiplicity
+    return sum( _factorint(n).values())
+
+def get_squarepart(n: int) -> int:
+    # squarepart = n / rad(n) = ∏ p^(e-1) over p^e || n  (as you defined)
+    fac =  _factorint(n)
+    res = 1
+    for p, e in fac.items():
+        res *= p ** max(e - 1, 0)
+    return res
+
+def get_liouville(n: int) -> int:
+    # Liouville λ(n) = (-1)^Ω(n)
+    return -1 if get_factor_count_with_multiplicity(n) % 2 else 1
+
+def get_num_divisors(n: int) -> int:
+    # τ(n)
+    return int(divisor_count(n))
+
+def get_sum_of_divisors(n: int) -> int:
+    # σ(n)
+    return int(divisor_sigma(n))
+
+def get_euler_totient(n: int) -> int:
+    # φ(n)
+    return int(totient(n))
+
+def get_carmichael(n: int) -> int:
+    # Carmichael λ(n) via lcm of prime-power components
+    from math import lcm
+    fac =  _factorint(n)
+    parts = []
+    for p, e in fac.items():
+        if p == 2:
+            if e == 1:
+                parts.append(1)
+            elif e == 2:
+                parts.append(2)
+            else:
+                parts.append(2 ** (e - 2))
+        else:
+            parts.append((p - 1) * (p ** (e - 1)))
+    if not parts:
+        return 1
+    out = parts[0]
+    for v in parts[1:]:
+        out = lcm(out, v)
+    return out
+
+def get_von_mangoldt(n: int):
+    # Λ(n) = log p if n is a prime power p^k, else 0
+    if n < 2:
+        return 0
+    fac =  _factorint(n)
+    if len(fac) == 1:
+        (p, e), = fac.items()
+        if e >= 1:
+            return log(p)
+    return 0
+
+def get_riemann_li(n: int):
+    # logarithmic integral Li(n), principal value
+    if n < 2:
+        return 0
+    return li(n)
+
+def get_riemann_r(n: int):
+    # Riemann R function via series: R(x) = Σ_{k≥1} μ(k)/k · li(x^(1/k))
+    # truncate at k where x^(1/k) < 2  ⇒ k ≤ floor(log_2 x)
+    if n <= 0:
+        return 0
+    if n < 2:
+        return 0
+    K = int(floor(log(int(n), 2)))
+    total = 0
+    for k in range(1, K + 1):
+        mu = mobius(k)
+        if mu != 0:
+            total += (mu / k) * li(n ** (1 / k))
+    return total
+
+def get_mertens(n: int) -> int:
+    # M(n) = Σ_{k≤n} μ(k)
+    if n < 1:
+        raise ValueError("n must be a positive integer")
+    s = 0
+    for k in range(1, n + 1):
+        s += mobius(k)
+    return int(s)
+
+def get_chebyshev_primes(n: int):
+    # θ(n) = Σ_{p≤n} log p
+    if n < 2:
+        return 0
+    total = 0
+    for p in primerange(2, n + 1):
+        total += log(p)
+    return total
+
+def get_chebyshev_prime_powers(n: int):
+    # ψ(n) = Σ_{p^k ≤ n} log p = Σ_{p≤n} floor(log_p n) · log p
+    if n < 2:
+        return 0
+    total = 0
+    N = Integer(n)
+    for p in primerange(2, n + 1):
+        kmax = int(floor(log(N, p)))
+        if kmax > 0:
+            total += kmax * log(p)
+    return total
+
+def get_dedekind_psi(n: int):
+    # Dedekind ψ(n) = n · ∏_{p|n} (1 + 1/p)
+    if n < 1:
+        raise ValueError("n must be a positive integer")
+    fac =  _factorint(n)
+    prod = 1
+    for p in fac.keys():
+        prod *= (1 + 1 / p)
+    return int(n * prod)
+
+def get_largest_prime_factor(n):
+    if n < 2:
+        return None
+    fac =  _factorint(n)
+    return max(fac.keys())
+
+def get_smallest_prime_factor(n):
+    if n < 2:
+        return None
+    fac =  _factorint(n)
+    return min(fac.keys())
+
+
+def get_residue_volatility_abs(n):
+    volatility = 0
+    for p in primerange(2, int(sqrt(n)) + 1):
+        volatility += n % p
+    return volatility
+
+
+def get_residue_volatility(n):
+    volatility = 0
+    for p in primerange(2, int(sqrt(n)) + 1):
+        r = n % p
+        volatility += r * 1.0 / p
+    return volatility
+
+def get_residue_volatility_signed(n):
+    volatility = 0
+    for p in primerange(2, int(sqrt(n)) + 1):
+        r = n % p
+        if r > p // 2:
+            r -= p
+        volatility += r * 1.0 / p
+    return volatility
+
+
+
+def estimate_primes_under_n(n):
+    if n < 2:
+        return 0
+    return n / (log(n) - 1)
 
 def radix_name(radix):
     if radix == 2:
@@ -488,16 +720,20 @@ def calc_n_values(n):
     val['pclass'] = get_prime_specialness(param, verbose=False)
 
     col_desc['psym'] = f'the symmetric primes at equal offsets around {paramname}'
-    val['psym'] = get_symmetric_primes(param, limit=8, range=100)
+    val['psym'] = get_symmetric_prime_str(param)
 
     col_desc['psymext'] = f'the symmetric primes p=n-d and q=n+d in the immediate vicinity of {paramname}, given as p:q(d)'
     psymnext = ''
-    for d in val['psym']:
+    psym = get_symmetric_primes(param, limit=arg.psym_limit + 1, range=100)
+    for d in psym:
         psymnext += f'{param - d}:{param + d}({d}) '
     val['psymext'] = psymnext.strip()
 
     col_desc['gbpairs'] = f'the Goldbach prime pairs that sum to {paramname}, if {paramname} is even and greater than 4'
     val['gbpairs'] = get_goldbach_pair_string(param) if param % 2 == 0 and param > 4 else ''
+
+    col_desc['gbcount'] = f'the number of Goldbach prime pairs that sum to {paramname}, if {paramname} is even and greater than 4'
+    val['gbcount'] = get_goldbach_pair_count(param) if param % 2 == 0 and param > 4 else 0
 
     col_desc['gbds'] = f'the offsets of prime pairs around {paramname}/2, which represent Goldbach partitions for n, if {paramname} is even and greater than 4'
     val['gbds'] = get_goldbach_d_string(param) if param % 2 == 0 and param > 4 else ''
@@ -508,8 +744,85 @@ def calc_n_values(n):
     col_desc['rcop'] = f'the factor of coprimality of {paramname} with all radicals up to sqrt({paramname})'
     val['rcop'] = f'{get_factor_of_radical_coprimality(param):.3f}'
 
-
+    col_desc['mob'] = f'the Möbius function of {paramname}, which is 1 if {paramname} is a product of an even number of distinct primes, -1 if odd, and 0 if any prime is repeated'
+    val['mob'] = get_mobeius(param)
     
+    col_desc['pi'] = f'the prime counting function π({paramname}), the number of primes less than or equal to {paramname}'
+    val['pi'] = get_prime_counting(param)
+
+    col_desc['piest'] = f'an estimate of the prime counting function π({paramname}), the number of primes less than or equal to {paramname}: n / (log n - 1)'
+    piest = estimate_primes_under_n(param)
+    val['piest'] = f'{piest:.3f}'
+
+    col_desc['piesti'] = f'an estimate n / (log n - 1) of the prime counting function π({paramname}),the number of primes less than or equal to {paramname}, truncated to an integer'
+    val['piesti'] = int(piest)
+
+    col_desc['pierr'] = f'the error in the estimate of the prime counting function π({paramname})'
+    pierr = val['pi'] - piest
+    val['pierr'] = f'{pierr:.3f}'
+
+    col_desc['primedist'] = f'the distance from {paramname} to the nearest prime'
+    val['primedist'] = get_dist_to_prime(param)
+
+    col_desc['numfacs'] = f'the number of distinct prime factors of {paramname}, ω({paramname})'
+    val['numfacs'] = get_unique_factor_count(param)
+
+    col_desc['totfacs'] = f'the total number of prime factors of {paramname}, counting multiplicity, Ω({paramname})'
+    val['totfacs'] = get_factor_count_with_multiplicity(param)
+
+    col_desc['squarepart'] = f'the squarepart of {paramname}, the largest perfect square dividing {paramname}'
+    val['squarepart'] = get_squarepart(param)
+
+    col_desc['liouville'] = f'the Liouville function of {paramname}, λ({paramname}) = (-1)^Ω({paramname})'
+    val['liouville'] = get_liouville(param)
+
+    col_desc['numdiv'] = f'the number of divisors of {paramname}, τ({paramname})'
+    val['numdiv'] = get_num_divisors(param)
+
+    col_desc['sumdiv'] = f'the sum of divisors of {paramname}, σ({paramname})'
+    val['sumdiv'] = get_sum_of_divisors(param)
+
+    col_desc['eulertot'] = f'the Euler totient of {paramname}, φ({paramname})'
+    val['eulertot'] = get_euler_totient(param)
+
+    col_desc['carmichael'] = f'the Carmichael function of {paramname}, λ({paramname})'
+    val['carmichael'] = get_carmichael(param)
+
+    col_desc['vonmangoldt'] = f'the von Mangoldt function of {paramname}, Λ({paramname})'
+    val['vonmangoldt'] = f'{get_von_mangoldt(param):.3f}'
+
+    col_desc['riemannli'] = f'the logarithmic integral Li({paramname})'
+    val['riemannli'] = f'{get_riemann_li(param):.3f}'
+
+    col_desc['riemannr'] = f'the Riemann R function R({paramname})'
+    val['riemannr'] = f'{get_riemann_r(param):.3f}'
+
+    col_desc['mertens'] = f'the Mertens function M({paramname})'
+    val['mertens'] = get_mertens(param)
+
+    col_desc['cheby'] = f'the Chebyshev θ({paramname}) function, the sum of log p for primes p ≤ {paramname}'
+    val['cheby'] = f'{get_chebyshev_primes(param):.3f}'
+
+    col_desc['chebypow'] = f'the Chebyshev ψ({paramname}) function, the sum of log p for prime powers p^k ≤ {paramname}'
+    val['chebypow'] = f'{get_chebyshev_prime_powers(param):.3f}'
+
+    col_desc['dedekind'] = f'the Dedekind ψ({paramname}) function'
+    val['dedekind'] = get_dedekind_psi(param)
+
+    col_desc['lpf'] = f'the largest prime factor of {paramname}'
+    val['lpf'] = get_largest_prime_factor(param) or ''
+
+    col_desc['spf'] = f'the smallest prime factor of {paramname}'
+    val['spf'] = get_smallest_prime_factor(param) or ''
+
+    col_desc['rvol'] = f'the residue volatility of {paramname}, the sum of the prime residues of {paramname} weighted by 1/p'
+    val['rvol'] = f'{get_residue_volatility(param):.3f}'
+
+    col_desc['rvolabs'] = f'the absolute residue volatility of {paramname}, the sum of the prime residues of {paramname}'
+    val['rvolabs'] = f'{get_residue_volatility_abs(param):.3f}'
+
+    col_desc['rvols'] = f'the signed residue volatility of {paramname}, the sum of the signed prime residues of {paramname} weighted by 1/p'
+    val['rvols'] = f'{get_residue_volatility_signed(param):.3f}'
 
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
     col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
@@ -592,7 +905,6 @@ def calc_n_values(n):
 
     # facgdbs is a list of integers separated by spaces. Replace each integer with its factorization, using facsep
     facgdbs_list = val['gbds'].split(' ')
-    print(facgdbs_list)
     facgdbs_factors = []
     if facgdbs_list and facgdbs_list[0] != '':
         for dstr in facgdbs_list:
@@ -604,21 +916,13 @@ def calc_n_values(n):
             facgdbs_factors.append(dfactors_str)
     val['facgbds'] = ' '.join(facgdbs_factors)
 
+    col_desc['closestprime'] = f'the closest prime to {paramname}'
+    closest = get_closest_prime(param)
+    val['closestprime'] = closest
 
     col_desc['factorzig'] = f'the prime factors of {paramname}, indented by distance from the nearest prime'
-    closest = get_closest_prime(param)
     dist = abs(param - closest)
     val['factorzig'] = ' ' * dist + factors_str
-
-    col_desc['factorzighalf'] = f'the prime factors of {paramname}/2, indented by distance from the nearest prime, for even numbers only'
-    closest = get_closest_prime(param // 2)
-    dist = abs((param // 2) - closest)
-    all_factors_half = get_prime_factors(param // 2)
-    factors_half_str = facsep.join([str(f) for f in all_factors_half])
-    factorzighalf = ' ' * dist + factors_half_str
-    if arg.factor_braces:
-        factorzighalf = '{' + factorzighalf + '}'
-    val['factorzighalf'] = factorzighalf if param % 2 == 0 else ''
 
     col_desc['factorsl'] = f'the prime factors of {paramname}-1'
     val['factorsl'] = factorsl_str
@@ -714,11 +1018,37 @@ def calc_n_values(n):
 n_cache = {}
 def get_n_values(n):
     global n_cache
-    if n in n_cache:
-        return n_cache[n]
-    val = calc_n_values(n)
-    n_cache[n] = val
-    return val
+    if not n in n_cache:
+        n_cache[n] = calc_n_values(n)
+    return n_cache[n]
+
+column_to_symbol = {
+    'cheby':        'θ',    
+    'chebypow':     'ψ',
+    'dedekind':     'Dψ',
+    'eulertot':     'φ',
+    'pi':           'π', 
+    'piest':        'π~',    
+    'riemannr':     'R',    
+    'riemannli':    'Li',   
+    'mob':          'μ',  
+    'numfacs':      'ω',    
+    'totfacs':      'Ω',    
+    'liouville':    'λ',    
+    'mertens':      'M',    
+    'numdiv':       'τ',    
+    'sumdiv':       'σ',    
+    'carmichael':   'λ',    
+    'vonmangoldt':  'Λ',    
+    'lpf':          'P+',
+    'spf':          'P−',
+}
+
+ljust_by_default = [
+    'factor'
+    'psym',
+    'mask',
+]
 
 
 _SUPERS = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -772,7 +1102,8 @@ def print_ns(ns):
                 for r in range(arg.residues):
                     col_headers.append(prefix + str(PRIMES[r + residue_offset]))
         else:
-            col_headers.append(col_raw)
+            header = col_raw
+            col_headers.append(header)
 
     header_line = ''
     cells = {}
@@ -795,23 +1126,33 @@ def print_ns(ns):
     if arg.pad:
         for col in col_headers:
             col_width = max(len(cell) for cell in cells[col])
-            col_width = max(col_width, len(col))
+            col_tag = col
+            if arg.column_symbols and col in column_to_symbol:
+                col_tag = column_to_symbol[col]
+            col_width = max(col_width, len(col_tag))
             col_width += len(sep)
             justified = []
-            rjust = ('-' + col) in arg.cols
+
+            ljust = False
+            for sub in ljust_by_default:
+                if sub in col:
+                    ljust = True
+            if ('-' + col) in arg.cols:
+                ljust = not ljust
             for cellval in cells[col]:
-                if rjust:
-                    justified.append(cellval.rjust(col_width))
-                else:
+                if ljust:
                     justified.append(cellval.ljust(col_width))
+                else:
+                    justified.append(cellval.rjust(col_width))
             cells[col] = justified
             if arg.header_line:
                 if arg.pad and header_line:
                     header_line += ' '
-                if rjust:
-                    header_line += (col + sep).rjust(col_width)
+                
+                if ljust:
+                    header_line += (col_tag + sep).ljust(col_width)
                 else:
-                    header_line += (col + sep).ljust(col_width)
+                    header_line += (col_tag + sep).ljust(col_width)
                 
 
 
@@ -856,6 +1197,7 @@ def print_ns(ns):
         if len(line) > 0 and line[-1] == sep.strip():
             if not arg.trailing_comma:
                 line = line[:-1]
+        line = line.rstrip()
         output_lines.append(line)
 
     print_output(output_lines)
@@ -913,6 +1255,15 @@ def print_burndown():
     print_output(output_lines)
 
 
+def print_all_column_names():
+    calc_n_values(1) # populate col_desc
+    longest_name = max(len(name) for name in col_desc.keys())
+    output_lines = []
+    for name, desc in col_desc.items():
+        label = f'`{name}`'
+        output_lines.append(f'# {label.ljust(longest_name + 2)} {desc}')
+    print_output(output_lines)
+
 if __name__ == "__main__":
     if arg.command == "table":
         print_table()
@@ -922,4 +1273,7 @@ if __name__ == "__main__":
         print_burndown()
     elif arg.command == "twins":
         print_twins()
+    elif arg.command == "columns":
+        print_all_column_names()
+
 

@@ -6,7 +6,7 @@ Note that these are *mirrored* corridors. Number properties like smoothness and 
 
 Define a "midprime" to be the integer half way between two consecutive prime numbers. For example, 9, 12, 15, 18, 21, 26, etc are the first midprimes, at the centerpoints of the first prime gaps. Midprimes are special points of local modular symmetry.
 
-Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127 and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is a highly composite higher power of two.
+Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127, 181-191, and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is a highly composite multiple of a higher power of two.
 
 ```
 113
@@ -24,9 +24,19 @@ Here are a couple of typical examples of prime corridors. Note the general mirro
   5³
  2 ⋅ 3² ⋅ 7
 127
-```
 
-```
+181
+ 2 ⋅ 7 ⋅ 13
+  3 ⋅ 61
+   2³ ⋅ 23
+    5 ⋅ 37
+     2 ⋅ 3 ⋅ 31   (midprime 186)
+    11 ⋅ 17
+   2² ⋅ 47
+  3³ ⋅ 7
+ 2 ⋅ 5 ⋅ 19
+191
+
 293
  2 ⋅ 3 ⋅ 7²
   5 ⋅ 59
@@ -78,7 +88,7 @@ The bird-of-prey pattern is not universal. The corridor from 2063-2069 is not al
 2069
 ```
 
-This is a nice long corridor from 4297 to 4327 below, a gap of 30. It's a bird of prey with very long wings.
+Below is a nice long corridor from 4297 to 4327, a gap of 30. It's a bird of prey with very long wings.
 
 A new property is visible: self-similarity. A section has been re-indented to highlight a nested instance of the bird of prey pattern. If you squint it is also flanked by 2 smaller ones.
 
@@ -116,6 +126,28 @@ A new property is visible: self-similarity. A section has been re-indented to hi
 4327
 ```
 
+There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a clear bird-of-prey motif. But as a prime, it resets the indentation and throws off a much more likely-looking midprime at 204:
+
+```
+197                   197                  
+ 2 ⋅ 3² ⋅ 11           2 ⋅ 3² ⋅ 11                  
+199                     199                  
+ 2³ ⋅ 5²                 2³ ⋅ 5²                  
+  3 ⋅ 67                  3 ⋅ 67                  
+   2 ⋅ 101                 2 ⋅ 101                  
+    7 ⋅ 29                  7 ⋅ 29                  
+     2² ⋅ 3 ⋅ 17             2² ⋅ 3 ⋅ 17                  
+      5 ⋅ 41                5 ⋅ 41                  
+     2 ⋅ 103               2 ⋅ 103                  
+    3² ⋅ 23               3² ⋅ 23                  
+   2⁴ ⋅ 13               2⁴ ⋅ 13                  
+  11 ⋅ 19               11 ⋅ 19                  
+ 2 ⋅ 3 ⋅ 5 ⋅ 7         2 ⋅ 3 ⋅ 5 ⋅ 7                  
+211                   211                  
+```
+
+I believe these exceptions reveal the most structural information. There are two forces in conflict exactly here, and 199 won.
+
 There is a fixed accordion of internally symmetrical structures at different frequencies too. For example, there is strong regularity in cycles of both 4 and 6, regardless of prime position. They cycle different *sorts* of properties, with their own schedule of symmetry.
 
 ```
@@ -134,18 +166,6 @@ Period of 4:             Period of 6:
    2² ⋅ 3 ⋅ 359             2² ⋅ 3 ⋅ 359         
   31 ⋅ 139                 31 ⋅ 139              
  2 ⋅ 5 ⋅ 431              2 ⋅ 5 ⋅ 431            
-  3² ⋅ 479                 3² ⋅ 479              
-   2³ ⋅ 7² ⋅ 11             2³ ⋅ 7² ⋅ 11         
-  19 ⋅ 227                   19 ⋅ 227              
- 2 ⋅ 3 ⋅ 719                2 ⋅ 3 ⋅ 719            
-  5 ⋅ 863                  5 ⋅ 863               
-   2² ⋅ 13 ⋅ 83           2² ⋅ 13 ⋅ 83         
-  3 ⋅ 1439                 3 ⋅ 1439              
- 2 ⋅ 17 ⋅ 127               2 ⋅ 17 ⋅ 127           
-  7 ⋅ 617                    7 ⋅ 617               
-   2⁵ ⋅ 3³ ⋅ 5              2⁵ ⋅ 3³ ⋅ 5          
-  29 ⋅ 149                 29 ⋅ 149              
- 2 ⋅ 2161                 2 ⋅ 2161               
 ...                       ...          
 ```
 
@@ -167,22 +187,12 @@ Period of 4 (phase +1):   Period of 6 (phase +1):
   31 ⋅ 139                  31 ⋅ 139              
  2 ⋅ 5 ⋅ 431               2 ⋅ 5 ⋅ 431            
 3² ⋅ 479                  3² ⋅ 479              
- 2³ ⋅ 7² ⋅ 11              2³ ⋅ 7² ⋅ 11         
-  19 ⋅ 227                  19 ⋅ 227              
- 2 ⋅ 3 ⋅ 719                 2 ⋅ 3 ⋅ 719            
-5 ⋅ 863                     5 ⋅ 863               
- 2² ⋅ 13 ⋅ 83              2² ⋅ 13 ⋅ 83         
-  3 ⋅ 1439                3 ⋅ 1439              
- 2 ⋅ 17 ⋅ 127              2 ⋅ 17 ⋅ 127           
-7 ⋅ 617                     7 ⋅ 617               
- 2⁵ ⋅ 3³ ⋅ 5                 2⁵ ⋅ 3³ ⋅ 5          
-  29 ⋅ 149                  29 ⋅ 149              
- 2 ⋅ 2161                  2 ⋅ 2161               
-3 ⋅ 11 ⋅ 131              3 ⋅ 11 ⋅ 131          
 ...                       ...      
 ```
 
-So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations. An extended listing follows.
+So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations.
+
+An extended listing follows.
 
 
 # Integer factorizations indented by distance from nearest prime
