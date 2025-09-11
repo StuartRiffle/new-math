@@ -192,9 +192,7 @@ Period of 4 (phase +1):   Period of 6 (phase +1):
 
 So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations.
 
-A metaphor: balls of string do not increase in radius monotonically as you wind them. The winds form ridges and valleys with lumpy distribution, bulging where there are overlaps. In fact, when you roll up string, you have to kind of keep rotating the ball on purpose, to distribute the winding. Sometimes you have no choice and the string is forced to loop over the top of a ridge and make a new local maximum.
-
-That's what the landscape of prime distribution feels like. It's a combination of cycles of mutually coprime things. It cannot roll up. This is the best it can do. It is neccessarily asymmetrical. 
+Another metaphor: balls of string do not increase in radius monotonically as you wind them. The winds form ridges and valleys with lumpy distribution, bulging where there are overlaps. In fact, when you roll up string, you have to kind of keep rotating the ball on purpose, to distribute the winding. Sometimes you have no choice and the string is forced to loop over the top of a ridge and make a new local maximum. That's what the landscape of prime distribution feels like. It's a combination of cycles of mutually coprime things. It cannot roll up. This is the best it can do. The structure is neccessarily asymmetrical, like a ball of string.
 
 
 An extended listing follows.

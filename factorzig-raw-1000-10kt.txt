@@ -1,5 +1,3 @@
-# Integer factorizations indented by distance from nearest prime
-
 1
 2
 3

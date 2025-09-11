@@ -5,6 +5,8 @@ from typing import List, Tuple, Optional, Dict
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 from pathlib import Path
+import re
+import math
 
 try:
     from PIL import Image, ImageColor
@@ -125,6 +127,125 @@ def count_chars_in_lines(lines: List[str]) -> Counter:
     for s in lines:
         cnt.update(s)
     return cnt
+
+# ---------- New: Columns ----------
+
+def wrap_lines_into_columns(
+    lines: List[str],
+    column_count: Optional[int],
+    column_length: Optional[int],
+    split_regex: Optional[str],
+    equal_width: bool,
+    width_increasing: bool,
+    margin: int,
+) -> List[str]:
+    """
+    Arrange `lines` into side-by-side columns.
+
+    Exactly one of `column_count` or `column_length` must be provided.
+    If `split_regex` is provided, only start NEW columns at a line that matches the regex.
+    """
+    if not lines:
+        return []
+
+    if (column_count is None) == (column_length is None):
+        # either both set or both None
+        raise ValueError("Provide exactly one of --column-count or --column-length for --columns.")
+
+    pattern = re.compile(split_regex) if split_regex else None
+    n = len(lines)
+
+    # Determine cut points (start indices for each column)
+    starts: List[int] = [0]
+
+    if column_count is not None:
+        target_len = math.ceil(n / max(1, column_count))
+        while len(starts) < column_count and starts[-1] < n:
+            want = min(starts[-1] + target_len, n)
+            if pattern:
+                # find the next index >= want that matches
+                next_idx = None
+                for i in range(want, n):
+                    if pattern.search(lines[i]):
+                        next_idx = i
+                        break
+                if next_idx is None:
+                    # no further match; stop splitting (rest stays in last column)
+                    break
+                starts.append(next_idx)
+            else:
+                if want >= n:
+                    break
+                starts.append(want)
+    else:
+        # Fixed height per column
+        H = max(1, column_length)
+        idx = 0
+        while idx < n:
+            if len(starts) > 1 and starts[-1] == idx:
+                # avoid infinite loops on degenerate cases
+                break
+            # Proposal for next start:
+            want = idx + H
+            if want >= n:
+                break
+            if pattern:
+                next_idx = None
+                for i in range(want, n):
+                    if pattern.search(lines[i]):
+                        next_idx = i
+                        break
+                if next_idx is None:
+                    # no more valid starts, so last column takes remainder
+                    break
+                starts.append(next_idx)
+                idx = next_idx
+            else:
+                starts.append(want)
+                idx = want
+
+    # Build column slices from starts
+    starts = sorted(set([s for s in starts if 0 <= s < n]))
+    if not starts or starts[0] != 0:
+        starts = [0] + starts
+    # Ensure last sentinel end
+    ends = starts[1:] + [n]
+
+    columns: List[List[str]] = []
+    for a, b in zip(starts, ends):
+        if a >= b:
+            continue
+        columns.append(lines[a:b])
+
+    if not columns:
+        return []
+
+    # Compute widths
+    widths = [max((len(s) for s in col), default=0) for col in columns]
+
+    # Equalize widths if requested
+    if equal_width:
+        w = max(widths) if widths else 0
+        widths = [w for _ in widths]
+
+    # Enforce nondecreasing widths if requested
+    if width_increasing and widths:
+        for i in range(1, len(widths)):
+            if widths[i] < widths[i - 1]:
+                widths[i] = widths[i - 1]
+
+    # Render row-wise
+    height = max(len(col) for col in columns)
+    space = " " * max(0, margin)
+
+    out_lines: List[str] = []
+    for r in range(height):
+        parts: List[str] = []
+        for col_idx, col in enumerate(columns):
+            cell = col[r] if r < len(col) else ""
+            parts.append(cell.ljust(widths[col_idx]))
+        out_lines.append(space.join(parts).rstrip())
+    return out_lines
 
 # ---------- Existing grid algorithms ----------
 
@@ -399,7 +520,7 @@ def write_bitmap_png(grid: List[List[str]], map_spec: str, out_path: Path, bg_co
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Flood fill, despeckle/melt, pathfinding, line transforms, and bitmap export over a text map."
+        description="Flood fill, despeckle/melt, pathfinding, line transforms, columns, and bitmap export over a text map."
     )
     parser.add_argument("file", help="Input text file")
 
@@ -430,6 +551,22 @@ def main():
 
     parser.add_argument("--replace", action="append", default=[], metavar="BEFORE=AFTER",
                         help="Simple string replacement (literal). May be repeated; applied in order per line.")
+
+    # Columns
+    parser.add_argument("--columns", action="store_true",
+                        help="Wrap lines into side-by-side columns.")
+    parser.add_argument("--column-count", type=int, default=None,
+                        help="Target number of columns (use with --columns).")
+    parser.add_argument("--column-length", type=int, default=None,
+                        help="Target number of lines per column (use with --columns).")
+    parser.add_argument("--column-equal-width", action="store_true",
+                        help="Pad all columns to the same width.")
+    parser.add_argument("--column-width-increasing", action="store_true",
+                        help="Ensure column widths are nondecreasing left-to-right.")
+    parser.add_argument("--column-split-regex", default=None, metavar="REGEX",
+                        help="Only start NEW columns at a line matching REGEX.")
+    parser.add_argument("--column-margin", type=int, default=1,
+                        help="Spaces between columns (default 1).")
 
     # Bitmap export
     parser.add_argument("--bitmap", nargs="?", const="", metavar="MAP",
@@ -469,6 +606,21 @@ def main():
     if args.rpad:
         lines = rpad_lines(lines)
 
+    # Columns (after line-level transforms, before grid algorithms)
+    if args.columns:
+        try:
+            lines = wrap_lines_into_columns(
+                lines=lines,
+                column_count=args.column_count,
+                column_length=args.column_length,
+                split_regex=args.column_split_regex,
+                equal_width=args.column_equal_width,
+                width_increasing=args.column_width_increasing,
+                margin=args.column_margin,
+            )
+        except ValueError as e:
+            parser.error(str(e))
+
     # --- Reporting-only mode ---
     if args.countchars:
         cnt = count_chars_in_lines(lines)
@@ -507,3 +659,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -44,6 +44,11 @@ arg.add_argument("--mask-limit", type=int, default=80)
 arg.add_argument("--mask-symbols", type=str, default=' X')
 arg.add_argument("--column-symbols", action="store_true")
 arg.add_argument("--psym-limit", type=int, default=12)
+arg.add_argument("--markdown", action="store_true")
+arg.add_argument("--title", type=str, default=None)
+arg.add_argument("--prologue", type=str, action='append', default=[])
+arg.add_argument("--epilogue", type=str, action='append', default=[])
+
 arg = arg.parse_args()
 
 
@@ -399,6 +404,18 @@ def get_goldbach_d_string(n):
     else:
         return ''
 
+def get_additive_triples(n):
+    # Generate a string with all additive combinations of 3 primes
+    # 11 -> '2+2+7 3+3+5'
+    triples = []
+    if n > 5:
+        for p1 in primerange(2, n):
+            for p2 in primerange(p1, n - p1):
+                p3 = n - p1 - p2
+                if p3 >= p2 and isprime(p3):
+                    triples.append(f'{p1}+{p2}+{p3}')
+    return ' '.join(triples)
+
 def get_closest_prime(n):
     if n < 2:
         return 2
@@ -497,7 +514,7 @@ def get_squarepart(n: int) -> int:
     return res
 
 def get_liouville(n: int) -> int:
-    # Liouville λ(n) = (-1)^Ω(n)
+    # Liouville ℓ(n) = (-1)^Ω(n)
     return -1 if get_factor_count_with_multiplicity(n) % 2 else 1
 
 def get_num_divisors(n: int) -> int:
@@ -835,6 +852,9 @@ def calc_n_values(n):
     col_desc['primedist'] = f'the distance from {paramname} to the nearest prime'
     val['primedist'] = get_dist_to_prime(param)
 
+    col_desc['primetriples'] = f'all combinations of three primes that sum to {paramname}, if {paramname} > 5'
+    val['primetriples'] = get_additive_triples(param) if param > 5 else ''
+
     col_desc['numfacs'] = f'the number of distinct prime factors of {paramname}, ω({paramname})'
     val['numfacs'] = get_unique_factor_count(param)
 
@@ -844,7 +864,7 @@ def calc_n_values(n):
     col_desc['squarepart'] = f'the squarepart of {paramname}, the largest perfect square dividing {paramname}'
     val['squarepart'] = get_squarepart(param)
 
-    col_desc['liouville'] = f'the Liouville function of {paramname}, λ({paramname}) = (-1)^Ω({paramname})'
+    col_desc['liouville'] = f'the Liouville function of {paramname}, ℓ({paramname}) = (-1)^Ω({paramname})'
     val['liouville'] = get_liouville(param)
 
     col_desc['numdiv'] = f'the number of divisors of {paramname}, τ({paramname})'
@@ -999,7 +1019,7 @@ def calc_n_values(n):
 
     col_desc['factorzig'] = f'the prime factors of {paramname}, indented by distance from the nearest prime'
     dist = abs(param - closest)
-    val['factorzig'] = ' ' * dist + factors_str
+    val['factorzig'] = ' ' * dist + (factors_str or '1')
 
     col_desc['factorsl'] = f'the prime factors of {paramname}-1'
     val['factorsl'] = factorsl_str
@@ -1111,7 +1131,7 @@ column_to_symbol = {
     'mob':          'μ',  
     'numfacs':      'ω',    
     'totfacs':      'Ω',    
-    'liouville':    'λ',    
+    'liouville':    'ℓ',    
     'mertens':      'M',    
     'numdiv':       'τ',    
     'sumdiv':       'σ',    
@@ -1201,13 +1221,12 @@ def print_ns(ns):
             cells[col].append(valstr)
 
     if arg.pad:
-        for col in col_headers:
+        for idx, col in enumerate(col_headers):
             col_width = max(len(cell) for cell in cells[col])
             col_tag = col
             if arg.column_symbols and col in column_to_symbol:
                 col_tag = column_to_symbol[col]
             col_width = max(col_width, len(col_tag))
-            col_width += len(sep)
             justified = []
 
             ljust = False
@@ -1216,6 +1235,10 @@ def print_ns(ns):
                     ljust = True
             if ('-' + col) in arg.cols:
                 ljust = not ljust
+
+            if idx > 0 or ljust:
+                col_width += len(sep)
+
             for cellval in cells[col]:
                 if ljust:
                     justified.append(cellval.ljust(col_width))
@@ -1231,14 +1254,51 @@ def print_ns(ns):
                 else:
                     header_line += (col_tag + sep).ljust(col_width)
                 
+    if arg.title:
+        title = arg.title
+        if arg.markdown:
+            title = f'# {title}'
+        output_lines.append(title)
+        output_lines.append('')
 
+    if arg.prologue:
+        for fname in arg.prologue:
+            with open(fname, 'r', encoding='utf-8') as f:
+                prologue = f.read().strip().split()
+                for line in prologue:
+                    output_lines.append(line.rstrip())
+                output_lines.append('')
 
     if arg.column_info:
-        longest_name = max(len(name) for name in col_info.keys())
+        if arg.markdown:
+            output_lines.append('| Column | Description |')
+            output_lines.append('')
+
+        longest_name = 0
+        for name in col_info.keys():
+            if name in column_to_symbol:
+                name = column_to_symbol[name]
+            if len(name) > longest_name:
+                longest_name = len(name)
+        longest_desc = max(len(desc) for desc in col_info.values())
+
+        prefix  = '# ' if arg.markdown else ''
+        sep     = '| ' if arg.markdown else '- '
+        suffix  = ' |' if arg.markdown else ''
         for name, desc in col_info.items():
-            label = f'`{name}`'
-            output_lines.append(f'# {label.ljust(longest_name + 2)} {desc}')
+            if name in column_to_symbol:
+                name = column_to_symbol[name]
+            label = name
+            if arg.markdown:
+                label = '`' + label + '`'
+            output_lines.append(f'{prefix}{label.ljust(longest_name + 2)} {sep}{desc}{suffix}')
         output_lines.append('')
+
+    if arg.markdown:
+        if arg.csv:
+            output_lines.append('```csv')
+        else:
+            output_lines.append('```')
 
     sorted_order = []
 
@@ -1277,6 +1337,19 @@ def print_ns(ns):
         line = line.rstrip()
         output_lines.append(line)
 
+    if arg.markdown:
+        output_lines.append('```')
+        output_lines.append('')
+
+    if arg.epilogue:
+        for fname in arg.epilogue:
+            with open(fname, 'r', encoding='utf-8') as f:
+                epilogue = f.read().strip().split()
+                for line in epilogue:
+                    output_lines.append(line.rstrip())
+                output_lines.append('')
+
+    output_lines.append('')
     print_output(output_lines)
 
 
