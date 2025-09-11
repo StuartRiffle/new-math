@@ -613,10 +613,6 @@ Period of 4 (phase +1):   Period of 6 (phase +1):
 
 So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations.
 
-
-
-
-
 There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a crystal clear bird-of-prey motif. But since it's prime, it resets the indentation and throws off a much more likely-looking midprime (204):
 
 \begin{lstlisting}
@@ -659,74 +655,20 @@ subsubsection{Prime Corridor Table}
 \end{lstlisting}
 
 
-# Prime triples
+\subsection{Harmonic addition}
 
-Odd numbers over 6 can be represented as the sum of 3 primes. 
+- Define "harmonic addition" of primes p and q as multiplication by a correction factorthat produces the correct sum.
+- The harmonic-add operator for two primes p and q is ha(p, q) = pqk, where k = (1/p + 1/q), which works out such that ha(p, q) = p + q. 
+- The set of pq prime products maps 1:1 with the set of their harmonic sums, which in turn maps many-to-one to the set of post-collision sums on the number line.
+- This separation allows us to disambiguate the additive collisions in our collection of primes, and reason about the growing set K of correction values as it evolves with each prime adjoined.
 
-\newpage
-\begin{lstlisting}
-#include "data/factorzig-1000-cols.txt"
-\end{lstlisting}
-
-
-
+% PLACEHOLDER - a list of invariants provided by harmonic addition to be pasted here
+% This method will be used in a later section.
 
 
 
 \section{Collatz Conjecture}
 
-\subsection{Collatz functional machinery}
-
-- The MSB and LSB protect the internal payload
-- Rolling over the MSB means you have reached a power of two, terminating the sequence
-- The LSB functions as a backstop for normalization
-- The value of n is a pointer
-
-## Information flow
-
-- The odd-to-odd Collatz map can be defined as ternary/binary shifts and +1
-- Shuffling zeroes in any base is reversible, so no information is lost.
-- The binary avalanche caused by +1 is the only meaningful change of state.
-- The number of bits flipped in the avalanche is k.
-
-
-## Factor set cursor
-- 3n and /2 only affect those factors, higher prime factors not added/removed
-
-[Visualization showing zeroes in residue vectors unchanged under scaling by 2 or 3]
-
-- Explain chaos inveriance
-- Explain cursor metaphor
-- Show that radicals map to factor sets
-- Define: cursor primes, cursor radical
-- Show that Collatz walks cursor radicals
-- Explain that 3n and /2 shuffle the order of the walk snipping it into series of discontinuous single steps between radicals, but that it's a permutation on all rings and radical transitions cycle.
-
-[Empirical data TBD]
-
-## Coprimality
-
-- Explain that +1 breaks alignment
-- Explain how this enumerates cursor radicals
-
-[Visualization of the orbit of 27 in Collatz order (top half of page) then sorted by piano roll (bottom half) to demonstrate that nontrivial factor sets don't repeat]
-
-## The persistent state is the CRT
-
-- Explain how the CRT keeps track long term despite constant 3n and /2
-- Show the "scrambled" residues preserve misalignment
-
-[Visualization of residue vector relationship?]
-
-## Argument for termination by cursor walk
-
-- Show convergence at only powers of two
-- Argument for termination
-
-## Carry propagation
-
-- Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
-- The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
 
 ##Dissection of orbit 27
 
@@ -911,7 +853,6 @@ Both 0 (░) and 1 (█) are seen to have unbroken bands of vertical connectivit
 \end{lstlisting}
 
 
-
 # Neighbor factor sets
 
 Some things to note:
@@ -952,34 +893,6 @@ The full trajectory of 27:
 \end{lstlisting}
 
 
-## Ergodicity
-
-- Integers have a finite MSB, so a carry avalanche is guaranteed to terminate, but 2-adic values are infinite bit strings, and sensitive to the low order bits instead. 
-- A pure 2-adic representation does not sieve radicals, so it can't make progress, and exhibits ergodic behavior.
-
-TODO: argue for termination through loss of entropy?
-
-\subsection{2-adic "odd core" decomposition}
-
-
-- Define:
-    oc(x)   2-adic "odd core" after removing factors of 2 (an odd number is its own odd core)
-    k(X)    power of two scaling, x = oc(c) * 2^k(x) (always 0 for odd numbers)
-- Explain motivation
-
-[Reference table of oc/k values for even integers, one page, dense]
-
-- Define:
-  neighbors   the even numbers n-1 and n+1 adjacent to odd n.
-
-
-## Local environment fingerprint
-
-- The arithmetic properties of n are completely determined by the 2-adic valuations (odd core and k exponent) of its two immediate even neighbors n-1 and n+1.
-- Define fingerprint as this pair of 2-adic valuations (4-tuple of integers).
-- This fingerprint uniquely identifies n and its position in the odd core graph.
-- List some invariants/relationships
-
 \section{Odd Core Connectivity}
 
 - Linking odd numbers to the odd cores of their even neighbors forms a self-similar directed graph over odd integers, terminating at 1.
@@ -1006,7 +919,6 @@ There is great regularity in the graph, but because individual primes are uneven
 #include "data/ocg127.dot"
 \end{lstlisting}
 
-
 \subsection{Odd core graph of stopping times}
 
 Considering the stopping times of the graph nodes instead of the odd n they represent, I note a couple of patterns:
@@ -1025,28 +937,68 @@ Many orbits are "switching sides" every iteration as they near the end.
 #include "data/ocg127-dist.dot"
 \end{lstlisting}
 
+\subsection{Stopping distance groups}
 
-[Diagram of odd core graph to 31 in top half of page with explanation underneath]
+Each odd number in the stopping group listing is given with a pair of 2-adic "odd core" valuations for its immediate even neighbors.
 
-- General topology
-- Local arithmetic constraints
-- Show odd core graph partitions integers by radical, unique walk to root
+This pair of vectors {oc(n-1), oc(n+1)} is like a "fingerprint" of a number's local arithmetic environment.
+It is *self-similar* and correlated with arithmetic properties in general, and Collatz evolution specifically.
+Within some distance groups, there are doublings with apparently recursive structure.
+It seems like they are part of the same graph but spilled across a wide range of numbers.
+There is strong order here, in fact most of it looks boilerplate.
 
-## Odd core graph isomorphic to Collatz evolution
+For example, look at distance group 42.
+We start with n=73, the lowest in magnitude, and valuations of neighbors 72 and 74, respectively:
 
-[Stopping distance group reference list, dense, one page]
+`n`   - an odd integer
+`ocl` - odd core of n's even neighbor to the left (n-1)
+`ocr` - odd core of n's even neighbor to the right (n+1)
 
-[Odd core graph labeled by stopping distance]
+n, ocl,  cr
+73,(9 3),(37 1)
 
-- Note ping-pong between sides
-- Note chains of repeated stopping times
+(75 follows 73 and is referenced later in the structure, but is not part of this distance group, it has distance 3).
 
-[Case study: distance group 42 connectivity]
+The "seed" number 73 has a doubled presence at 145 and 147. They share neighbor 146 in the middle.
+Their core values all match or point to the seed number 73. This part looks deterministic.
 
-- Show that linked chains share a radical
-- Explain why it's a stopping time equivalence class
+145,  (9 4), (73 1)     # shared middle neighbor 146 links both to 73
+147, (73 1), (37 2)     # "uplink" to 37 (?)
 
-[Case study: astronomical values]
+(149 follows 147 and is referenced later in the structure, but is not part of this distance group, it has distance 6).
+
+There is now a re-doubling, which links back to the first doubled presence around 146. The shared middle neighbor 292 again links to 73.
+
+291, (145 1),  (73 2)   # link back to first doubled (145)
+293,  (73 2), (147 1)   # link back to secobd doubled (147)
+
+(295 follows 293 and is referenced later in the structure, but is not part of this distance group, it has distance 18).
+
+Just past the redoubling we have this "connector".
+It's not clear why this appears at 299, except that it's similar to a re-doubling of 75, which is adjacent to the original seed 73 (?)
+
+299, (149 1), (75, 2) # 149 is after the doubled presence, 75 follows the original 73
+
+But now we double a *third* time, sort of. The structure has grown more complex, but still ordered.
+
+581, (145 2), (291 1)   # link back to first doubled (145) and first redoubled (291)
+                        # skipping 2 odd numbers, 584 in center, which has odd core 73
+587, (293 1), (147 2)   # link back to second redoubled (293) and second doubled (147)
+589, (147 2), (295 1)   # shared middle neighbor 588 links back to 147, and 295, just _after_ the second redoubled
+                        # skipping 2 odd numbers, 594 in center, which has odd core 297
+599, (299 1), (75 3)    # link back to the previous connector, after the re-doubling, and (like it) back to 75
+
+It continues like this. The distance groups seem to be something like a handful of seed values in an infinite hall of mirrors.
+
+It appears that following the even neighbor with the lowest k value can allow n to move through the tree of doublings to its distance group seed.
+
+% TODO - this would be better in columns or somthing
+
+\begin{lstlisting}
+#include "data/by-collatz-dist.txt"
+\end{lstlisting}
+
+
 
 ## Automaton implementation
 
@@ -1099,10 +1051,6 @@ TODO:
 
 - Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set.
 - If the Goldbach conjecture holds then, we can consider the first *gap* in even additive coverage after the largest prime an upper bound for the location of the next prime: p_{n+1} <= gap - 3.
-- To stay in the multiplicative domain, let's define "harmonic addition" as multiplication by a correction factor (related to their harmonic mean) that produces the correct sum.
-- The harmonic-add operator for two primes p and q is ha(p, q) = pqk, where k = (1/p + 1/q), which works out such that ha(p, q) = p + q. 
-- The set of pq prime products maps 1:1 with the set of their harmonic sums, which in turn maps many-to-one to the set of post-collision sums on the number line.
-- This separation allows us to disambiguate the additive collisions in our collection of primes, and reason about the growing set K of correction values as it evolves with each prime adjoined.
 - The matrix of prime products is symmetric (pq=qp), and likewise the one of their harmonic sums, because ha(p, q) = ha(q, p).
 - This k-symmetry manifests in a "corridor" of composite numbers between successive primes.
 - A local guarantee that even numbers between primes are covered by additive combinations (i.e. Goldbach partitions) would lift to infinity.
@@ -1111,14 +1059,23 @@ TODO:
 [sighs]
 
 
-<soapbox>
-- Also twin prime centers are anti-primes.
-</soapbox>
+\section{Coda}
+
+Also twin prime centers are anti-primes.
 
 [runs away]
 
+
 \newpage
 \begin{appendices}
+\section{Integer reference}
+
+% TODO - for publication expand to at least 1000
+
+\begin{lstlisting}
+#include "factorzig-full-500.txt"
+\end{lstlisting}
+
 \end{appendices}
 \end{document}
 

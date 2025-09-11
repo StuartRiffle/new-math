@@ -425,6 +425,25 @@ def do_melt(grid: List[List[str]], chars: str, threshold: int = 5) -> int:
 
     return total_changes
 
+# ---------- Dumb-simple preprocess ----------
+
+def preprocess_file(path: Path) -> list[str]:
+    out: list[str] = []
+    base_dir = path.parent
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            s = line.rstrip("\n")
+            if s.lstrip().startswith("#include"):
+                # grab everything after #include
+                rest = s.lstrip()[len("#include"):].strip()
+                rest = rest.strip('"').strip()
+                inc_path = (base_dir / rest)
+                with inc_path.open("r", encoding="utf-8") as inc:
+                    out.extend(inc.read().splitlines())
+            else:
+                out.append(s)
+    return out
+
 # ---------- Bitmap export ----------
 
 def _parse_color(color_str: str) -> Tuple[int, int, int, int]:
@@ -525,6 +544,7 @@ def main():
     parser.add_argument("--melt", dest="melt", default="", help="Characters for fuzzy despeckle, processed in order (e.g., '░█░')")
     parser.add_argument("--fill", dest="fill", default="", help="Characters to use for flood fill (e.g., 'xyz')")
     parser.add_argument("--path", dest="path", default="", help="Characters for vertical pathfinding (e.g., 'abcd')")
+    parser.add_argument("--preprocess", action="store_true", help='Process #include declarations')
 
     # Reporting
     parser.add_argument("--countchars", action="store_true",
@@ -578,6 +598,9 @@ def main():
 
     # --- Read raw lines and apply line-level transforms ---
     lines = read_lines(args.file)
+
+    if args.preprocess:
+        lines = preprocess_file(Path(args.file))
 
     # Parse replacements BEFORE other transforms.
     if args.replace:
