@@ -181,11 +181,7 @@ def wrap_lines_into_columns(
         # Fixed height per column
         H = max(1, column_length)
         idx = 0
-        while idx < n:
-            if len(starts) > 1 and starts[-1] == idx:
-                # avoid infinite loops on degenerate cases
-                break
-            # Proposal for next start:
+        while True:
             want = idx + H
             if want >= n:
                 break
@@ -196,7 +192,7 @@ def wrap_lines_into_columns(
                         next_idx = i
                         break
                 if next_idx is None:
-                    # no more valid starts, so last column takes remainder
+                    # no more valid starts; last column takes remainder
                     break
                 starts.append(next_idx)
                 idx = next_idx

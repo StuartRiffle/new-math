@@ -100,6 +100,8 @@ symbol_map = {
     3: '░▒█',
 }
 
+col_flip_char = '~'
+
 def padic(n, base = 2):
     k = 0
     if n:
@@ -1188,8 +1190,7 @@ def print_ns(ns):
     col_info = {}
     col_headers = []
     for col in cols:
-        # remove leading '-'
-        col_raw = col.lstrip('-')
+        col_raw = col.lstrip(col_flip_char)
         col_info[col_raw] = col_desc[col_raw]
 
         if col_raw == 'm*' or col_raw == 'sm*' or col_raw == 'cyc*':
@@ -1233,7 +1234,7 @@ def print_ns(ns):
             for sub in ljust_by_default:
                 if sub in col:
                     ljust = True
-            if ('-' + col) in arg.cols:
+            if (col_flip_char + col) in arg.cols:
                 ljust = not ljust
 
             if idx > 0 or ljust:

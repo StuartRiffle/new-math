@@ -11,6 +11,157 @@
 \section{Introduction}
 \subsection{Definitions}
 
+\section{WIP - rough notes}
+
+[clears throat and inhales deeply]
+
+<soapbox>
+- The odd-to-odd Collatz map can be defined as a shift left in ternary, and a shift right in binary, with a +1 operation in between.
+- Wait, where are you going? Collatz isn't Turing complete, so it's still on the table, fair and square. I brought a bullet point list and a wall of numbers, stay with me here.
+- Anyway both shifts are information preserving, because they only shuffle zeroes. Pushing n around in this base or the other is reversible, so no information is lost.
+- A full iteration exchanges k for new congruence information, which is propagated forward thereafter by the CRT.
+- The binary avalanche caused by +1 is the only meaningful change of state in the Collatz map. The shifts are temporary and informationally harmless.
+- The number of bits flipped in the avalanche is k.
+- The per-step information evolution of Collatz is proportional to k. The nature of it is isomorphic to the rules of carry propagation.
+- (As an aside, this is why Minsky's two-tag machine traces Collatz: it's a cleverly obfuscated carry-propagator, unrolled bit by bit).
+- The binary carry avalanche maximizes diffusion of information from odd prime rings into the dyadic hierarchy (powers of two).
+- Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
+- Information diffused by odd primes is not shed until the dyadic hierarchy is "drained", which only happens when the orbit of n intersects a "connector" (details of this below), which collapses accumulated information modulo odd primes.
+
+- The LSB of n under the odd-to-odd map is always 1 (because it's odd). There must also be an MSB _somewhere_ (because we're still playing Collatz, so n > 1).
+- These can be considered delimiters without informational value then. The interior "payload" bits completely determine the state of the process, which ends when the delimiters join (at 1).
+- The MSB is a placeholder that protects the leading zeroes in the payload. The LSB protects the trailing zeroes, and serves as a "stop" during the /2 normalization step. Together they form a frame.
+- The interior bits as a string form a symbolic progression, isomorphic to the arithmetic by construction (you can always wrap the string in delimiters again to recover n, so a 1:1 mapping).
+- Integers have a finite MSB, so a carry avalanche is guaranteed to terminate, but 2-adic values are infinite bit strings, and sensitive to the low order bits instead. A pure 2-adic representation does not sieve radicals, so it can't make progress, and exhibits ergodic behavior. When the avalanche reaches the MSB, it is replaced by the carry, destroying information.
+- It's really unfortunate that the (meaningless) MSB of n has the largest effect on magnitude, that sure doesn't help things.
+</soapbox>
+
+[pauses to sip water]
+
+<soapbox>
+- Define the "natural" order of prime factor sets to be the one arising as you simply increment integers, the "successor" operation: {}, {2}, {3}, {2}, {5}, {2,3}, {7}, {2}, {3}, {2,5}, and so on.
+- Natural ordering is a constrained mapping: consecutive integers share no factors.
+- The +1 operation is a permutation on all prime integer rings, at once.
+- The sequence is cyclical modulo the product of primes.
+- 3n can only add a factor of 3, the rest of the factor set is unchanged.
+- The same is true of the /2 step: scaling by powers of two can't add or remove odd prime factors.
+- The set of prime factors above 3 is therefore chaos-invariant, and we can reason about its long term evolution.
+- The +1 operation breaks multiplicative alignment with the product of the prime factors of n (its radical).
+- Forever, because the CRT never forgets.
+- Which prevents n from repeating.
+- In aggregate these observations establish an information channel that amounts to an "odd prime factor set cursor", and it cycles modulo the product of primes.
+- The process of accumulating coprimality through iteration acts like a sieve over radical lattices, which are coprime by definition.
+- The coprimality is propagated forward by the CRT, forcing n to (effectively) enumerate odd prime factor sets.
+- Each set of odd prime factors above three is unique among odd numbers on a Collatz orbit. That combination of factors will be seen only once. This is the cursor walk.
+- This is independent of factor exponent. Gaining coprimality with 5x7 (for example) also makes n coprime to 5^2x7^3, because they have the same radical.
+- Many small values of n share factor sets that differ only in their exponents. These are a "jackpot" of coprimality, because the entire radical equivalence class of composite numbers is sieved out together.
+
+- The prime numbers 3 (click) and 2 (bang) are the functional machinery of Collatz. 
+- Define the "cursor primes" to be all the rest of them: the set of odd primes above 3. Their presence/absence is the persistent state that allows n to walk unique factor sets.
+- Cursor primes cycle.
+- The +1 operation steps cursor primes through this cycle, unimpeded by the 3n and /2 steps (because they only change n by factors of 3 or 2), making the set of cursor primes Collatz-invariant.
+- The 3n and /2 operations are permutations over all prime rings. They hop n to another number, but always with the *same* cursor radical. The +1 step in natural order (nested prime cycles) is made from there. 
+- For example, 41 is a prime number. In natural order, it successor is 2x3x7 = 42, and incrementing 41 would normally change the set of cursor primes from {41} to {7}. However, the 3n operation jumps to 41x3 = 123, making the cursor primes the factor set above 3 {41}, then steps in natural order from there, to 124, which has factors 2x2x31, or cursor prime set {31}, which will pass unmodified through the following /2 steps. 
+- To put it another way, we're still following natural order, but the sequence of numbers in each radical class has been internally shuffled.
+- Collatz then is a permutation of the natural order of succession of cursor-prime-factor-sets, technically a wreath product.
+- 3n has full coverage over prime rings (it just has to go around them 3 times), the sequence cycles modulo the product of primes, and the +1 operation is applied in shuffled but deterministic order.
+
+- The product of n's unique prime factors is its radical. The value of n is always a multiple of its radical; it is aligned with it. Offset from n on both sides by the its radical is another number which is a multiple of the radical.
+- Every combination of factors represents a radical, if you multiply them all together. There is a 1:1 correspondence between factor sets and radicals, because prime numbers are all coprime to each other, so every uniqe combination of prime factors has a unique product.
+- Every radical is coprime to all other radicals, because primes are coprime to each other, so all their multiples are too.
+- Prime factor set <==> prime radical, same thing.
+
+- Ignoring 2 and 3, the product of the higher prime factors (cursor primes) can be called their "cursor radical", because they implement a walk over radicals formed from just those primes. 
+- The cursor radical can be defined R(n)=rad(n) / gcd(rad(n), 2*3). Every odd-to-odd step of the Collatz map we have gcd(R(n), R(n')) = 1. The Collatz map is a strictly monotonic walk down the poset of cursor radicals.
+- The +1 operation cycles *radicals*, in natural order.
+- Collatz runs in a permutation of natural order (3n), therefore Collatz also cycles cursor radicals. Once a set of cursor prime factors (uniquely represented by its radical) has been seen in Collatz order, it will not be seen again modulo that radical until it cycles.
+- Natural ordering modulo any set of primes does not present every combination evenly. Numbers with higher prime factors not represented in the set will alias numbers sharing the same subset of lower factors.
+- For example, there are only 16 unique combinations of the factors {2, 3, 5, 7}, but they cycle with period 2x3x5x7 = 210. Inside that cycle, the first 3 also cycle with period 2x3x5 = 30, and the first two with period 2x3 = 6. That 6-cycle repeats 5 times in the 30 cycle, against every phase of prime 5. That 30-cycle repeats 7 times in the 210-cycle, and so on as you add higher primes. This is the pattern of natural ordering, 
+- Considering factors {2, 3, 5, 7} the empty set {} appears 48 times in the first 210 integers, representing numbers having none of those factors. This is modeled by Euler's Totient Theorem: φ(N) = φ(2)φ(3)φ(5)φ(7) = 1 * 2 * 4 * 6 = 48 gaps in the cycle.
+- During the cycle, the sequence of factor sets appears chaotic, but the order they appear is strict and deterministic: nested prime subcycles.
+- The full factor set 2x3x5x7 appears exactly *once* in the cycle of 210, at the end.
+- That's the radical for that set of primes, and the radical has that property whatever set of primes you choose: exactly one instance per cycle.
+</soapbox>
+
+[stops to catch his breath, now visibly perspiring]
+
+<soapbox>
+- When +1 steps past a radical, the radical goes to the back of that very long cycle. This works the same no matter what set of primes you choose to look at.
+- For example, becoming coprime to 35 (the radical of all numbers having factor set {5, 7}) under the +1 operation means it will take 34 more steps to reach another multiple of 35. All numbers with the same factor prime set, like 5x5x5x7, are unreachable by n under Collatz rules until then, at any magnitude.
+- We know that at n-35 and n+35, we will not find a number with the factor set {5, 7}, that is, any multiple of 35. That radical (factor set) is *forbidden* at those offsets from n, until a full cycle completes.
+- As Collatz iterates, and coprimality is gained with more cursor radicals, these prohibitions on factorization accumulate, because +1 runs strictly in natural order, and +1 systematically moves each radical encountered to the back of its cycle.
+- Low magnitude n are "immune" to the presence of higher factors in natural cycle order. Their reduced space of factor sets (reachable radicals) cycles more quickly. Large numbers cycle a large space of potential factors. Small numbers have fewer potential factors. 
+- This is the case at every scale. The set of potential factors monotonically increases, but numbers are usually "behind" the maximum for whatever subcycle they are in.
+- The odd-to-odd Collatz map is ergodic in 2-adic space, but biased towards lower radicals in integers, because small factors are more common.
+- The carry-propagation step in Collatz is a lossless-dissipative (but not reversible) shift into dyadic form, enforced by the finite MSB.
+- The presence of the MSB is what allows Collatz to make forward progress.
+- Non-factor residues appear "scrambled" because they are mutating to maintain existing odd congruences in a constrained way. This is a feature, not a bug.
+
+- Eventual misalignment with all odd prime factor sets under the Collatz map will force n to a power of two.
+- Because what's evolving is "the set of odd prime factors above three", the actual magnitude of n at any time has little value. It is a pointer to the richer state information in n's local neighborhood.
+- The value of n never repeats. This is a clue, because doing that long term requires non-trivial persistent state.
+- Long orbits can pass through small values of n and recover. That requires indirection. A handful of bits can't hold enough state to support the complex long term behavior observed; n must represent something more than itself.
+- Accumulating modular constraint is the reason n seems to find so many prime numbers: it has no choice. As n becomes coprime with common factor sets, composite numbers become unreachable.
+- Collatz runs in the space of prime residues, which represent CRT constraint state. This determines congruence (or lack thereof). The value of n is indexing this space. It is chaotic-looking but stepping very carefully.
+
+- The value of n also sits in a web of modular constraints with its neighbors on the number line.
+- The neighboring evens share no factors.
+- The previous even shares no factors above 3 with the next odd, and vice versa.
+- Neighboring odds share no factors above 5, etc. Factor constraint drops off with distance from n.
+- The orbit of Collatz is an intersection of these constraint systems.
+- The value of n gains coprimality as it iterates and the neighbors of n must not contradict that relationship, which funnels evolution.
+
+- The arithmetic properties of n are completely determined by the 2-adic valuations (odd core and k exponent) of its two immediate even neighbors n-1 and n+1.
+- This pair of 2-adic valuations (4-tuple of integers) uniquely identifies n, like a fingerprint.
+- The fingerprint of even n must have k-values (2-adic valuations) that follow one of two patterns: (>1, 1, >1, 1) or (1, >1, 1, >1).
+- For odd n, it will be one of (>1, 1, 1, >1) or (1, >1, >1, 1).
+- The Collatz process can run directly on these fingerprints, as a counter automaton; you don't need to use n at all.
+
+- The local environment E(n) is the complete local state vector of an integer n. It is the set of measurements of n's local neighborhood that are sufficient to uniquely determine n's global arithmetic properties, including its prime factorization. It's a map from a neighborhood of integers to a vector of their 2-adic and p-adic properties.
+- Iₙ is the set of integers being measured. Here we focus on n's immediate neighbors, {n-1, n+1}, but this set can include more distant neighbors.
+- Pₙ is the set of small "test" primes, e.g., {3, 5, 7, ..., p} where p ≤ log(n)².
+- E(n) = {m ↦ (k(m), {oc(m) mod p})_p∈Pₙ | m ∈ Iₙ}
+- The minimal environment {n-1, n+1} is a **static snapshot**, and what you need for "spectroscopy", to read the prime factors of n itself. 
+- The extended environment {..., n-1, n+1, ...} is more like a movie frame, capturing the local "slope" or "momentum" of the environmental patterns by sampling farther from n.
+- The E(n) environment of n = p^k reveals the structure of prime powers within the 2-adic landscape.
+- For an odd prime p and any odd exponent k, the 2-adic valuation of p^k-1 matches the base prime's neighbor, that is: v₂(p^k-1) = v₂(p-1). The prime `p` projects a stable 2-adic "shadow" across all its odd powers.
+- Odd integer n is divisible by prime p iff oc(n-1) * 2^k(n-1) ≡ -1 mod p, and oc(n+1) * 2^k(n+1) ≡ 1 mod p.
+- For any even m, oc(3m) = 3 * oc(m).
+- For n ≡ 1 (mod 8), oc(n'-1) = 3 * oc(n-1), and v₂(n'-1) = v₂(n-1) - 2.
+- For n ≡ 3 (mod 4), i.e. n ≡ 3, 7 (mod 8), oc(n'+1) = 3 * oc(n+1), and v₂(n'+1) = v₂(n+1) - 1.
+- For n ≡ 5 (mod 8), v₂(n-1) = 2, and v₂(3n+1) > 2.
+- For any even exponent k, the valuation undergoes a phase shift, and is amplified: v₂(p^k - 1) ≥ 3. 
+- The parity of the exponent k in p^k is encoded directly into its environmental fingerprint E(p^k), and we can read it instantly by observing v₂(p^k - 1).
+- The LSB of odd n is 1, so n ≡ 1 mod 2. There is also a distinct MSB if n > 1, which it is, letting us say v₂(n-1) + v₂(n+1) ≥ 3.
+- For odd prime p and odd k such that n = p^k, v₂(n-1) = v₂(p-1).
+- For even integer m > 0, gcd(oc(m), oc(m+2)) = 1, which means the odd cores of n's even neighbors are coprime, and the odd prime factor sets of those odd cores disjoint.
+- For any odd integer n > 1, the 2-adic valuations of its neighbors are asymmetric. One neighbor will have k = 1, the other >= 2. This is a consequence of the structure of integers modulo 4. If n=4k+1, then n-1 is a multiple of 4 and n+1 is only a multiple of 2. If n=4k+3, the roles reverse.
+- These things together show that the 2-adic landscape around an odd number is intrinsically lopsided at any magnitude. The multiplicative (odd core) and dyadic (v₂) components are governed by rigid rules of **segregation** and **asymmetry**.
+- The space of E(n) is a brittle lattice defined by these forced relationships. 
+
+- An odd-to-odd Collatz orbit is a deterministic walk through the residue product space G = ∏ₚ(Z/pZ) over the odd primes dividing n (above 3).
+- For each p>3, the odd-to-odd step translates to “n → n+1 (mod p)”. All radical bits (prime factors) become coset coordinates, and Collatz steps advance diagonally in this space; carry shifts, odd core merges, and residuation by 2 are just coordinate transforms.
+- Stopping distance for n is exactly the time until the “radical mask” (bit vector of surviving odd primes) is fully “burned”: that is, until you first hit (modulo all p in the radical) n+d ≡ −1 (mod p) for all p.
+- This is a simultaneous hitting-time for the tuple (p₁-1, p₂-1,...) steps forward from n in each ring. Chinese Remainder Theorem gives a unique solution d (mod ∏p) to these congruences: the “naive” diagonal cycle. But Collatz merges/hubs cause in-practice much shorter real walks, as radical constraints collapse when the walk encounters a “merge” in the odd core graph.
+- Short stopping distances correspond to radicals whose cycles quickly align with −1 in all coordinates, i.e., dense merges. Long stopping distances correspond to radicals made of rare/large primes, forcing long walks before alignment and delayed merges.
+- The process of “burning” radicals is visible in the binary/ternary trace as avalanche “triangles”—each big carry-or-resonance event is the moment a prime constraint gets sieved out of play.
+
+- Linking odd numbers to the 2-adic odd cores of their even neighbors forms a self-similar DAG over odd integers, terminating at 1.
+- I am as surprised as you are.
+- The Collatz map contains infinite sequences of deterministic "almost-doublings" that form an odd-to-odd stopping time equivalence class.
+- Using the graph and always following the link with lowest k-value appears to reduce astronomical n to representative "seed" values for the equivalence class in log2 n steps, but the limit has not been tested.
+
+- Each odd seed is the base of an infinite 2-adic chain of even multiples of powers of two. These even numbers are an odd-to-odd stopping time equivalence class, because the Collatz /2 rule collapses them all immediately to the same odd seed.
+- Seeds partition the set of odd integers into classes: every odd number belongs to exactly one seed’s “doubling chain”.
+- Adjacent to every even number on the seed's doubling chain are two odd neighbors. One or both will have the same odd-to-odd stopping time as the seed for this reason.
+- Some odd composite numbers work as "hubs" where multiple seed chains join, and the rest of the path is shared.
+- The hubs are fed by "connectors" with a similar (but simpler) pattern of doubling, and these funnel into it. The density of connectors increases with n.
+- The pattern of self-similar odd core connectivity is unavoidable, because even at astronomical values, the rules of 2-adic valuation (remove power of two factors) connect n regularly to much smaller odd core values. The odd cores have unlimited "reach" in this way.
+- Continuing from a seed, using the lowest-k traversal rule, intermediate values are no longer in the same stopping time equivalence class, and paths merge quickly into common "trunk lines". There is no stopping time differentiation below the seed.
+- The complete lowest-k root walk across the odd-core connectivity graph (n -> seed -> 1) uniquely identifies n.
+</soapbox>
+
+[collapses gasping]
 
 
 
@@ -18,246 +169,125 @@
 
 \subsection{Natural order of factor sets}
 
-- Explain nested prime cycles
+The pattern of prime factors in integers is a cycle modulo the product of primes as you increment n. Call this the "natural" permutation, the one you get by simply adding 1. This transform is the only thing +1 knows how to do.
 
-[Visualization of prime cycle misalignment and convergence]
+Successive numbers share no factors, which amounts to an information-preserving mechanism. The +1 operation is an invertible permutation over all prime factor rings of integers at once, which is a very complicated mapping, but it's also a cycle modulo the product of a subset of those rings, which makes it predictable.
 
-- Explain totient theorem, frequency of combinations
-- Define radical, show uneven distribution of factor sets in progression, and radical happens only once at the end
+The two prime factors (2 and 3) cycle with period 6. The first two columns represent the presence of prime factors 2 and 3:
 
-[Visualization of long prime cycle with one radical]
+```
+00 (1)  {}
+10 (2)  {2}
+01 (3)  {3}
+10 (4)  {2}
+00 (5)  {}
+11 (6)  {2,3}
+```
 
-- Constraints on succession
-- Fundamental asymmetry
+Values repeat because they have higher prime factors (like 5 here) that are not shown.
+
+The first 3 prime factors appear with period (2 * 3 * 5) = 30.
+The existing 6-cycle repeats 5 times, the new 5-cycle repeats 6 times alongside it, so touching every unique combination of 3 factors takes 30 steps.
+It looks like this:
+
+```
+000 100 010 100 001 110
+000 100 010 101 000 110
+000 100 011 100 000 110
+000 101 010 100 000 110
+001 100 010 100 000 111
+```
+
+The first 4 factors appear in a cycle with period (2 * 3 * 5 * 7) = 210:
+
+```
+0000 1000 0100 1000 0010 1100 0001 1000 0100 1010 
+0000 1100 0000 1001 0110 1000 0000 1100 0000 1010
+0101 1000 0000 1100 0010 1000 0100 1001 0000 1110
+0000 1000 0100 1000 0011 1100 0000 1000 0100 1010
+0000 1101 0000 1000 0110 1000 0000 1100 0001 1010
+0100 1000 0000 1100 0010 1001 0100 1000 0000 1110
+0000 1000 0101 1000 0010 1100 0000 1000 0100 1011
+0000 1100 0000 1000 0110 1000 0001 1100 0000 1010
+0100 1000 0000 1101 0010 1000 0100 1000 0000 1110
+0001 1000 0100 1000 0010 1100 0000 1001 0100 1010 
+0000 1100 0000 1000 0111 1000 0000 1100 0000 1010
+0100 1001 0000 1100 0010 1000 0100 1000 0001 1110 
+0000 1000 0100 1000 0010 1101 0000 1000 0100 1010
+0000 1100 0001 1000 0110 1000 0000 1100 0000 1011
+0100 1000 0000 1100 0010 1000 0101 1000 0000 1110
+0000 1000 0100 1001 0010 1100 0000 1000 0100 1010
+0001 1100 0000 1000 0110 1000 0000 1101 0000 1010
+0100 1000 0000 1100 0011 1000 0100 1000 0000 1110
+0000 1001 0100 1000 0010 1100 0000 1000 0101 1010
+0000 1100 0000 1000 0110 1001 0000 1100 0000 1010
+0100 1000 0001 1100 0010 1000 0100 1000 0000 1111
+```
+
+Some states appear much more often than others, but all combinations of factors are represented at least once.
+Numbers having no factors among {2, 3, 5, 7} (0000) appear 48/210 times, and the full factor set {2, 3, 5, 7} = 210 (1111) appears only once, at the very end. 
+
+```
+0000 * 48 (0)
+1000 * 48 (2)
+0100 * 24 (3)
+0010 * 12 (5)
+1010 * 12 (10)
+0001 * 8  (7)
+1001 * 8  (14)
+1100 * 8  (6)
+0110 * 6  (15)
+1110 * 6  (30)
+0101 * 4  (21)
+1101 * 4  (42)
+0011 * 2  (35)
+1011 * 2  (70)
+0111 * 1  (105)
+1111 * 1  (210)
+```
+
+Euler's totient theorem can calculate this distribution.
+
+Including new prime factors for large values of n quickly explodes the length of an exhaustive cycle:
+
+```
+Factor  Length
+11      2310
+13      30030
+17      510510
+19      9699690
+```
 
 \subsubsection{Piano roll visualization}
 
 % TODO: for the pdf, make this one full page, with a piano roll (in small font) on the left, and commentary to the right
 
-This is a "piano roll" visualization marking factors up to 199 for each integer. It's like a vertical view of the prime cycle gaps, but "zoomed out" to show long range structure.
+This is a "piano roll" visualization marking factors up to 199 for each integer. It's like a vertical view of the prime cycle gaps, but "zoomed out" to show long range structure. Note the way subcyles of different primes go in and out of phase.
 
 \begin{lstlisting}
-- `oc` is the 2-adic "odd core" of the number, after removing all factors of 2. For odd numbers, oc is the number itself.
-- `k` is the 2-adic exponent, the number of halvings (n = oc * 2^k). For odd numbers, k is always 0.
-- 'base3' and 'base2' are ternary and binary representations of the oc respectively
-- `factors` is a mask of the prime factor set of oc, where each ■ represents a prime factor. The first 46 prime factors (2-199 inclusive) are marked, for numbers up to 2*3*5*7 = 210. Even numbers are represented by their 2-adic valuations.
-
-  oc, k, base3, base2,    factors
-   1, 0, 00001, 00000001, ──────────────────────────────────────────────
-   1, 1, 00001, 00000001, ■─────────────────────────────────────────────
-   3, 0, 00010, 00000011, ─■────────────────────────────────────────────
-   1, 2, 00001, 00000001, ■─────────────────────────────────────────────
-   5, 0, 00012, 00000101, ──■───────────────────────────────────────────
-   3, 1, 00010, 00000011, ■■────────────────────────────────────────────
-   7, 0, 00021, 00000111, ───■──────────────────────────────────────────
-   1, 3, 00001, 00000001, ■─────────────────────────────────────────────
-   9, 0, 00100, 00001001, ─■────────────────────────────────────────────
-   5, 1, 00012, 00000101, ■─■───────────────────────────────────────────
-  11, 0, 00102, 00001011, ────■─────────────────────────────────────────
-   3, 2, 00010, 00000011, ■■────────────────────────────────────────────
-  13, 0, 00111, 00001101, ─────■────────────────────────────────────────
-   7, 1, 00021, 00000111, ■──■──────────────────────────────────────────
-  15, 0, 00120, 00001111, ─■■───────────────────────────────────────────
-   1, 4, 00001, 00000001, ■─────────────────────────────────────────────
-  17, 0, 00122, 00010001, ──────■───────────────────────────────────────
-   9, 1, 00100, 00001001, ■■────────────────────────────────────────────
-  19, 0, 00201, 00010011, ───────■──────────────────────────────────────
-   5, 2, 00012, 00000101, ■─■───────────────────────────────────────────
-  21, 0, 00210, 00010101, ─■─■──────────────────────────────────────────
-  11, 1, 00102, 00001011, ■───■─────────────────────────────────────────
-  23, 0, 00212, 00010111, ────────■─────────────────────────────────────
-   3, 3, 00010, 00000011, ■■────────────────────────────────────────────
-  25, 0, 00221, 00011001, ──■───────────────────────────────────────────
-  13, 1, 00111, 00001101, ■────■────────────────────────────────────────
-  27, 0, 01000, 00011011, ─■────────────────────────────────────────────
-   7, 2, 00021, 00000111, ■──■──────────────────────────────────────────
-  29, 0, 01002, 00011101, ─────────■────────────────────────────────────
-  15, 1, 00120, 00001111, ■■■───────────────────────────────────────────
-  31, 0, 01011, 00011111, ──────────■───────────────────────────────────
-   1, 5, 00001, 00000001, ■─────────────────────────────────────────────
-  33, 0, 01020, 00100001, ─■──■─────────────────────────────────────────
-  17, 1, 00122, 00010001, ■─────■───────────────────────────────────────
-  35, 0, 01022, 00100011, ──■■──────────────────────────────────────────
-   9, 2, 00100, 00001001, ■■────────────────────────────────────────────
-  37, 0, 01101, 00100101, ───────────■──────────────────────────────────
-  19, 1, 00201, 00010011, ■──────■──────────────────────────────────────
-  39, 0, 01110, 00100111, ─■───■────────────────────────────────────────
-   5, 3, 00012, 00000101, ■─■───────────────────────────────────────────
-  41, 0, 01112, 00101001, ────────────■─────────────────────────────────
-  21, 1, 00210, 00010101, ■■─■──────────────────────────────────────────
-  43, 0, 01121, 00101011, ─────────────■────────────────────────────────
-  11, 2, 00102, 00001011, ■───■─────────────────────────────────────────
-  45, 0, 01200, 00101101, ─■■───────────────────────────────────────────
-  23, 1, 00212, 00010111, ■───────■─────────────────────────────────────
-  47, 0, 01202, 00101111, ──────────────■───────────────────────────────
-   3, 4, 00010, 00000011, ■■────────────────────────────────────────────
-  49, 0, 01211, 00110001, ───■──────────────────────────────────────────
-  25, 1, 00221, 00011001, ■─■───────────────────────────────────────────
-  51, 0, 01220, 00110011, ─■────■───────────────────────────────────────
-  13, 2, 00111, 00001101, ■────■────────────────────────────────────────
-  53, 0, 01222, 00110101, ───────────────■──────────────────────────────
-  27, 1, 01000, 00011011, ■■────────────────────────────────────────────
-  55, 0, 02001, 00110111, ──■─■─────────────────────────────────────────
-   7, 3, 00021, 00000111, ■──■──────────────────────────────────────────
-  57, 0, 02010, 00111001, ─■─────■──────────────────────────────────────
-  29, 1, 01002, 00011101, ■────────■────────────────────────────────────
-  59, 0, 02012, 00111011, ────────────────■─────────────────────────────
-  15, 2, 00120, 00001111, ■■■───────────────────────────────────────────
-  61, 0, 02021, 00111101, ─────────────────■────────────────────────────
-  31, 1, 01011, 00011111, ■─────────■───────────────────────────────────
-  63, 0, 02100, 00111111, ─■─■──────────────────────────────────────────
-   1, 6, 00001, 00000001, ■─────────────────────────────────────────────
-  65, 0, 02102, 01000001, ──■──■────────────────────────────────────────
-  33, 1, 01020, 00100001, ■■──■─────────────────────────────────────────
-  67, 0, 02111, 01000011, ──────────────────■───────────────────────────
-  17, 2, 00122, 00010001, ■─────■───────────────────────────────────────
-  69, 0, 02120, 01000101, ─■──────■─────────────────────────────────────
-  35, 1, 01022, 00100011, ■─■■──────────────────────────────────────────
-  71, 0, 02122, 01000111, ───────────────────■──────────────────────────
-   9, 3, 00100, 00001001, ■■────────────────────────────────────────────
-  73, 0, 02201, 01001001, ────────────────────■─────────────────────────
-  37, 1, 01101, 00100101, ■──────────■──────────────────────────────────
-  75, 0, 02210, 01001011, ─■■───────────────────────────────────────────
-  19, 2, 00201, 00010011, ■──────■──────────────────────────────────────
-  77, 0, 02212, 01001101, ───■■─────────────────────────────────────────
-  39, 1, 01110, 00100111, ■■───■────────────────────────────────────────
-  79, 0, 02221, 01001111, ─────────────────────■────────────────────────
-   5, 4, 00012, 00000101, ■─■───────────────────────────────────────────
-  81, 0, 10000, 01010001, ─■────────────────────────────────────────────
-  41, 1, 01112, 00101001, ■───────────■─────────────────────────────────
-  83, 0, 10002, 01010011, ──────────────────────■───────────────────────
-  21, 2, 00210, 00010101, ■■─■──────────────────────────────────────────
-  85, 0, 10011, 01010101, ──■───■───────────────────────────────────────
-  43, 1, 01121, 00101011, ■────────────■────────────────────────────────
-  87, 0, 10020, 01010111, ─■───────■────────────────────────────────────
-  11, 3, 00102, 00001011, ■───■─────────────────────────────────────────
-  89, 0, 10022, 01011001, ───────────────────────■──────────────────────
-  45, 1, 01200, 00101101, ■■■───────────────────────────────────────────
-  91, 0, 10101, 01011011, ───■─■────────────────────────────────────────
-  23, 2, 00212, 00010111, ■───────■─────────────────────────────────────
-  93, 0, 10110, 01011101, ─■────────■───────────────────────────────────
-  47, 1, 01202, 00101111, ■─────────────■───────────────────────────────
-  95, 0, 10112, 01011111, ──■────■──────────────────────────────────────
-   3, 5, 00010, 00000011, ■■────────────────────────────────────────────
-  97, 0, 10121, 01100001, ────────────────────────■─────────────────────
-  49, 1, 01211, 00110001, ■──■──────────────────────────────────────────
-  99, 0, 10200, 01100011, ─■──■─────────────────────────────────────────
-  25, 2, 00221, 00011001, ■─■───────────────────────────────────────────
- 101, 0, 10202, 01100101, ─────────────────────────■────────────────────
-  51, 1, 01220, 00110011, ■■────■───────────────────────────────────────
- 103, 0, 10211, 01100111, ──────────────────────────■───────────────────
-  13, 3, 00111, 00001101, ■────■────────────────────────────────────────
- 105, 0, 10220, 01101001, ─■■■──────────────────────────────────────────
-  53, 1, 01222, 00110101, ■──────────────■──────────────────────────────
- 107, 0, 10222, 01101011, ───────────────────────────■──────────────────
-  27, 2, 01000, 00011011, ■■────────────────────────────────────────────
- 109, 0, 11001, 01101101, ────────────────────────────■─────────────────
-  55, 1, 02001, 00110111, ■─■─■─────────────────────────────────────────
- 111, 0, 11010, 01101111, ─■─────────■──────────────────────────────────
-   7, 4, 00021, 00000111, ■──■──────────────────────────────────────────
- 113, 0, 11012, 01110001, ─────────────────────────────■────────────────
-  57, 1, 02010, 00111001, ■■─────■──────────────────────────────────────
- 115, 0, 11021, 01110011, ──■─────■─────────────────────────────────────
-  29, 2, 01002, 00011101, ■────────■────────────────────────────────────
- 117, 0, 11100, 01110101, ─■───■────────────────────────────────────────
-  59, 1, 02012, 00111011, ■───────────────■─────────────────────────────
- 119, 0, 11102, 01110111, ───■──■───────────────────────────────────────
-  15, 3, 00120, 00001111, ■■■───────────────────────────────────────────
- 121, 0, 11111, 01111001, ────■─────────────────────────────────────────
-  61, 1, 02021, 00111101, ■────────────────■────────────────────────────
- 123, 0, 11120, 01111011, ─■──────────■─────────────────────────────────
-  31, 2, 01011, 00011111, ■─────────■───────────────────────────────────
- 125, 0, 11122, 01111101, ──■───────────────────────────────────────────
-  63, 1, 02100, 00111111, ■■─■──────────────────────────────────────────
- 127, 0, 11201, 01111111, ──────────────────────────────■───────────────
-   1, 7, 00001, 00000001, ■─────────────────────────────────────────────
- 129, 0, 11210, 10000001, ─■───────────■────────────────────────────────
-  65, 1, 02102, 01000001, ■─■──■────────────────────────────────────────
- 131, 0, 11212, 10000011, ───────────────────────────────■──────────────
-  33, 2, 01020, 00100001, ■■──■─────────────────────────────────────────
- 133, 0, 11221, 10000101, ───■───■──────────────────────────────────────
-  67, 1, 02111, 01000011, ■─────────────────■───────────────────────────
- 135, 0, 12000, 10000111, ─■■───────────────────────────────────────────
-  17, 3, 00122, 00010001, ■─────■───────────────────────────────────────
- 137, 0, 12002, 10001001, ────────────────────────────────■─────────────
-  69, 1, 02120, 01000101, ■■──────■─────────────────────────────────────
- 139, 0, 12011, 10001011, ─────────────────────────────────■────────────
-  35, 2, 01022, 00100011, ■─■■──────────────────────────────────────────
- 141, 0, 12020, 10001101, ─■────────────■───────────────────────────────
-  71, 1, 02122, 01000111, ■──────────────────■──────────────────────────
- 143, 0, 12022, 10001111, ────■■────────────────────────────────────────
-   9, 4, 00100, 00001001, ■■────────────────────────────────────────────
- 145, 0, 12101, 10010001, ──■──────■────────────────────────────────────
-  73, 1, 02201, 01001001, ■───────────────────■─────────────────────────
- 147, 0, 12110, 10010011, ─■─■──────────────────────────────────────────
-  37, 2, 01101, 00100101, ■──────────■──────────────────────────────────
- 149, 0, 12112, 10010101, ──────────────────────────────────■───────────
-  75, 1, 02210, 01001011, ■■■───────────────────────────────────────────
- 151, 0, 12121, 10010111, ───────────────────────────────────■──────────
-  19, 3, 00201, 00010011, ■──────■──────────────────────────────────────
- 153, 0, 12200, 10011001, ─■────■───────────────────────────────────────
-  77, 1, 02212, 01001101, ■──■■─────────────────────────────────────────
- 155, 0, 12202, 10011011, ──■───────■───────────────────────────────────
-  39, 2, 01110, 00100111, ■■───■────────────────────────────────────────
- 157, 0, 12211, 10011101, ────────────────────────────────────■─────────
-  79, 1, 02221, 01001111, ■────────────────────■────────────────────────
- 159, 0, 12220, 10011111, ─■─────────────■──────────────────────────────
-   5, 5, 00012, 00000101, ■─■───────────────────────────────────────────
- 161, 0, 12222, 10100001, ───■────■─────────────────────────────────────
-  81, 1, 10000, 01010001, ■■────────────────────────────────────────────
- 163, 0, 20001, 10100011, ─────────────────────────────────────■────────
-  41, 2, 01112, 00101001, ■───────────■─────────────────────────────────
- 165, 0, 20010, 10100101, ─■■─■─────────────────────────────────────────
-  83, 1, 10002, 01010011, ■─────────────────────■───────────────────────
- 167, 0, 20012, 10100111, ──────────────────────────────────────■───────
-  21, 3, 00210, 00010101, ■■─■──────────────────────────────────────────
- 169, 0, 20021, 10101001, ─────■────────────────────────────────────────
-  85, 1, 10011, 01010101, ■─■───■───────────────────────────────────────
- 171, 0, 20100, 10101011, ─■─────■──────────────────────────────────────
-  43, 2, 01121, 00101011, ■────────────■────────────────────────────────
- 173, 0, 20102, 10101101, ───────────────────────────────────────■──────
-  87, 1, 10020, 01010111, ■■───────■────────────────────────────────────
- 175, 0, 20111, 10101111, ──■■──────────────────────────────────────────
-  11, 4, 00102, 00001011, ■───■─────────────────────────────────────────
- 177, 0, 20120, 10110001, ─■──────────────■─────────────────────────────
-  89, 1, 10022, 01011001, ■──────────────────────■──────────────────────
- 179, 0, 20122, 10110011, ────────────────────────────────────────■─────
-  45, 2, 01200, 00101101, ■■■───────────────────────────────────────────
- 181, 0, 20201, 10110101, ─────────────────────────────────────────■────
-  91, 1, 10101, 01011011, ■──■─■────────────────────────────────────────
- 183, 0, 20210, 10110111, ─■───────────────■────────────────────────────
-  23, 3, 00212, 00010111, ■───────■─────────────────────────────────────
- 185, 0, 20212, 10111001, ──■────────■──────────────────────────────────
-  93, 1, 10110, 01011101, ■■────────■───────────────────────────────────
- 187, 0, 20221, 10111011, ────■─■───────────────────────────────────────
-  47, 2, 01202, 00101111, ■─────────────■───────────────────────────────
- 189, 0, 21000, 10111101, ─■─■──────────────────────────────────────────
-  95, 1, 10112, 01011111, ■─■────■──────────────────────────────────────
- 191, 0, 21002, 10111111, ──────────────────────────────────────────■───
-   3, 6, 00010, 00000011, ■■────────────────────────────────────────────
- 193, 0, 21011, 11000001, ───────────────────────────────────────────■──
-  97, 1, 10121, 01100001, ■───────────────────────■─────────────────────
- 195, 0, 21020, 11000011, ─■■──■────────────────────────────────────────
-  49, 2, 01211, 00110001, ■──■──────────────────────────────────────────
- 197, 0, 21022, 11000101, ────────────────────────────────────────────■─
-  99, 1, 10200, 01100011, ■■──■─────────────────────────────────────────
- 199, 0, 21101, 11000111, ─────────────────────────────────────────────■
-  25, 3, 00221, 00011001, ■─■───────────────────────────────────────────
- 201, 0, 21110, 11001001, ─■────────────────■───────────────────────────
- 101, 1, 10202, 01100101, ■────────────────────────■────────────────────
- 203, 0, 21112, 11001011, ───■─────■────────────────────────────────────
-  51, 2, 01220, 00110011, ■■────■───────────────────────────────────────
- 205, 0, 21121, 11001101, ──■─────────■─────────────────────────────────
- 103, 1, 10211, 01100111, ■─────────────────────────■───────────────────
- 207, 0, 21200, 11001111, ─■──────■─────────────────────────────────────
-  13, 4, 00111, 00001101, ■────■────────────────────────────────────────
- 209, 0, 21202, 11010001, ────■──■──────────────────────────────────────
- 105, 1, 10220, 01101001, ■■■■──────────────────────────────────────────
+#include "data/piano-roll-210.txt"
 \end{lstlisting}
 
+\newpage
+\subsection{Factor set distribution on Collatz orbits}
 
+This is the Collatz orbit of 27, with a very wide factor set to show all of them in a piano roll view. No pattern is visible when viewed in orbit order.
 
-# Countercycling gap alignment
+\begin{lstlisting}
+#include "data/orbit-piano-roll-27.txt"
+\end{lstlisting}
+
+\newpage
+Below is the same orbit of 27 again, but NOT IN ORDER: this is sorted by factor set, to line up the factors for inspection.
+It demonstrates that odd prime factor sets (corresponding to radicals) of numbers on the orbit are effectively *unique*. They are eliminated one by one by the cursor.
+Very small factor sets have short cycles, and have a chance repeat in long orbits. Here it happens once: 35 and 175 both have factor set {5, 7}. Nontrivial radicals have no hope of cycling.
+
+\begin{lstlisting}
+#include "data/orbit-sorted-27.txt"
+\end{lstlisting}
+
+\newpage
+\subsection{Countercycling gap alignment}
 
 This shows the alignment of countercycles +/1 offsets from the radical for an odd cycle length (3*5 = 15).
 There is no center element of the cycle, but you can see in the middle they meet with a gap of 2 regardless.
@@ -303,32 +333,12 @@ Let's look closer at the full cycle of 2*3*5*7 = 210. Euler's totient theorem ca
 
         φ(N) = φ(2)φ(3)φ(5)φ(7) = 1 * 2 * 4 * 6 = 48
 
-The gaps (0000) appear at these positions in the cycle:
-[1, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 121, 127, 131, 137, 139, 143, 149, 151, 157, 163, 167, 169, 173, 179, 181, 187, 191, 193, 197, 199, 209]
-
 The pattern is symmetrical around the midpoint of the cycle, and the radical, exactly as demonstrated above.
 You can see the | "channels" highlighted that higher primes can pass through.
 
 \begin{lstlisting}
-        1  -->                                                                                          (natural order) -->                                                                                            209
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-    2: ■|■─■─■─■─■|■|■─■|■|■─■|■─■─■|■|■─■─■|■─■|■|■─■|■─■─■|■─■─■|■|■─■─■|■─■|■|■─■─■|■─■|■─■─■|■─■─■─■|■─■|■|■─■|■|■─■|■─■─■─■|■─■─■|■─■|■─■─■|■|■─■|■─■─■|■|■─■─■|■─■─■|■─■|■|■─■|■─■─■|■|■─■─■|■─■|■|■─■|■|■─■─■─■─■|■
-    3: ■|─■──■──■─|■|─■─|■|─■─|■──■─|■|─■──■|─■─|■|─■─|■──■─|■──■─|■|─■──■|─■─|■|─■──■|─■─|■──■─|■──■──■|─■─|■|─■─|■|─■─|■──■──■|─■──■|─■─|■──■─|■|─■─|■──■─|■|─■──■|─■──■|─■─|■|─■─|■──■─|■|─■──■|─■─|■|─■─|■|─■──■──■─|■
-    5: ■|───■────■|─|─■─|─|■──|─■───|■|───■─|──■|─|─■─|──■──|─■───|■|───■─|──■|─|─■───|■──|─■───|■────■─|──■|─|─■─|─|■──|─■────■|───■─|──■|───■─|─|■──|─■───|■|───■─|──■──|─■─|─|■──|─■───|■|───■─|──■|─|─■─|─|■────■───|■
-    7: ■|─────■───|─|■──|─|─■─|────■|─|───■─|───|■|───|─■───|──■──|─|─■───|──■|─|───■─|───|■────|─■─────|■──|─|─■─|─|──■|─────■─|────■|───|─■───|─|■──|───■─|─|──■──|───■─|───|■|───|─■───|─|■────|─■─|─|──■|─|───■─────|■
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-   -7: ■|─────■───|─|■──|─|─■─|────■|─|───■─|───|■|───|─■───|──■──|─|─■───|──■|─|───■─|───|■────|─■─────|■──|─|─■─|─|──■|─────■─|────■|───|─■───|─|■──|───■─|─|──■──|───■─|───|■|───|─■───|─|■────|─■─|─|──■|─|───■─────|■
-   -5: ■|───■────■|─|─■─|─|■──|─■───|■|───■─|──■|─|─■─|──■──|─■───|■|───■─|──■|─|─■───|■──|─■───|■────■─|──■|─|─■─|─|■──|─■────■|───■─|──■|───■─|─|■──|─■───|■|───■─|──■──|─■─|─|■──|─■───|■|───■─|──■|─|─■─|─|■────■───|■
-   -3: ■|─■──■──■─|■|─■─|■|─■─|■──■─|■|─■──■|─■─|■|─■─|■──■─|■──■─|■|─■──■|─■─|■|─■──■|─■─|■──■─|■──■──■|─■─|■|─■─|■|─■─|■──■──■|─■──■|─■─|■──■─|■|─■─|■──■─|■|─■──■|─■──■|─■─|■|─■─|■──■─|■|─■──■|─■─|■|─■─|■|─■──■──■─|■
-   -2: ■|■─■─■─■─■|■|■─■|■|■─■|■─■─■|■|■─■─■|■─■|■|■─■|■─■─■|■─■─■|■|■─■─■|■─■|■|■─■─■|■─■|■─■─■|■─■─■─■|■─■|■|■─■|■|■─■|■─■─■─■|■─■─■|■─■|■─■─■|■|■─■|■─■─■|■|■─■─■|■─■─■|■─■|■|■─■|■─■─■|■|■─■─■|■─■|■|■─■|■|■─■─■─■─■|■
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
- <--  -209                                                                                           <-- (reversed order)                                                                                              -1
+#include "data/countercycle-gaps-210.txt"
 \end{lstlisting}
-
-
 
 
 # Relative alignment of mirrored cycles
@@ -340,146 +350,14 @@ This shows the cycle of 210 against all relative phases of the backwards cycle. 
 It demonstrates that there is always significant gap alignment at any relative offset for the mirrored sequences. There is a count of them in the right margin for every row.
            
 \begin{lstlisting}
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-    2: X|X.X.X.X.X|X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X.X.X|X.X.X|X|X.X.X|X.X|X|X.X.X|X.X|X.X.X|X.X.X.X|X.X|X|X.X|X|X.X|X.X.X.X|X.X.X|X.X|X.X.X|X|X.X|X.X.X|X|X.X.X|X.X.X|X.X|X|X.X|X.X.X|X|X.X.X|X.X|X|X.X|X|X.X.X.X.X|X
-    3: X|.X..X..X.|X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X..X.|X..X.|X|.X..X|.X.|X|.X..X|.X.|X..X.|X..X..X|.X.|X|.X.|X|.X.|X..X..X|.X..X|.X.|X..X.|X|.X.|X..X.|X|.X..X|.X..X|.X.|X|.X.|X..X.|X|.X..X|.X.|X|.X.|X|.X..X..X.|X
-    5: X|...X....X|.|.X.|.|X..|.X...|X|...X.|..X|.|.X.|..X..|.X...|X|...X.|..X|.|.X...|X..|.X...|X....X.|..X|.|.X.|.|X..|.X....X|...X.|..X|...X.|.|X..|.X...|X|...X.|..X..|.X.|.|X..|.X...|X|...X.|..X|.|.X.|.|X....X...|X
-    7: X|.....X...|.|X..|.|.X.|....X|.|...X.|...|X|...|.X...|..X..|.|.X...|..X|.|...X.|...|X....|.X.....|X..|.|.X.|.|..X|.....X.|....X|...|.X...|.|X..|...X.|.|..X..|...X.|...|X|...|.X...|.|X....|.X.|.|..X|.|...X.....|X
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        |         | |   | |   |     | |     |   | |   |     |     | |     |   | |     |   |     |       |   | |   | |   |       |     |   |     | |   |     | |     |     |   | |   |     | |     |   | |   | |         |
-        V         V V   V V   V     V V     V   V V   V     V     V V     V   V V     V   V     V       V   V V   V V   V       V     V   V     V V   V     V V     V     V   V V   V     V V     V   V V   V V         V 
-ofs                                                                                                                                                                                                                         gaps
-  0:    #.........#.#...#.#...#.....#.#.....#...#.#...#.....#.....#.#.....#...#.#.....#...#.....#.......#...#.#...#.#...#.......#.....#...#.....#.#...#.....#.#.....#.....#...#.#...#.....#.#.....#...#.#...#.#.........#.    48
-  2:    #.o.........#.o...#.o...o.....#.o.....o...#.o...o.....o.....#.o.....o...#.o.....o...o.....o.......o...#.o...#.o...o.......o.....o...o.....#.o...o.....#.o.....o.....o...#.o...o.....#.o.....o...#.o...#.o.........    15
-  4:    ..o.o.........o.#...o.#...o.....o.o.....#...o.#...o.....o.....o.o.....#...o.o.....#...o.....o.......#...o.#...o.#...o.......o.....#...o.....o.#...o.....o.o.....o.....#...o.#...o.....o.o.....#...o.#...o.o.......    15
-  6:    ....o.o.........#.#...#.o...#.....o.#.....#...#.o...#.....#.....o.#.....#...o.#.....o...#.....o.......#...#.#...#.o...o.......#.....o...#.....#.o...#.....o.#.....#.....#...#.o...#.....o.#.....#...#.#...o.o.....    30
-  8:    ......o.o.........#.o...o.o...#.....#.o.....o...o.o...o.....#.....#.o.....o...#.o.....o...o.....#.......o...#.o...o.o...#.......o.....o...#.....o.o...#.....#.o.....o.....o...o.o...#.....#.o.....o...#.o...o.o...    15
- 10:    ........o.#.........o.#...o.#...o.....o.#.....#...o.#...o.....o.....o.#.....o...o.#.....#...o.....o.......#...o.#...o.o...o.......#.....#...o.....o.#...o.....o.o.....#.....#...o.#...o.....o.#.....#...o.o...o.#.    20
- 12:    #.........#.#.........#.o...#.#...o.....#.#.....o...#.o...#.....o.....#.#.....#...#.o.....o...o.....#.......#...#.o...o.#...o.......o.....#...#.....#.#...o.....o.#.....#.....o...#.#...o.....#.#.....#...o.o...#.    30
- 14:    #.o.........#.o.........o.o...#.o...#.....#.o.....o...o.o...#.....#.....#.o.....o...o.o.....o...#.....#.......o...o.o...#.o...#.......o.....o...o.....#.o...#.....#.o.....o.....o...#.o...#.....#.o.....o...o.o...    18
- 16:    ..o.o.........o.#.........o.#...o.o...o.....o.#.....#...o.#...o.....o.....o.o.....#...o.#.....o...o.....o.......#...o.o...o.o...o.......#.....#...o.....o.o...o.....o.#.....#.....#...o.o...o.....o.#.....o...o.#.    15
- 18:    #...o.o.........#.#.........#.#...o.#...#.....#.o.....o...#.#...o.....#.....o.#.....o...#.o.....#...#.....#.......o...o.#...o.#...#.......#.....o...#.....o.#...o.....#.#.....o.....#...o.#...#.....#.#.....o...#.    30
- 20:    #.o...o.o.........#.o.........#.o...#.o...#.....o.o.....o...#.o...#.....#.....#.o.....o...o.o.....o...#.....#.......o...#.o...#.o...o.......o.....o...#.....#.o...#.....#.o.....o.....o...#.o...#.....#.o.....o...    20
- 22:    ..o.o...o.#.........o.#.........o.o...o.#...o.....o.#.....#...o.o...o.....o.....o.#.....#...o.o.....#...o.....o.......o...o.o...o.#...o.......#.....#...o.....o.o...o.....o.#.....#.....o...o.#...o.....o.o.....#.    15
- 24:    #...o.o...#.#.........#.o.........o.#...#.#...#.....#.o.....#...o.#...#.....o.....#.o.....o...o.#.....#...#.....#.......#...o.#...#.o...#.......o.....#...o.....o.#...#.....#.o.....#.....#...#.#...#.....o.o.....    30
- 26:    ..o...o.o...#.o.........o.o.........#.o...#.o...o.....o.o.....o...#.o...#.....#.....o.o.....o...#.o.....o...#.....o.......o...#.o...o.o...#.......o.....o...#.....#.o...#.....o.o.....o.....o...#.o...#.....o.o...    15
- 28:    ....o...o.#...o.#.........o.#.........o.#...o.#...o.....o.#.....o...o.#...o.....o.....o.#.....o...o.#.....#...o.....o.......o...o.#...o.#...o.......#.....o...o.....o.#...o.....o.#.....o.....#...o.#...o.....o.#.    18
- 30:    #.....o...#.#...#.#.........#.#.........#.#...#.o...#.....#.#.....#...#.#...o.....#.....#.o.....#...#.#.....#...#.....o.......#...#.o...#.#...#.......#.....#...o.....#.#...#.....#.#.....#.....#...#.#...o.....#.    40
- 32:    #.o.....o...#.o...#.o.........#.o.........#.o...o.o...o.....#.o.....o...#.o...#.....o.....o.o.....o...#.o.....o...o.....#.......o...o.o...#.o...o.......o.....o...#.....#.o...o.....#.o.....o.....o...#.o...o.....    15
- 34:    ..o.o.....#...o.#...o.#.........o.o.........o.#...o.#...o.....o.o.....#...o.o...o.....o.....o.o.....#...o.#.....#...o.....o.......#...o.#...o.#...o.......o.....o...o.....o.#...o.....o.o.....#.....#...o.o...o...    15
- 36:    ....o.o.....#...#.#...#.o.........o.#.........#.o...#.o...#.....o.#.....#...o.#...#.....#.....o.#.....#...#.#.....o...o.....o.......o...#.#...#.o...#.......#.....#...#.....#.o...#.....o.#.....#.....#...o.o...#.    30
- 38:    #.....o.o.....o...#.o...o.o.........#.o.........o.o...o.o...#.....#.o.....o...#.o...o.....o.....#.o.....o...#.o.....o...#.....#.......o...#.o...o.o...#.......o.....o...#.....o.o...#.....#.o.....o.....o...o.o...    15
- 40:    ..o.....o.#.....#...o.#...o.#.........o.#.........o.#...o.#...o.....o.#.....o...o.#...o.....o.....o.#.....#...o.#.....o...o.....o.......#...o.#...o.#...o.......o.....#...o.....o.#...o.....o.#.....#.....o...o.#.    20
- 42:    #...o.....#.#.....#...#.o...#.#.........#.#.........#.o...#.#...o.....#.#.....#...#.o...#.....o.....#.#.....#...#.o.....#...o.....#.......#...#.o...#.#...o.......#.....#...#.....#.#...o.....#.#.....#.....o...#.    36
- 44:    #.o...o.....#.o.....o...o.o...#.o.........#.o.........o.o...#.o...#.....#.o.....o...o.o...o.....#.....#.o.....o...o.o.....o...#.....o.......o...o.o...#.o...#.......o.....o...o.....#.o...#.....#.o.....o.....o...    15
- 46:    ..o.o...o.....o.#.....#...o.#...o.o.........o.#.........o.#...o.o...o.....o.o.....#...o.#...o.....o.....o.#.....#...o.o.....o...o.....o.......#...o.#...o.o...o.......#.....#...o.....o.o...o.....o.#.....o.....#.    15
- 48:    #...o.o...#.....#.#.....o...#.#...o.#.........#.o.........#.#...o.#...#.....o.#.....o...#.o...o.....#.....#.#.....o...o.#.....#...#.....#.......o...#.#...o.#...o.......#.....o...#.....o.#...#.....#.#.....o.....    30
- 50:    ..o...o.o...#.....#.o.....o...#.o...#.o.........o.o.........#.o...#.o...#.....#.o.....o...o.o...#.....#.....#.o.....o...#.o.....o...o.....#.......o...#.o...#.o...#.......o.....o...#.....#.o...#.....#.o.....o...    20
- 52:    ....o...o.#...o.....o.#.....#...o.o...o.#.........o.#.........o.o...o.#...o.....o.#.....#...o.o...o.....o.....o.#.....o...o.o.....#...o.....o.......#...o.o...o.o...o.......#.....#...o.....o.#...o.....o.o.....#.    15
- 54:    #.....o...#.#...#.....#.o.....#...o.#...#.#.........#.o.........o.#...#.#...o.....#.o.....o...o.#...#.....#.....#.o.....#...o.#.....o...#.....#.......#...o.#...o.#...#.......o.....#...o.....#.#...#.....o.o.....    30
- 56:    ..o.....o...#.o...#.....o.o.....o...#.o...#.o.........o.o.........#.o...#.o...#.....o.o.....o...#.o...#.....#.....o.o.....o...#.o.....o...#.....o.......o...#.o...#.o...#.......o.....o...#.....#.o...#.....o.o...    18
- 58:    ....o.....#...o.#...o.....o.#.....o...o.#...o.#.........o.#.........o.#...o.o...o.....o.#.....o...o.#...o.....o.....o.o.....o...o.#.....#...o.....o.......o...o.o...o.#...o.......#.....o...o.....o.#...o.....o.#.    15
- 60:    #.....o.....#...#.#...#.....#.#.....#...#.#...#.o.........#.#.........#.#...o.#...#.....#.o.....#...#.#...#.....#.....o.#.....#...#.o.....#...#.....#.......#...o.#...#.#...#.......#.....#...#.....#.#...o.....#.    40
- 62:    #.o.....o.....o...#.o...o.....#.o.....o...#.o...o.o.........#.o.........#.o...#.o...o.....o.o.....o...#.o...#.....o.....#.o.....o...o.o.....o...o.....#.......o...#.o...#.o...o.......o.....o...#.....#.o...o.....    15
- 64:    ..o.o.....#.....#...o.#...o.....o.o.....#...o.#...o.#.........o.o.........o.o...o.#...o.....o.o.....#...o.#...o.....o.....o.o.....#...o.#.....#...o.....o.......o...o.#...o.#...o.......o.....#...o.....o.o...o...    15
- 66:    ....o.o.....#.....#...#.o...#.....o.#.....#...#.o...#.o.........o.#.........o.#...#.o...#.....o.#.....#...#.#...#.....o.....o.#.....o...#.#.....o...#.....o.......#...#.#...#.o...#.......#.....#...#.....o.o...#.    30
- 68:    #.....o.o.....o.....o...o.o...#.....#.o.....o...o.o...o.o.........#.o.........#.o...o.o...o.....#.o.....o...#.o...o.....#.....#.o.....o...#.o.....o...#.....#.......o...#.o...o.o...#.......o.....o...#.....o.o...    15
- 70:    ..o.....o.#.....#.....#...o.#...o.....o.#.....#...o.#...o.#.........o.#.........o.#...o.#...o.....o.#.....#...o.#...o.....o.....o.#.....#...o.#.....#...o.....o.......#...o.#...o.#...o.......#.....#...o.....o.#.    24
- 72:    #...o.....#.#.....#.....o...#.#...o.....#.#.....o...#.o...#.#.........#.#.........#.o...#.o...o.....#.#.....#...#.o...o.....o.....#.o.....#...#.o.....#...o.....o.......#...#.o...#.#...o.......#.....#...o.....#.    30
- 74:    #.o...o.....#.o.....o.....o...#.o...#.....#.o.....o...o.o...#.o.........#.o.........o.o...o.o...#.....#.o.....o...o.o...#.....#.....o.o.....o...o.o.....o...#.....#.......o...o.o...#.o...#.......o.....o...o.....    15
- 76:    ..o.o...o.....o.#.....#.....#...o.o...o.....o.#.....#...o.#...o.o.........o.o.........o.#...o.o...o.....o.#.....#...o.o...o.....o.....o.#.....#...o.#.....o...o.....o.......#...o.#...o.o...o.......#.....o...o...    15
- 78:    ....o.o...#.....#.#.....o.....#...o.#...#.....#.o.....o...#.#...o.#.........o.#.........#.o...o.#...#.....#.#.....o...o.#...o.....#.....#.#.....o...#.#.....#...o.....#.......o...#.#...o.#...#.......#.....o...#.    30
- 80:    #.....o.o...#.....#.o.....o.....o...#.o...#.....o.o.....o...#.o...#.o.........#.o.........o.o...#.o...#.....#.o.....o...#.o...#.....o.....#.o.....o...#.o.....o...#.....#.......o...#.o...#.o...#.......o.....o...    20
- 82:    ..o.....o.#...o.....o.#.....#.....o...o.#...o.....o.#.....#...o.o...o.#.........o.#.........o.o...o.#...o.....o.#.....o...o.o...o.....o.....o.#.....#...o.o.....o...o.....o.......#...o.o...o.#...o.......o.....#.    15
- 84:    #...o.....#.#...#.....#.o.....#.....#...#.#...#.....#.o.....#...o.#...#.#.........#.o.........o.#...#.#...#.....#.o.....#...o.#...#.....#.....#.o.....#...o.#.....#...#.....#.......#...o.#...#.#...#.......o.....    36
- 86:    ..o...o.....#.o...#.....o.o.....o.....o...#.o...o.....o.o.....o...#.o...#.o.........o.o.........#.o...#.o...#.....o.o.....o...#.o...o.....#.....o.o.....o...#.o.....o...#.....o.......o...#.o...#.o...#.......o...    15
- 88:    ....o...o.....o.#...o.....o.#.....o.....#...o.#...o.....o.#.....o...o.#...o.o.........o.#.........o.#...o.#...o.....o.o.....o...o.#...o.....o.....o.#.....o...o.o.....#...o.....o.......o...o.#...o.#...o.......#.    15
- 90:    #.....o...#.....#.#...#.....#.#.....#.....#...#.o...#.....#.#.....#...#.#...o.#.........#.o.........#.#...#.#...#.....o.#.....#...#.o...#.....#.....#.#.....#...o.#.....#...#.....#.......#...#.#...#.#...o.......    40
- 92:    ..o.....o...#.....#.o...o.....#.o.....o.....o...o.o...o.....#.o.....o...#.o...#.o.........o.o.........#.o...#.o...o.....#.o.....o...o.o...#.....o.....#.o.....o...#.o.....o...o.....#.......o...#.o...#.o...o.....    15
- 94:    ....o.....#...o.....o.#...o.....o.o.....#.....#...o.#...o.....o.o.....#...o.o...o.#.........o.o.........o.#...o.#...o.....o.o.....#...o.#...o.....o.....o.o.....o...o.#.....#...o.....o.......#...o.#...o.o...o...    15
- 96:    ......o.....#...#.....#.o...#.....o.#.....#.....o...#.o...#.....o.#.....#...o.#...#.o.........o.#.........#.#...#.o...o.....o.#.....o...#.#...#.....#.....o.#.....#...#.#.....o...#.....o.......#...#.#...o.o...#.    30
- 98:    #.......o.....o...#.....o.o...#.....#.o.....o.....o...o.o...#.....#.o.....o...#.o...o.o.........#.o.........#.o...o.o...#.....#.o.....o...#.o...o.....#.....#.o.....o...#.o.....o...#.....#.......o...#.o...o.o...    18
-100:    ..o.......#.....#...o.....o.#...o.....o.#.....#.....#...o.#...o.....o.#.....o...o.#...o.#.........o.#.........o.#...o.o...o.....o.#.....#...o.#...o.....o.....o.o.....#...o.#.....#...o.....o.......#...o.o...o.#.    20
-102:    #...o.......#.....#...#.....#.#...o.....#.#.....o.....o...#.#...o.....#.#.....#...#.o...#.o.........#.#.........#.o...o.#...o.....#.o.....#...#.o...#.....o.....o.#.....#...#.o.....#...o.....#.......#...o.o...#.    30
-104:    #.o...o.......o.....o...o.....#.o...#.....#.o.....o.....o...#.o...#.....#.o.....o...o.o...o.o.........#.o.........o.o...#.o...#.....o.o.....o...o.o...#.....#.....#.o.....o...o.o.....o...#.....#.......o...o.o...    15
-106:    ..o.o...o.......#.....#...o.....o.o...o.....o.#.....#.....#...o.o...o.....o.o.....#...o.#...o.o.........o.#.........o.o...o.o...o.....o.#.....#...o.#...o.....o.....o.#.....#...o.#.....o...o.....o.......o...o.#.    15
-108:    #...o.o...#.......#.....o...#.....o.#...#.....#.o.....o.....#...o.#...#.....o.#.....o...#.o...o.#.........#.#.........o.#...o.#...#.....#.#.....o...#.#...o.....o.....#.#.....o...#.#.....#...#.....#.......o...#.    30
-110:    #.o...o.o...#.......o.....o...#.....#.o...#.....o.o.....o.....o...#.o...#.....#.o.....o...o.o...#.o.........#.o.........#.o...#.o...o.....#.o.....o...#.o...#.....#.....#.o.....o...#.o.....o...#.....#.......o...    20
-112:    ..o.o...o.#...o.......#.....#...o.....o.#...o.....o.#.....#.....o...o.#...o.....o.#.....#...o.o...o.#.........o.#.........o.o...o.#...o.....o.#.....#...o.o...o.....o.....o.#.....#...o.o.....#...o.....o.......#.    18
-114:    #...o.o...#.#...#.......o.....#...o.....#.#...#.....#.o.....#.....#...#.#...o.....#.o.....o...o.#...#.#.........#.o.........o.#...#.o...#.....#.o.....#...o.#...o.....#.....#.o.....#...o.#.....#...#.....o.......    30
-116:    ..o...o.o...#.o...#.......o.....o...#.....#.o...o.....o.o.....o.....o...#.o...#.....o.o.....o...#.o...#.o.........o.o.........#.o...o.o...#.....o.o.....o...#.o...#.....#.....o.o.....o...#.o.....o...#.....o.....    15
-118:    ....o...o.#...o.#...o.......#.....o...o.....o.#...o.....o.#.....o.....#...o.o...o.....o.#.....o...o.#...o.#.........o.o.........o.#...o.#...o.....o.#.....o...o.o...o.....o.....o.#.....o...o.#.....#...o.....o...    15
-120:    ......o...#.#...#.#...#.......#.....#...#.....#.o...#.....#.#.....#.....#...o.#...#.....#.o.....#...#.#...#.#.........o.#.........#.o...#.#...#.....#.#.....#...o.#...#.....#.....#.#.....#...#.#.....#...o.....#.    40
-122:    #.......o...#.o...#.o...o.......o.....o...#.....o.o...o.....#.o.....o.....o...#.o...o.....o.o.....o...#.o...#.o.........#.o.........o.o...#.o...o.....#.o.....o...#.o...#.....o.....#.o.....o...#.o.....o...o.....    15
-124:    ..o.......#...o.#...o.#...o.......o.....#...o.....o.#...o.....o.o.....#.....o...o.#...o.....o.o.....#...o.#...o.#.........o.o.........o.#...o.#...o.....o.o.....o...o.#...o.....o.....o.o.....#...o.#.....o...o...    15
-126:    ....o.......#...#.#...#.o...#.......#.....#...#.....#.o...#.....o.#.....#.....#...#.o...#.....o.#.....#...#.#...#.o.........o.#.........#.#...#.o...#.....o.#.....#...#.#...#.....#.....o.#.....#...#.#.....o...#.    36
-128:    #.....o.......o...#.o...o.o...#.......o.....o...o.....o.o...#.....#.o.....o.....o...o.o...o.....#.o.....o...#.o...o.o.........#.o.........#.o...o.o...#.....#.o.....o...#.o...o.....#.....#.o.....o...#.o.....o...    15
-130:    ..o.....o.......#...o.#...o.#...o.......#.....#...o.....o.#...o.....o.#.....o.....#...o.#...o.....o.#.....#...o.#...o.o.........o.#.........o.#...o.#...o.....o.o.....#...o.#...o.....o.....o.#.....#...o.o.....#.    20
-132:    #...o.....#.......#...#.o...#.#...o.......#.....o...#.....#.#...o.....#.#.....#.....o...#.o...o.....#.#.....#...#.o...o.#.........#.o.........#.o...#.#...o.....o.#.....#...#.o...#.....o.....#.#.....#...o.o.....    30
-134:    ..o...o.....#.......o...o.o...#.o...#.......o.....o...o.....#.o...#.....#.o.....o.....o...o.o...#.....#.o.....o...o.o...#.o.........o.o.........o.o...#.o...#.....#.o.....o...o.o...#.....#.....#.o.....o...o.o...    15
-136:    ....o...o.....o.......#...o.#...o.o...o.......#.....#...o.....o.o...o.....o.o.....#.....#...o.o...o.....o.#.....#...o.o...o.o.........o.#.........o.#...o.o...o.....o.#.....#...o.#...o.....o.....o.#.....o...o.#.    15
-138:    #.....o...#.....#.......o...#.#...o.#...#.......o.....o...#.....o.#...#.....o.#.....o.....o...o.#...#.....#.#.....o...o.#...o.#.........#.#.........#.#...o.#...o.....#.#.....o...#.#...o.....#.....#.#.....o...#.    30
-140:    #.o.....o...#.....#.......o...#.o...#.o...#.......o.....o...#.....#.o...#.....#.o.....o.....o...#.o...#.....#.o.....o...#.o...#.o.........#.o.........#.o...#.o...#.....#.o.....o...#.o...#.....#.....#.o.....o...    24
-142:    ..o.o.....#...o.....o.......#...o.o...o.#...o.......#.....#...o.....o.#...o.....o.#.....#.....o...o.#...o.....o.#.....o...o.o...o.#.........o.#.........o.o...o.o...o.....o.#.....#...o.o...o.....o.....o.o.....#.    15
-144:    #...o.o.....#...#.....#.......#...o.#...#.#...#.......o.....#...o.....#.#...o.....#.o.....o.....#...#.#...#.....#.o.....#...o.#...#.o.........#.o.........o.#...o.#...#.....#.o.....#...o.#...#.....#.....o.o.....    30
-146:    ..o...o.o.....o...#.....o.......o...#.o...#.o...o.......o.....o...#.....#.o...#.....o.o.....o.....o...#.o...#.....o.o.....o...#.o...o.o.........o.o.........#.o...#.o...#.....o.o.....o...#.o...#.....#.....o.o...    15
-148:    ....o...o.#.....#...o.....o.......o...o.#...o.#...o.......#.....o...o.....o.o...o.....o.#.....o.....#...o.#...o.....o.o.....o...o.#...o.#.........o.#.........o.o...o.#...o.....o.#.....o...o.#...o.....o.....o.#.    15
-150:    #.....o...#.#.....#...#.....#.......#...#.#...#.o...#.......#.....#...#.....o.#...#.....#.o.....#.....#...#.#...#.....o.#.....#...#.o...#.#.........#.#.........o.#...#.#...#.....#.#.....#...#.#...#.....o.....#.    40
-152:    #.o.....o...#.o.....o...o.....#.......o...#.o...o.o...o.......o.....o...#.....#.o...o.....o.o.....o.....o...#.o...o.....#.o.....o...o.o...#.o.........#.o.........#.o...#.o...o.....#.o.....o...#.o...#.....o.....    15
-154:    ..o.o.....#...o.#.....#...o.....o.......#...o.#...o.#...o.......o.....#...o.....o.#...o.....o.o.....#.....#...o.#...o.....o.o.....#...o.#...o.#.........o.o.........o.#...o.#...o.....o.o.....#...o.#...o.....o...    18
-156:    ....o.o.....#...#.#.....o...#.....o.......#...#.o...#.o...#.......#.....#...o.....#.o...#.....o.#.....#.....#...#.o...o.....o.#.....o...#.#...#.o.........o.#.........#.#...#.o...#.....o.#.....#...#.#...o.....#.    30
-158:    #.....o.o.....o...#.o.....o...#.....#.......o...o.o...o.o...#.......o.....o...#.....o.o...o.....#.o.....o.....o...o.o...#.....#.o.....o...#.o...o.o.........#.o.........#.o...o.o...#.....#.o.....o...#.o...o.....    15
-160:    ..o.....o.#.....#...o.#.....#...o.....o.......#...o.#...o.#...o.......#.....o...o.....o.#...o.....o.#.....#.....#...o.o...o.....o.#.....#...o.#...o.#.........o.o.........o.#...o.#...o.....o.#.....#...o.o...o...    20
-162:    ....o.....#.#.....#...#.o.....#...o.....#.......o...#.o...#.#...o.......#.....#...#.....#.o...o.....#.#.....#.....o...o.#...o.....#.o.....#...#.o...#.#.........o.#.........#.o...#.#...o.....#.#.....#...o.o...#.    30
-164:    #.....o.....#.o.....o...o.o.....o...#.....#.......o...o.o...#.o...#.......o.....o...o.....o.o...#.....#.o.....o.....o...#.o...#.....o.o.....o...o.o...#.o.........#.o.........o.o...#.o...#.....#.o.....o...o.o...    15
-166:    ..o.....o.....o.#.....#...o.#.....o...o.....o.......#...o.#...o.o...o.......o.....#...o.....o.o...o.....o.#.....#.....o...o.o...o.....o.#.....#...o.#...o.o.........o.#.........o.#...o.o...o.....o.#.....o...o.#.    15
-168:    #...o.....#.....#.#.....o...#.#.....#...#.....#.......o...#.#...o.#...#.......#.....o...#.....o.#...#.....#.#.....o.....#...o.#...#.....#.#.....o...#.#...o.#.........#.#.........#.#...o.#...#.....#.#.....o...#.    36
-170:    #.o...o.....#.....#.o.....o...#.o.....o...#.....o.......o...#.o...#.o...#.......o.....o...o.....#.o...#.....#.o.....o.....o...#.o...o.....#.o.....o...#.o...#.o.........#.o.........#.o...#.o...#.....#.o.....o...    20
-172:    ..o.o...o.....o.....o.#.....#...o.o.....#...o.....o.......#...o.o...o.#...o.......#.....#...o.....o.#...o.....o.#.....o.....o...o.#...o.....o.#.....#...o.o...o.o.........o.#.........o.o...o.#...o.....o.o.....#.    15
-174:    #...o.o...#.....#.....#.o.....#...o.#.....#...#.....#.......#...o.#...#.#...o.......o.....o...o.....#.#...#.....#.o.....#.....#...#.o...#.....#.o.....#...o.#...o.#.........#.o.........o.#...#.#...#.....o.o.....    30
-176:    ..o...o.o...#.....#.....o.o.....o...#.o.....o...o.....o.......o...#.o...#.o...#.......o.....o...#.....#.o...#.....o.o.....o.....o...o.o...#.....o.o.....o...#.o...#.o.........o.o.........#.o...#.o...#.....o.o...    15
-178:    ....o...o.#...o.....o.....o.#.....o...o.#.....#...o.....o.......o...o.#...o.o...o.......#.....o...o.....o.#...o.....o.o.....o.....#...o.#...o.....o.#.....o...o.o...o.#.........o.#.........o.#...o.#...o.....o.#.    15
-180:    #.....o...#.#...#.....#.....#.#.....#...#.#.....o...#.....#.......#...#.#...o.#...#.......o.....#...#.....#.#...#.....o.#.....#.....o...#.#...#.....#.#.....#...o.#...#.#.........#.#.........#.#...#.#...o.....#.    40
-182:    #.o.....o...#.o...#.....o.....#.o.....o...#.o.....o...o.....#.......o...#.o...#.o...o.......o.....o...#.....#.o...o.....#.o.....o.....o...#.o...o.....#.o.....o...#.o...#.o.........#.o.........#.o...#.o...o.....    18
-184:    ..o.o.....#...o.#...o.....o.....o.o.....#...o.#.....#...o.....o.......#...o.o...o.#...o.......o.....#...o.....o.#...o.....o.o.....#.....#...o.#...o.....o.o.....o...o.#...o.#.........o.o.........o.#...o.o...o...    15
-186:    ....o.o.....#...#.#...#.....#.....o.#.....#...#.o.....o...#.....o.......#...o.#...#.o...#.......#.....#...#.....#.o...o.....o.#.....o.....#...#.o...#.....o.#.....#...#.#...#.o.........o.#.........#.#...o.o...#.    30
-188:    #.....o.o.....o...#.o...o.....#.....#.o.....o...o.o.....o...#.....#.......o...#.o...o.o...o.......o.....o...#.....o.o...#.....#.o.....o.....o...o.o...#.....#.o.....o...#.o...o.o.........#.o.........#.o...o.o...    15
-190:    ..o.....o.#.....#...o.#...o.....o.....o.#.....#...o.#.....#...o.....o.......o...o.#...o.#...o.......#.....#...o.....o.o...o.....o.#.....#.....#...o.#...o.....o.o.....#...o.#...o.#.........o.#.........o.o...o.#.    20
-192:    #...o.....#.#.....#...#.o...#.....o.....#.#.....o...#.o.....#...o.....#.......#...#.o...#.o...o.......#.....#...#.....o.#...o.....#.o.....#.....o...#.#...o.....o.#.....#...#.o...#.#.........#.#.........o.o...#.    30
-194:    #.o...o.....#.o.....o...o.o...#.....#.....#.o.....o...o.o.....o...#.....#.......o...o.o...o.o...#.......o.....o...o.....#.o...#.....o.o.....o.....o...#.o...#.....#.o.....o...o.o...#.o.........#.o.........o.o...    15
-196:    ..o.o...o.....o.#.....#...o.#...o.....o.....o.#.....#...o.#.....o...o.....o.......#...o.#...o.o...o.......#.....#...o.....o.o...o.....o.#.....#.....#...o.o...o.....o.#.....#...o.#...o.o.........o.#.........o.#.    18
-198:    #...o.o...#.....#.#.....o...#.#...o.....#.....#.o.....o...#.#.....#...#.....o.......o...#.o...o.#...#.......#.....o...o.....o.#...#.....#.#.....o.....#...o.#...o.....#.#.....o...#.#...o.#.........#.#.........#.    30
-200:    #.o...o.o...#.....#.o.....o...#.o...#.....#.....o.o.....o...#.o.....o...#.....#.......o...o.o...#.o...#.......o.....o...#.....#.o...o.....#.o.....o.....o...#.o...#.....#.o.....o...#.o...#.o.........#.o.........    20
-202:    ..o.o...o.#...o.....o.#.....#...o.o...o.....o.....o.#.....#...o.o.....#...o.....o.......#...o.o...o.#...o.......#.....o...o.....o.#...o.....o.#.....#.....o...o.o...o.....o.#.....#...o.o...o.#.........o.o.......    15
-204:    ....o.o...#.#...#.....#.o.....#...o.#...#.....#.....#.o.....#...o.#.....#...o.....#.......o...o.#...#.#...#.......o.....#...o.....#.o...#.....#.o.....#.....#...o.#...#.....#.o.....#...o.#...#.#.........o.o.....    30
-206:    ......o.o...#.o...#.....o.o.....o...#.o...#.....o.....o.o.....o...#.o.....o...#.....o.......o...#.o...#.o...#.......o.....o...#.....o.o...#.....o.o.....o.....o...#.o...#.....o.o.....o...#.o...#.o.........o.o...    15
-208:    ........o.#...o.#...o.....o.#.....o...o.#...o.....o.....o.#.....o...o.#.....o...o.....o.......o...o.#...o.#...o.......o.....o...o.....o.#...o.....o.#.....o.....o...o.#...o.....o.#.....o...o.#...o.#.........o.#.    15
+#include "data/countercycle-exhaustive.txt"
 \end{lstlisting}
 
 Empirically at least 15 gaps remain when the prime cycle of 210 is masked against its anti-cycle, at any relative phase.
 
 \begin{lstlisting}
-                                     ║
-                <──────(n-d)──────── n ────────(n+d)──────>
-                         │           ║           │                  
-                         │           ║     :     │                       :     :     :     :
-7 ───■──────■──────■─────│■──────■───║──■──│───■─│────■──────■──────■────│─■───│──■──│───■─│────■────── 7
-5 █────■────■────■────■──│─■────█────║────■│───■─│──■────■────█────■────■│───■─│──■──│─■───│█────■────■ 5
-3 █──■──█──■──█──■──█──■─│█──■──█──■─║█──■─│█──■─│█──■──█──■──█──■──█──■─│█──■─│█──■─│█──■─│█──■──█──■─ 3
-2 █─■─■─█─■─■─█─■─■─█─■─■│█─■─■─█─■─■║█─■─■│█─■─■│█─■─■─█─■─■─█─■─■─█─■─■│█─■─■│█─■─■│█─■─■│█─■─■─█─■─■ 2
-                                     ║     │     │                       │     │     │     │           
-     From a given number n, step     ║    gap  MATCH                    gap   gap   gap   gap    
-     the same distance d in both     ║     │     │                       │     │     │     │           
-     directions. The same pattern    ║───■─│────■│─────■──────■──────■───│──■──│───■─│────■│─────■───── 7
-     of gaps in any prime cycle      ║────█│───■─│──■────■────■────■────█│───■─│──■──│─■───│■────■────█ 5
-     will reappear, but backwards,   ║─■──█│─■──█│─■──█──■──█──■──█──■──█│─■──█│─■──█│─■──█│─■──█──■──█ 3
-     and offset by a multiple of 2.  ║■─■─█│■─■─█│■─■─█─■─■─█─■─■─█─■─■─█│■─■─█│■─■─█│■─■─█│■─■─█─■─■─█ 2
-     Some gaps will not match up,    ║     :     │                       :     :     :     :
-     but one or more always will.    ║           │                       
-                                     n ────────(n-d)──────>
-                                     ║       BACKWARDS
+#include "data/gap-symmetry-diagram.txt"
 \end{lstlisting}
-                                          
 
 
 \subsection{Prime symmetry around radicals}
@@ -541,20 +419,17 @@ The overlapping factors at 131, 137, 139 are not power of two offsets from 165 a
 \end{lstlisting}
 
 
-		
-
-
 \subsection{Corridors between prime numbers}
 
-Below is a list of integer factorizations indented by distance to the nearest prime. All the primes are left justified, but between them is a zig-zag "corridor" of composite numbers.
+Following this section is a list of integer factorizations indented by distance to the nearest prime. All the primes are left justified, but between them is a zig-zag "corridor" of composite numbers.
 
 Note that these are *mirrored* corridors. Number properties like smoothness and factor multiplicity show [crucially] imperfect symmetry across the corridor between primes.
 
 Define a "midprime" to be the integer half way between two consecutive prime numbers. For example, 9, 12, 15, 18, 21, 26, etc are the first midprimes, at the centerpoints of the first prime gaps. Midprimes are special points of local modular symmetry.
 
-Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127 and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is a highly composite higher power of two.
+Here are a couple of typical examples of prime corridors. Note the general mirror symmetry of composite properties. The first examples (113-127, 181-191, and 293-307) show a canonical "Klingon bird of prey" motif: smooth composite spikes at the edges of the wings, and a "long neck" visually due to the midprime, which is (very often) a highly composite multiple of a power of two.
 
-\begin{lstlisting}
+```
 113
  2 ⋅ 3 ⋅ 19
   5 ⋅ 23
@@ -571,7 +446,17 @@ Here are a couple of typical examples of prime corridors. Note the general mirro
  2 ⋅ 3² ⋅ 7
 127
 
-...
+181
+ 2 ⋅ 7 ⋅ 13
+  3 ⋅ 61
+   2³ ⋅ 23
+    5 ⋅ 37
+     2 ⋅ 3 ⋅ 31   (midprime 186)
+    11 ⋅ 17
+   2² ⋅ 47
+  3³ ⋅ 7
+ 2 ⋅ 5 ⋅ 19
+191
 
 293
  2 ⋅ 3 ⋅ 7²
@@ -588,11 +473,11 @@ Here are a couple of typical examples of prime corridors. Note the general mirro
   5 ⋅ 61
  2 ⋅ 3² ⋅ 17
 307
-\end{lstlisting}
+```
 
-The range from 421-431 shows some crisp symmetries as well, snug between a pair of twin primes.
+The range from 421-431 shows some crisp symmetries, and lies snug between a pair of twin primes too.
 
-\begin{lstlisting}
+```
 419
  2² ⋅ 3 ⋅ 5 ⋅ 7
 421
@@ -608,13 +493,13 @@ The range from 421-431 shows some crisp symmetries as well, snug between a pair 
 431
  2⁴ ⋅ 3³
 433
-\end{lstlisting}
+```
 
 Consider that as n begins marching across this gap between primes, its trajectory is *set in stone*. The path has a midpoint, after which the scenery starts looking familiar, and the distance to the next prime starts to reveal itself.
 
 The bird-of-prey pattern is not universal. The corridor from 2063-2069 is not aligned that way, though it still shows the expected local symmetry.
 
-\begin{lstlisting}
+```
 2063
  2⁴ ⋅ 3 ⋅ 43
   5 ⋅ 7 ⋅ 59
@@ -622,13 +507,13 @@ The bird-of-prey pattern is not universal. The corridor from 2063-2069 is not al
   3 ⋅ 13 ⋅ 53
  2² ⋅ 11 ⋅ 47
 2069
-\end{lstlisting}
+```
 
-This is a nice long corridor from 4297 to 4327 below, a gap of 30. It's a "bird of prey" with very long wings.
+Below is a nice long corridor from 4297 to 4327, a gap of 30. It's a bird of prey with very long wings.
 
 A new property is visible: self-similarity. A section has been re-indented to highlight a nested instance of the bird of prey pattern. If you squint it is also flanked by 2 smaller ones.
 
-\begin{lstlisting}
+```
 4297
  2 ⋅ 7 ⋅ 307
   3 ⋅ 1433
@@ -660,11 +545,33 @@ A new property is visible: self-similarity. A section has been re-indented to hi
   5² ⋅ 173                             
  2 ⋅ 3 ⋅ 7 ⋅ 103      
 4327
-\end{lstlisting}
+```
+
+There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a clear bird-of-prey motif. But as a prime, it resets the indentation and throws off a much more likely-looking midprime at 204:
+
+```
+197                   197                  
+ 2 ⋅ 3² ⋅ 11           2 ⋅ 3² ⋅ 11                  
+199                     199                  
+ 2³ ⋅ 5²                 2³ ⋅ 5²                  
+  3 ⋅ 67                  3 ⋅ 67                  
+   2 ⋅ 101                 2 ⋅ 101                  
+    7 ⋅ 29                  7 ⋅ 29                  
+     2² ⋅ 3 ⋅ 17             2² ⋅ 3 ⋅ 17                  
+      5 ⋅ 41                5 ⋅ 41                  
+     2 ⋅ 103               2 ⋅ 103                  
+    3² ⋅ 23               3² ⋅ 23                  
+   2⁴ ⋅ 13               2⁴ ⋅ 13                  
+  11 ⋅ 19               11 ⋅ 19                  
+ 2 ⋅ 3 ⋅ 5 ⋅ 7         2 ⋅ 3 ⋅ 5 ⋅ 7                  
+211                   211                  
+```
+
+I believe these exceptions reveal the most structural information. There are two forces in conflict exactly here, and 199 won.
 
 There is a fixed accordion of internally symmetrical structures at different frequencies too. For example, there is strong regularity in cycles of both 4 and 6, regardless of prime position. They cycle different *sorts* of properties, with their own schedule of symmetry.
 
-\begin{lstlisting}
+```
 Period of 4:             Period of 6:
 ...                      ...   
  2 ⋅ 7 ⋅ 307              2 ⋅ 7 ⋅ 307            
@@ -680,13 +587,12 @@ Period of 4:             Period of 6:
    2² ⋅ 3 ⋅ 359             2² ⋅ 3 ⋅ 359         
   31 ⋅ 139                 31 ⋅ 139              
  2 ⋅ 5 ⋅ 431              2 ⋅ 5 ⋅ 431            
-       
 ...                       ...          
-\end{lstlisting}
+```
 
 The same symmetrical relationships are seen if we start one step out of phase too, the cycles just have a different "character".
 
-\begin{lstlisting}
+```
 Period of 4 (phase +1):   Period of 6 (phase +1):
 ...                       ...   
 3 ⋅ 1433                  3 ⋅ 1433              
@@ -702,1038 +608,69 @@ Period of 4 (phase +1):   Period of 6 (phase +1):
   31 ⋅ 139                  31 ⋅ 139              
  2 ⋅ 5 ⋅ 431               2 ⋅ 5 ⋅ 431            
 3² ⋅ 479                  3² ⋅ 479              
- 2³ ⋅ 7² ⋅ 11              2³ ⋅ 7² ⋅ 11         
-  19 ⋅ 227                  19 ⋅ 227              
- 2 ⋅ 3 ⋅ 719                 2 ⋅ 3 ⋅ 719            
-5 ⋅ 863                     5 ⋅ 863               
- 2² ⋅ 13 ⋅ 83              2² ⋅ 13 ⋅ 83         
-  3 ⋅ 1439                3 ⋅ 1439              
- 2 ⋅ 17 ⋅ 127              2 ⋅ 17 ⋅ 127           
-7 ⋅ 617                     7 ⋅ 617               
- 2⁵ ⋅ 3³ ⋅ 5                 2⁵ ⋅ 3³ ⋅ 5          
-  29 ⋅ 149                  29 ⋅ 149              
- 2 ⋅ 2161                  2 ⋅ 2161               
-3 ⋅ 11 ⋅ 131              3 ⋅ 11 ⋅ 131          
 ...                       ...      
-\end{lstlisting}
+```
 
-So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations. An extended listing follows.
+So there is a basic regularity in the "texture" of integer factorizations underlying the prime corridor symmetries. This may give rise to something like resonance or interference at those locations.
 
-subsubsection{Integer Factorization Corridors}
 
-% TODO - for the PDF, this should be one entire page, in a small font, in columns. And probably pretty colors. But for now, the raw data:
+
+
+
+There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a crystal clear bird-of-prey motif. But since it's prime, it resets the indentation and throws off a much more likely-looking midprime (204):
+
 \begin{lstlisting}
-1
-2
-3
- 2²
-5
- 2 ⋅ 3
-7
- 2³
-  3²
- 2 ⋅ 5
-11
- 2² ⋅ 3
-13
- 2 ⋅ 7
-  3 ⋅ 5
- 2⁴
-17
- 2 ⋅ 3²
-19
- 2² ⋅ 5
-  3 ⋅ 7
- 2 ⋅ 11
-23
- 2³ ⋅ 3
-  5²
-   2 ⋅ 13
-  3³
- 2² ⋅ 7
-29
- 2 ⋅ 3 ⋅ 5
-31
- 2⁵
-  3 ⋅ 11
-   2 ⋅ 17
-  5 ⋅ 7
- 2² ⋅ 3²
-37
- 2 ⋅ 19
-  3 ⋅ 13
- 2³ ⋅ 5
-41
- 2 ⋅ 3 ⋅ 7
-43
- 2² ⋅ 11
-  3² ⋅ 5
- 2 ⋅ 23
-47
- 2⁴ ⋅ 3
-  7²
-   2 ⋅ 5²
-  3 ⋅ 17
- 2² ⋅ 13
-53
- 2 ⋅ 3³
-  5 ⋅ 11
-   2³ ⋅ 7
-  3 ⋅ 19
- 2 ⋅ 29
-59
- 2² ⋅ 3 ⋅ 5
-61
- 2 ⋅ 31
-  3² ⋅ 7
-   2⁶
-  5 ⋅ 13
- 2 ⋅ 3 ⋅ 11
-67
- 2² ⋅ 17
-  3 ⋅ 23
- 2 ⋅ 5 ⋅ 7
-71
- 2³ ⋅ 3²
-73
- 2 ⋅ 37
-  3 ⋅ 5²
-   2² ⋅ 19
-  7 ⋅ 11
- 2 ⋅ 3 ⋅ 13
-79
- 2⁴ ⋅ 5
-  3⁴
- 2 ⋅ 41
-83
- 2² ⋅ 3 ⋅ 7
-  5 ⋅ 17
-   2 ⋅ 43
-  3 ⋅ 29
- 2³ ⋅ 11
-89
- 2 ⋅ 3² ⋅ 5
-  7 ⋅ 13
-   2² ⋅ 23
-    3 ⋅ 31
-   2 ⋅ 47
-  5 ⋅ 19
- 2⁵ ⋅ 3
-97
- 2 ⋅ 7²
-  3² ⋅ 11
- 2² ⋅ 5²
-101
- 2 ⋅ 3 ⋅ 17
-103
- 2³ ⋅ 13
-  3 ⋅ 5 ⋅ 7
- 2 ⋅ 53
-107
- 2² ⋅ 3³
-109
- 2 ⋅ 5 ⋅ 11
-  3 ⋅ 37
- 2⁴ ⋅ 7
-113
- 2 ⋅ 3 ⋅ 19
-  5 ⋅ 23
-   2² ⋅ 29
-    3² ⋅ 13
-     2 ⋅ 59
-      7 ⋅ 17
-       2³ ⋅ 3 ⋅ 5
-      11²
-     2 ⋅ 61
-    3 ⋅ 41
-   2² ⋅ 31
-  5³
- 2 ⋅ 3² ⋅ 7
-127
- 2⁷
-  3 ⋅ 43
- 2 ⋅ 5 ⋅ 13
-131
- 2² ⋅ 3 ⋅ 11
-  7 ⋅ 19
-   2 ⋅ 67
-  3³ ⋅ 5
- 2³ ⋅ 17
-137
- 2 ⋅ 3 ⋅ 23
-139
- 2² ⋅ 5 ⋅ 7
-  3 ⋅ 47
-   2 ⋅ 71
-    11 ⋅ 13
-     2⁴ ⋅ 3²
-    5 ⋅ 29
-   2 ⋅ 73
-  3 ⋅ 7²
- 2² ⋅ 37
-149
- 2 ⋅ 3 ⋅ 5²
-151
- 2³ ⋅ 19
-  3² ⋅ 17
-   2 ⋅ 7 ⋅ 11
-  5 ⋅ 31
- 2² ⋅ 3 ⋅ 13
-157
- 2 ⋅ 79
-  3 ⋅ 53
-   2⁵ ⋅ 5
-  7 ⋅ 23
- 2 ⋅ 3⁴
-163
- 2² ⋅ 41
-  3 ⋅ 5 ⋅ 11
- 2 ⋅ 83
-167
- 2³ ⋅ 3 ⋅ 7
-  13²
-   2 ⋅ 5 ⋅ 17
-  3² ⋅ 19
- 2² ⋅ 43
-173
- 2 ⋅ 3 ⋅ 29
-  5² ⋅ 7
-   2⁴ ⋅ 11
-  3 ⋅ 59
- 2 ⋅ 89
-179
- 2² ⋅ 3² ⋅ 5
-181
- 2 ⋅ 7 ⋅ 13
-  3 ⋅ 61
-   2³ ⋅ 23
-    5 ⋅ 37
-     2 ⋅ 3 ⋅ 31
-    11 ⋅ 17
-   2² ⋅ 47
-  3³ ⋅ 7
- 2 ⋅ 5 ⋅ 19
-191
- 2⁶ ⋅ 3
-193
- 2 ⋅ 97
-  3 ⋅ 5 ⋅ 13
- 2² ⋅ 7²
-197
- 2 ⋅ 3² ⋅ 11
-199
- 2³ ⋅ 5²
-  3 ⋅ 67
-   2 ⋅ 101
-    7 ⋅ 29
-     2² ⋅ 3 ⋅ 17
-      5 ⋅ 41
-     2 ⋅ 103
-    3² ⋅ 23
-   2⁴ ⋅ 13
-  11 ⋅ 19
- 2 ⋅ 3 ⋅ 5 ⋅ 7
-211
- 2² ⋅ 53
-  3 ⋅ 71
-   2 ⋅ 107
-    5 ⋅ 43
-     2³ ⋅ 3³
-      7 ⋅ 31
-     2 ⋅ 109
-    3 ⋅ 73
-   2² ⋅ 5 ⋅ 11
-  13 ⋅ 17
- 2 ⋅ 3 ⋅ 37
-223
- 2⁵ ⋅ 7
-  3² ⋅ 5²
- 2 ⋅ 113
-227
- 2² ⋅ 3 ⋅ 19
-229
- 2 ⋅ 5 ⋅ 23
-  3 ⋅ 7 ⋅ 11
- 2³ ⋅ 29
-233
- 2 ⋅ 3² ⋅ 13
-  5 ⋅ 47
-   2² ⋅ 59
-  3 ⋅ 79
- 2 ⋅ 7 ⋅ 17
-239
- 2⁴ ⋅ 3 ⋅ 5
-241
- 2 ⋅ 11²
-  3⁵
-   2² ⋅ 61
-    5 ⋅ 7²
-     2 ⋅ 3 ⋅ 41
-    13 ⋅ 19
-   2³ ⋅ 31
-  3 ⋅ 83
- 2 ⋅ 5³
-251
- 2² ⋅ 3² ⋅ 7
-  11 ⋅ 23
-   2 ⋅ 127
-  3 ⋅ 5 ⋅ 17
- 2⁸
-257
- 2 ⋅ 3 ⋅ 43
-  7 ⋅ 37
-   2² ⋅ 5 ⋅ 13
-  3² ⋅ 29
- 2 ⋅ 131
-263
- 2³ ⋅ 3 ⋅ 11
-  5 ⋅ 53
-   2 ⋅ 7 ⋅ 19
-  3 ⋅ 89
- 2² ⋅ 67
-269
- 2 ⋅ 3³ ⋅ 5
-271
- 2⁴ ⋅ 17
-  3 ⋅ 7 ⋅ 13
-   2 ⋅ 137
-  5² ⋅ 11
- 2² ⋅ 3 ⋅ 23
-277
- 2 ⋅ 139
-  3² ⋅ 31
- 2³ ⋅ 5 ⋅ 7
-281
- 2 ⋅ 3 ⋅ 47
-283
- 2² ⋅ 71
-  3 ⋅ 5 ⋅ 19
-   2 ⋅ 11 ⋅ 13
-    7 ⋅ 41
-     2⁵ ⋅ 3²
-    17²
-   2 ⋅ 5 ⋅ 29
-  3 ⋅ 97
- 2² ⋅ 73
-293
- 2 ⋅ 3 ⋅ 7²
-  5 ⋅ 59
-   2³ ⋅ 37
-    3³ ⋅ 11
-     2 ⋅ 149
-      13 ⋅ 23
-       2² ⋅ 3 ⋅ 5²
-      7 ⋅ 43
-     2 ⋅ 151
-    3 ⋅ 101
-   2⁴ ⋅ 19
-  5 ⋅ 61
- 2 ⋅ 3² ⋅ 17
-307
- 2² ⋅ 7 ⋅ 11
-  3 ⋅ 103
- 2 ⋅ 5 ⋅ 31
-311
- 2³ ⋅ 3 ⋅ 13
-313
- 2 ⋅ 157
-  3² ⋅ 5 ⋅ 7
- 2² ⋅ 79
-317
- 2 ⋅ 3 ⋅ 53
-  11 ⋅ 29
-   2⁶ ⋅ 5
-    3 ⋅ 107
-     2 ⋅ 7 ⋅ 23
-      17 ⋅ 19
-       2² ⋅ 3⁴
-      5² ⋅ 13
-     2 ⋅ 163
-    3 ⋅ 109
-   2³ ⋅ 41
-  7 ⋅ 47
- 2 ⋅ 3 ⋅ 5 ⋅ 11
-331
- 2² ⋅ 83
-  3² ⋅ 37
-   2 ⋅ 167
-  5 ⋅ 67
- 2⁴ ⋅ 3 ⋅ 7
-337
- 2 ⋅ 13²
-  3 ⋅ 113
-   2² ⋅ 5 ⋅ 17
-    11 ⋅ 31
-     2 ⋅ 3² ⋅ 19
-    7³
-   2³ ⋅ 43
-  3 ⋅ 5 ⋅ 23
- 2 ⋅ 173
-347
- 2² ⋅ 3 ⋅ 29
-349
- 2 ⋅ 5² ⋅ 7
-  3³ ⋅ 13
- 2⁵ ⋅ 11
-353
- 2 ⋅ 3 ⋅ 59
-  5 ⋅ 71
-   2² ⋅ 89
-  3 ⋅ 7 ⋅ 17
- 2 ⋅ 179
-359
- 2³ ⋅ 3² ⋅ 5
-  19²
-   2 ⋅ 181
-    3 ⋅ 11²
-   2² ⋅ 7 ⋅ 13
-  5 ⋅ 73
- 2 ⋅ 3 ⋅ 61
-367
- 2⁴ ⋅ 23
-  3² ⋅ 41
-   2 ⋅ 5 ⋅ 37
-  7 ⋅ 53
- 2² ⋅ 3 ⋅ 31
-373
- 2 ⋅ 11 ⋅ 17
-  3 ⋅ 5³
-   2³ ⋅ 47
-  13 ⋅ 29
- 2 ⋅ 3³ ⋅ 7
-379
- 2² ⋅ 5 ⋅ 19
-  3 ⋅ 127
- 2 ⋅ 191
-383
- 2⁷ ⋅ 3
-  5 ⋅ 7 ⋅ 11
-   2 ⋅ 193
-  3² ⋅ 43
- 2² ⋅ 97
-389
- 2 ⋅ 3 ⋅ 5 ⋅ 13
-  17 ⋅ 23
-   2³ ⋅ 7²
-    3 ⋅ 131
-   2 ⋅ 197
-  5 ⋅ 79
- 2² ⋅ 3² ⋅ 11
-397
- 2 ⋅ 199
-  3 ⋅ 7 ⋅ 19
- 2⁴ ⋅ 5²
-401
- 2 ⋅ 3 ⋅ 67
-  13 ⋅ 31
-   2² ⋅ 101
-    3⁴ ⋅ 5
-   2 ⋅ 7 ⋅ 29
-  11 ⋅ 37
- 2³ ⋅ 3 ⋅ 17
-409
- 2 ⋅ 5 ⋅ 41
-  3 ⋅ 137
-   2² ⋅ 103
-    7 ⋅ 59
-     2 ⋅ 3² ⋅ 23
-    5 ⋅ 83
-   2⁵ ⋅ 13
-  3 ⋅ 139
- 2 ⋅ 11 ⋅ 19
-419
- 2² ⋅ 3 ⋅ 5 ⋅ 7
-421
- 2 ⋅ 211
-  3² ⋅ 47
-   2³ ⋅ 53
-    5² ⋅ 17
-     2 ⋅ 3 ⋅ 71
-    7 ⋅ 61
-   2² ⋅ 107
-  3 ⋅ 11 ⋅ 13
- 2 ⋅ 5 ⋅ 43
-431
- 2⁴ ⋅ 3³
-433
- 2 ⋅ 7 ⋅ 31
-  3 ⋅ 5 ⋅ 29
-   2² ⋅ 109
-  19 ⋅ 23
- 2 ⋅ 3 ⋅ 73
-439
- 2³ ⋅ 5 ⋅ 11
-  3² ⋅ 7²
- 2 ⋅ 13 ⋅ 17
-443
- 2² ⋅ 3 ⋅ 37
-  5 ⋅ 89
-   2 ⋅ 223
-  3 ⋅ 149
- 2⁶ ⋅ 7
-449
- 2 ⋅ 3² ⋅ 5²
-  11 ⋅ 41
-   2² ⋅ 113
-    3 ⋅ 151
-   2 ⋅ 227
-  5 ⋅ 7 ⋅ 13
- 2³ ⋅ 3 ⋅ 19
-457
- 2 ⋅ 229
-  3³ ⋅ 17
- 2² ⋅ 5 ⋅ 23
-461
- 2 ⋅ 3 ⋅ 7 ⋅ 11
-463
- 2⁴ ⋅ 29
-  3 ⋅ 5 ⋅ 31
- 2 ⋅ 233
-467
- 2² ⋅ 3² ⋅ 13
-  7 ⋅ 67
-   2 ⋅ 5 ⋅ 47
-    3 ⋅ 157
-     2³ ⋅ 59
-      11 ⋅ 43
-     2 ⋅ 3 ⋅ 79
-    5² ⋅ 19
-   2² ⋅ 7 ⋅ 17
-  3² ⋅ 53
- 2 ⋅ 239
-479
- 2⁵ ⋅ 3 ⋅ 5
-  13 ⋅ 37
-   2 ⋅ 241
-    3 ⋅ 7 ⋅ 23
-   2² ⋅ 11²
-  5 ⋅ 97
- 2 ⋅ 3⁵
-487
- 2³ ⋅ 61
-  3 ⋅ 163
- 2 ⋅ 5 ⋅ 7²
-491
- 2² ⋅ 3 ⋅ 41
-  17 ⋅ 29
-   2 ⋅ 13 ⋅ 19
-    3² ⋅ 5 ⋅ 11
-   2⁴ ⋅ 31
-  7 ⋅ 71
- 2 ⋅ 3 ⋅ 83
-499
- 2² ⋅ 5³
-  3 ⋅ 167
- 2 ⋅ 251
-503
- 2³ ⋅ 3² ⋅ 7
-  5 ⋅ 101
-   2 ⋅ 11 ⋅ 23
-  3 ⋅ 13²
- 2² ⋅ 127
-509
- 2 ⋅ 3 ⋅ 5 ⋅ 17
-  7 ⋅ 73
-   2⁹
-    3³ ⋅ 19
-     2 ⋅ 257
-      5 ⋅ 103
-     2² ⋅ 3 ⋅ 43
-    11 ⋅ 47
-   2 ⋅ 7 ⋅ 37
-  3 ⋅ 173
- 2³ ⋅ 5 ⋅ 13
-521
- 2 ⋅ 3² ⋅ 29
-523
- 2² ⋅ 131
-  3 ⋅ 5² ⋅ 7
-   2 ⋅ 263
-    17 ⋅ 31
-     2⁴ ⋅ 3 ⋅ 11
-      23²
-       2 ⋅ 5 ⋅ 53
-        3² ⋅ 59
-         2² ⋅ 7 ⋅ 19
-        13 ⋅ 41
-       2 ⋅ 3 ⋅ 89
-      5 ⋅ 107
-     2³ ⋅ 67
-    3 ⋅ 179
-   2 ⋅ 269
-  7² ⋅ 11
- 2² ⋅ 3³ ⋅ 5
-541
- 2 ⋅ 271
-  3 ⋅ 181
-   2⁵ ⋅ 17
-  5 ⋅ 109
- 2 ⋅ 3 ⋅ 7 ⋅ 13
-547
- 2² ⋅ 137
-  3² ⋅ 61
-   2 ⋅ 5² ⋅ 11
-    19 ⋅ 29
-     2³ ⋅ 3 ⋅ 23
-    7 ⋅ 79
-   2 ⋅ 277
-  3 ⋅ 5 ⋅ 37
- 2² ⋅ 139
-557
- 2 ⋅ 3² ⋅ 31
-  13 ⋅ 43
-   2⁴ ⋅ 5 ⋅ 7
-  3 ⋅ 11 ⋅ 17
- 2 ⋅ 281
-563
- 2² ⋅ 3 ⋅ 47
-  5 ⋅ 113
-   2 ⋅ 283
-  3⁴ ⋅ 7
- 2³ ⋅ 71
-569
- 2 ⋅ 3 ⋅ 5 ⋅ 19
-571
- 2² ⋅ 11 ⋅ 13
-  3 ⋅ 191
-   2 ⋅ 7 ⋅ 41
-  5² ⋅ 23
- 2⁶ ⋅ 3²
-577
- 2 ⋅ 17²
-  3 ⋅ 193
-   2² ⋅ 5 ⋅ 29
-    7 ⋅ 83
-     2 ⋅ 3 ⋅ 97
-    11 ⋅ 53
-   2³ ⋅ 73
-  3² ⋅ 5 ⋅ 13
- 2 ⋅ 293
-587
- 2² ⋅ 3 ⋅ 7²
-  19 ⋅ 31
-   2 ⋅ 5 ⋅ 59
-  3 ⋅ 197
- 2⁴ ⋅ 37
-593
- 2 ⋅ 3³ ⋅ 11
-  5 ⋅ 7 ⋅ 17
-   2² ⋅ 149
-  3 ⋅ 199
- 2 ⋅ 13 ⋅ 23
-599
- 2³ ⋅ 3 ⋅ 5²
-601
- 2 ⋅ 7 ⋅ 43
-  3² ⋅ 67
-   2² ⋅ 151
-  5 ⋅ 11²
- 2 ⋅ 3 ⋅ 101
-607
- 2⁵ ⋅ 19
-  3 ⋅ 7 ⋅ 29
-   2 ⋅ 5 ⋅ 61
-  13 ⋅ 47
- 2² ⋅ 3² ⋅ 17
-613
- 2 ⋅ 307
-  3 ⋅ 5 ⋅ 41
- 2³ ⋅ 7 ⋅ 11
-617
- 2 ⋅ 3 ⋅ 103
-619
- 2² ⋅ 5 ⋅ 31
-  3³ ⋅ 23
-   2 ⋅ 311
-    7 ⋅ 89
-     2⁴ ⋅ 3 ⋅ 13
-      5⁴
-     2 ⋅ 313
-    3 ⋅ 11 ⋅ 19
-   2² ⋅ 157
-  17 ⋅ 37
- 2 ⋅ 3² ⋅ 5 ⋅ 7
-631
- 2³ ⋅ 79
-  3 ⋅ 211
-   2 ⋅ 317
-    5 ⋅ 127
-     2² ⋅ 3 ⋅ 53
-    7² ⋅ 13
-   2 ⋅ 11 ⋅ 29
-  3² ⋅ 71
- 2⁷ ⋅ 5
-641
- 2 ⋅ 3 ⋅ 107
-643
- 2² ⋅ 7 ⋅ 23
-  3 ⋅ 5 ⋅ 43
- 2 ⋅ 17 ⋅ 19
-647
- 2³ ⋅ 3⁴
-  11 ⋅ 59
-   2 ⋅ 5² ⋅ 13
-  3 ⋅ 7 ⋅ 31
- 2² ⋅ 163
-653
- 2 ⋅ 3 ⋅ 109
-  5 ⋅ 131
-   2⁴ ⋅ 41
-  3² ⋅ 73
- 2 ⋅ 7 ⋅ 47
-659
- 2² ⋅ 3 ⋅ 5 ⋅ 11
-661
- 2 ⋅ 331
-  3 ⋅ 13 ⋅ 17
-   2³ ⋅ 83
-    5 ⋅ 7 ⋅ 19
-     2 ⋅ 3² ⋅ 37
-      23 ⋅ 29
-     2² ⋅ 167
-    3 ⋅ 223
-   2 ⋅ 5 ⋅ 67
-  11 ⋅ 61
- 2⁵ ⋅ 3 ⋅ 7
-673
- 2 ⋅ 337
-  3³ ⋅ 5²
- 2² ⋅ 13²
-677
- 2 ⋅ 3 ⋅ 113
-  7 ⋅ 97
-   2³ ⋅ 5 ⋅ 17
-  3 ⋅ 227
- 2 ⋅ 11 ⋅ 31
-683
- 2² ⋅ 3² ⋅ 19
-  5 ⋅ 137
-   2 ⋅ 7³
-    3 ⋅ 229
-   2⁴ ⋅ 43
-  13 ⋅ 53
- 2 ⋅ 3 ⋅ 5 ⋅ 23
-691
- 2² ⋅ 173
-  3² ⋅ 7 ⋅ 11
-   2 ⋅ 347
-    5 ⋅ 139
-     2³ ⋅ 3 ⋅ 29
-    17 ⋅ 41
-   2 ⋅ 349
-  3 ⋅ 233
- 2² ⋅ 5² ⋅ 7
-701
- 2 ⋅ 3³ ⋅ 13
-  19 ⋅ 37
-   2⁶ ⋅ 11
-    3 ⋅ 5 ⋅ 47
-   2 ⋅ 353
-  7 ⋅ 101
- 2² ⋅ 3 ⋅ 59
-709
- 2 ⋅ 5 ⋅ 71
-  3² ⋅ 79
-   2³ ⋅ 89
-    23 ⋅ 31
-     2 ⋅ 3 ⋅ 7 ⋅ 17
-    5 ⋅ 11 ⋅ 13
-   2² ⋅ 179
-  3 ⋅ 239
- 2 ⋅ 359
-719
- 2⁴ ⋅ 3² ⋅ 5
-  7 ⋅ 103
-   2 ⋅ 19²
-    3 ⋅ 241
-   2² ⋅ 181
-  5² ⋅ 29
- 2 ⋅ 3 ⋅ 11²
-727
- 2³ ⋅ 7 ⋅ 13
-  3⁶
-   2 ⋅ 5 ⋅ 73
-  17 ⋅ 43
- 2² ⋅ 3 ⋅ 61
-733
- 2 ⋅ 367
-  3 ⋅ 5 ⋅ 7²
-   2⁵ ⋅ 23
-  11 ⋅ 67
- 2 ⋅ 3² ⋅ 41
-739
- 2² ⋅ 5 ⋅ 37
-  3 ⋅ 13 ⋅ 19
- 2 ⋅ 7 ⋅ 53
-743
- 2³ ⋅ 3 ⋅ 31
-  5 ⋅ 149
-   2 ⋅ 373
-    3² ⋅ 83
-   2² ⋅ 11 ⋅ 17
-  7 ⋅ 107
- 2 ⋅ 3 ⋅ 5³
-751
- 2⁴ ⋅ 47
-  3 ⋅ 251
-   2 ⋅ 13 ⋅ 29
-  5 ⋅ 151
- 2² ⋅ 3³ ⋅ 7
-757
- 2 ⋅ 379
-  3 ⋅ 11 ⋅ 23
- 2³ ⋅ 5 ⋅ 19
-761
- 2 ⋅ 3 ⋅ 127
-  7 ⋅ 109
-   2² ⋅ 191
-    3² ⋅ 5 ⋅ 17
-   2 ⋅ 383
-  13 ⋅ 59
- 2⁸ ⋅ 3
-769
- 2 ⋅ 5 ⋅ 7 ⋅ 11
-  3 ⋅ 257
- 2² ⋅ 193
-773
- 2 ⋅ 3² ⋅ 43
-  5² ⋅ 31
-   2³ ⋅ 97
-    3 ⋅ 7 ⋅ 37
-     2 ⋅ 389
-      19 ⋅ 41
-       2² ⋅ 3 ⋅ 5 ⋅ 13
-      11 ⋅ 71
-     2 ⋅ 17 ⋅ 23
-    3³ ⋅ 29
-   2⁴ ⋅ 7²
-  5 ⋅ 157
- 2 ⋅ 3 ⋅ 131
-787
- 2² ⋅ 197
-  3 ⋅ 263
-   2 ⋅ 5 ⋅ 79
-    7 ⋅ 113
-     2³ ⋅ 3² ⋅ 11
-    13 ⋅ 61
-   2 ⋅ 397
-  3 ⋅ 5 ⋅ 53
- 2² ⋅ 199
-797
- 2 ⋅ 3 ⋅ 7 ⋅ 19
-  17 ⋅ 47
-   2⁵ ⋅ 5²
-    3² ⋅ 89
-     2 ⋅ 401
-      11 ⋅ 73
-     2² ⋅ 3 ⋅ 67
-    5 ⋅ 7 ⋅ 23
-   2 ⋅ 13 ⋅ 31
-  3 ⋅ 269
- 2³ ⋅ 101
-809
- 2 ⋅ 3⁴ ⋅ 5
-811
- 2² ⋅ 7 ⋅ 29
-  3 ⋅ 271
-   2 ⋅ 11 ⋅ 37
-    5 ⋅ 163
-     2⁴ ⋅ 3 ⋅ 17
-    19 ⋅ 43
-   2 ⋅ 409
-  3² ⋅ 7 ⋅ 13
- 2² ⋅ 5 ⋅ 41
-821
- 2 ⋅ 3 ⋅ 137
-823
- 2³ ⋅ 103
-  3 ⋅ 5² ⋅ 11
- 2 ⋅ 7 ⋅ 59
-827
- 2² ⋅ 3² ⋅ 23
-829
- 2 ⋅ 5 ⋅ 83
-  3 ⋅ 277
-   2⁶ ⋅ 13
-    7² ⋅ 17
-     2 ⋅ 3 ⋅ 139
-    5 ⋅ 167
-   2² ⋅ 11 ⋅ 19
-  3³ ⋅ 31
- 2 ⋅ 419
-839
- 2³ ⋅ 3 ⋅ 5 ⋅ 7
-  29²
-   2 ⋅ 421
-    3 ⋅ 281
-     2² ⋅ 211
-      5 ⋅ 13²
-       2 ⋅ 3² ⋅ 47
-      7 ⋅ 11²
-     2⁴ ⋅ 53
-    3 ⋅ 283
-   2 ⋅ 5² ⋅ 17
-  23 ⋅ 37
- 2² ⋅ 3 ⋅ 71
-853
- 2 ⋅ 7 ⋅ 61
-  3² ⋅ 5 ⋅ 19
- 2³ ⋅ 107
-857
- 2 ⋅ 3 ⋅ 11 ⋅ 13
-859
- 2² ⋅ 5 ⋅ 43
-  3 ⋅ 7 ⋅ 41
- 2 ⋅ 431
-863
- 2⁵ ⋅ 3³
-  5 ⋅ 173
-   2 ⋅ 433
-    3 ⋅ 17²
-     2² ⋅ 7 ⋅ 31
-      11 ⋅ 79
-       2 ⋅ 3 ⋅ 5 ⋅ 29
-      13 ⋅ 67
-     2³ ⋅ 109
-    3² ⋅ 97
-   2 ⋅ 19 ⋅ 23
-  5³ ⋅ 7
- 2² ⋅ 3 ⋅ 73
-877
- 2 ⋅ 439
-  3 ⋅ 293
- 2⁴ ⋅ 5 ⋅ 11
-881
- 2 ⋅ 3² ⋅ 7²
-883
- 2² ⋅ 13 ⋅ 17
-  3 ⋅ 5 ⋅ 59
- 2 ⋅ 443
-887
- 2³ ⋅ 3 ⋅ 37
-  7 ⋅ 127
-   2 ⋅ 5 ⋅ 89
-    3⁴ ⋅ 11
-     2² ⋅ 223
-      19 ⋅ 47
-       2 ⋅ 3 ⋅ 149
-        5 ⋅ 179
-         2⁷ ⋅ 7
-          3 ⋅ 13 ⋅ 23
-         2 ⋅ 449
-        29 ⋅ 31
-       2² ⋅ 3² ⋅ 5²
-      17 ⋅ 53
-     2 ⋅ 11 ⋅ 41
-    3 ⋅ 7 ⋅ 43
-   2³ ⋅ 113
-  5 ⋅ 181
- 2 ⋅ 3 ⋅ 151
-907
- 2² ⋅ 227
-  3² ⋅ 101
- 2 ⋅ 5 ⋅ 7 ⋅ 13
-911
- 2⁴ ⋅ 3 ⋅ 19
-  11 ⋅ 83
-   2 ⋅ 457
-    3 ⋅ 5 ⋅ 61
-   2² ⋅ 229
-  7 ⋅ 131
- 2 ⋅ 3³ ⋅ 17
-919
- 2³ ⋅ 5 ⋅ 23
-  3 ⋅ 307
-   2 ⋅ 461
-    13 ⋅ 71
-     2² ⋅ 3 ⋅ 7 ⋅ 11
-    5² ⋅ 37
-   2 ⋅ 463
-  3² ⋅ 103
- 2⁵ ⋅ 29
-929
- 2 ⋅ 3 ⋅ 5 ⋅ 31
-  7² ⋅ 19
-   2² ⋅ 233
-    3 ⋅ 311
-   2 ⋅ 467
-  5 ⋅ 11 ⋅ 17
- 2³ ⋅ 3² ⋅ 13
-937
- 2 ⋅ 7 ⋅ 67
-  3 ⋅ 313
- 2² ⋅ 5 ⋅ 47
-941
- 2 ⋅ 3 ⋅ 157
-  23 ⋅ 41
-   2⁴ ⋅ 59
-  3³ ⋅ 5 ⋅ 7
- 2 ⋅ 11 ⋅ 43
-947
- 2² ⋅ 3 ⋅ 79
-  13 ⋅ 73
-   2 ⋅ 5² ⋅ 19
-  3 ⋅ 317
- 2³ ⋅ 7 ⋅ 17
-953
- 2 ⋅ 3² ⋅ 53
-  5 ⋅ 191
-   2² ⋅ 239
-    3 ⋅ 11 ⋅ 29
-     2 ⋅ 479
-      7 ⋅ 137
-       2⁶ ⋅ 3 ⋅ 5
-      31²
-     2 ⋅ 13 ⋅ 37
-    3² ⋅ 107
-   2² ⋅ 241
-  5 ⋅ 193
- 2 ⋅ 3 ⋅ 7 ⋅ 23
-967
- 2³ ⋅ 11²
-  3 ⋅ 17 ⋅ 19
- 2 ⋅ 5 ⋅ 97
-971
- 2² ⋅ 3⁵
-  7 ⋅ 139
-   2 ⋅ 487
-  3 ⋅ 5² ⋅ 13
- 2⁴ ⋅ 61
-977
- 2 ⋅ 3 ⋅ 163
-  11 ⋅ 89
-   2² ⋅ 5 ⋅ 7²
-  3² ⋅ 109
- 2 ⋅ 491
-983
- 2³ ⋅ 3 ⋅ 41
-  5 ⋅ 197
-   2 ⋅ 17 ⋅ 29
-    3 ⋅ 7 ⋅ 47
-   2² ⋅ 13 ⋅ 19
-  23 ⋅ 43
- 2 ⋅ 3² ⋅ 5 ⋅ 11
-991
- 2⁵ ⋅ 31
-  3 ⋅ 331
-   2 ⋅ 7 ⋅ 71
-  5 ⋅ 199
- 2² ⋅ 3 ⋅ 83
-997
- 2 ⋅ 499
-  3³ ⋅ 37
-   2³ ⋅ 5³
-    7 ⋅ 11 ⋅ 13
-     2 ⋅ 3 ⋅ 167
-      17 ⋅ 59
-     2² ⋅ 251
-    3 ⋅ 5 ⋅ 67
-   2 ⋅ 503
-  19 ⋅ 53
- 2⁴ ⋅ 3² ⋅ 7
-1009
-...
+197                                 197                  
+ 2 ⋅ 3² ⋅ 11                         2 ⋅ 3² ⋅ 11                  
+199           (intruder prime)        199                  
+ 2³ ⋅ 5²                               2³ ⋅ 5²                  
+  3 ⋅ 67                                3 ⋅ 67                  
+   2 ⋅ 101                               2 ⋅ 101                  
+    7 ⋅ 29                                7 ⋅ 29                  
+     2² ⋅ 3 ⋅ 17                           2² ⋅ 3 ⋅ 17  (true midprime 204)
+      5 ⋅ 41  (impostor midprime)         5 ⋅ 41                  
+     2 ⋅ 103                             2 ⋅ 103                  
+    3² ⋅ 23                             3² ⋅ 23                  
+   2⁴ ⋅ 13                             2⁴ ⋅ 13                  
+  11 ⋅ 19                             11 ⋅ 19                  
+ 2 ⋅ 3 ⋅ 5 ⋅ 7                       2 ⋅ 3 ⋅ 5 ⋅ 7                  
+211                                 211                  
 \end{lstlisting}
+
+Exceptions tend to reveal the most structural information. There are two forces in conflict exactly here, and 199 won.
+
+210 is a primorial (2*3*5*7), and has a strong effect on local symmetry by consuming all the small primes. It is flanked by 204 and 216, 6 steps away, which reclaim primes 2 and 3, the most important to local structure. They also radiate symmetry, just not as strong as the primorial. 204 lights up that corridor.
+
+But the primorial radiation has no effect on the frequency 11. And indeed 11 steps away is 199, out of the primorial's control.
+
+*Every* integer "broadcasts" modular constraint in this way. Each is a mini-primorial of its own factors, and affects admissability on those frequencies in the local environment. 
+
+subsubsection{Prime Corridor Table}
+
+% This is a one-page listing showing factorizations up to 1000 in narrow columns.
+% It is intended to be an easy reference to show readers the structure. Extended
+% reference will be included in an appendix.
+
+% TODO - This is a placeholder with the columns formatted as text, replace with Latex
+
+\newpage
+\begin{lstlisting}
+#include "data/factorzig-1000-cols.txt"
+\end{lstlisting}
+
+
+# Prime triples
+
+Odd numbers over 6 can be represented as the sum of 3 primes. 
+
+\newpage
+\begin{lstlisting}
+#include "data/factorzig-1000-cols.txt"
+\end{lstlisting}
+
+
+
+
 
 
 \section{Collatz Conjecture}
@@ -1786,7 +723,6 @@ subsubsection{Integer Factorization Corridors}
 - Show convergence at only powers of two
 - Argument for termination
 
-
 ## Carry propagation
 
 - Each bit flipped in the avalanche shuffles the corresponding mod 2^k class, erasing low-order memory.
@@ -1810,49 +746,209 @@ subsubsection{Integer Factorization Corridors}
 - Note that the triangles correspond to contiguous up-runs of n.
 
 \begin{lstlisting}
-         base2        sym2 sym3         base3 dist    n                                               
-         11011         ▓░▓ ▒▒▒│          1000   41    27                                           ▓░▓▒▒▒│                                
-        101001        ░▓░░ █│││          1112   40    41                                         ░▓░░█│││                                                    
-         11111         ▓▓▓ ││▒│          1011   39    31                                         ▓▓▓││▒│                                                      
-        101111        ░▓▓▓ █▒█│          1202   38    47                                       ░▓▓▓█▒█│        ▓▓▓  47  │                          
-       1000111       ░░░▓▓ █│██          2122   37    71                                     ░░░▓▓█│██         ▓▓█  71  │          
-       1101011       ▓░▓░▓ ███▒│        10222   36   107                                    ▓░▓░▓███▒│         ▓██ 107  │                         
-      10100001      ░▓░░░░ ████│        12222   35   161                                  ░▓░░░░████│          ███ 161  v                         
-       1111001       ▓▓▓░░ │││││        11111   34   121                                  ▓▓▓░░│││││                                               
-       1011011       ░▓▓░▓ │▒│▒│        10101   33    91                                 ░▓▓░▓│▒│▒│                                                        
-      10001001      ░░░▓░░ █▒▒█│        12002   32   137                               ░░░▓░░█▒▒█│                                                        
-       1100111       ▓░░▓▓ ││█▒│        10211   31   103                               ▓░░▓▓│││█▒          ▓▓ 103  │
-      10011011      ░░▓▓░▓ █▒██│        12202   30   155                             ░░▓▓░▓█▒██│           ▓█ 155  │                    
-      11101001      ▓▓░▓░░ ██│██        22122   29   233                            ▓▓░▓░░██│██            ██ 233  v                          
-      10101111      ░▓░▓▓▓ │││▒█        20111   28   175                           ░▓░▓▓▓│││▒█        ▓▓▓ 175  │                              
-     100000111     ░░░░░▓▓ █▒█▒▒│      100202   27   263                         ░░░░░▓▓█▒█▒▒│        ▓▓█ 263  │                               
-     110001011     ▓░░░▓░▓ ██│█││      112122   26   395                        ▓░░░▓░▓██│█││         ▓██ 395  │                               
-    1001010001    ░░▓░▓░░░ ███▒│█      210222   25   593                      ░░▓░▓░░░███▒│█          ███ 593  v                               
-     110111101     ▓░▓▓▓▓░ ││││█│      121111   24   445                      ▓░▓▓▓▓░││││█│                                              
-      10100111      ░▓░░▓▓ █│▒▒█        20012   23   167                      ░▓░░▓▓█│▒▒█        ▓▓█ 167  │                                 
-      11111011      ▓▓▓▓░▓ ██▒▒▒│      100022   22   251                     ▓▓▓▓░▓██▒▒▒│        ▓██ 251  │                                 
-     101111001     ░▓▓▓▓░░ ███│││      111222   21   377                   ░▓▓▓▓░░███│││         ███ 377  v                             
-     100011011     ░░░▓▓░▓ ││││▒│      101111   20   283                  ░░░▓▓░▓││││▒│                       
-     110101001     ▓░▓░▓░░ █▒█▒█│      120202   19   425                 ▓░▓░▓░░█▒█▒█│                   1b
-     100111111     ░░▓▓▓▓▓ ││██▒│      102211   18   319                ░░▓▓▓▓▓││██▒│ ----------------- ▓▓▓▓▓        319  │
-     111011111     ▓▓░▓▓▓▓ █▒███│      122202   17   479               ▓▓░▓▓▓▓█▒███│                    ▓▓▓▓      █  479  │
-    1011001111    ░▓▓░░▓▓▓ ██│███      222122   16   719             ░▓▓░░▓▓▓██│███                     ▓▓▓      ██  719  │
-   10000110111   ░░░░▓▓░▓▓ ███▒│││    1110222   15  1079           ░░░░▓▓░▓▓███▒│││                     ▓▓  ->  ███ 1079  │
-   11001010011   ▓░░▓░▓░░▓ ████│▒█    2012222   14  1619          ▓░░▓░▓░░▓████│▒█                      ▓      ████ 1619  │
-  100101111101  ░░▓░▓▓▓▓▓░ █████▒▒│  10022222   13  2429        ░░▓░▓▓▓▓▓░█████▒▒│ -------------------------- █████ 2429  v
-    1110001111    ▓▓░░░▓▓▓ █▒█▒█▒│    1020202   12   911         ▓▓░░░▓▓▓█▒█▒█▒│       ▓▓▓█  911  │             2t
-   10101010111   ░▓░▓░▓░▓▓ ██│█│█│    1212122   11  1367       ░▓░▓░▓░▓▓██│█│█│        ▓▓██ 1367  │           
-  100000000011  ░░░░░░░░░▓ ███▒│██    2210222   10  2051     ░░░░░░░░░▓███▒│██         ▓███ 2051  │                
-  110000000101  ▓░░░░░░░▓░ ████│▒││  11012222    9  3077    ▓░░░░░░░▓░████│▒││         ████ 3077  v       
-    1001000001    ░░▓░░░░░ │▒│▒│█      210101    8   577     ░░▓░░░░░│▒│▒│█                             
-     110110001     ▓░▓▓░░░ │▒▒│█│      121001    7   433     ▓░▓▓░░░│▒▒│█│                                      
-     101000101     ░▓░░░▓░ │▒▒▒││      110001    6   325    ░▓░░░▓░│▒▒▒││                                                 
-        111101        ▓▓▓░ │█▒█          2021    5    61      ▓▓▓░│█▒█                                     
-         10111         ░▓▓ █│█▒          0212    4    23      ░▓▓█│█▒       ▓▓█ 23  │
-        100011        ░░░▓ ██▒│          1022    3    35    ░░░▓██▒│        ▓██ 35  │ 
-        110101        ▓░▓░ ███│          1222    2    53   ▓░▓░███│         ███ 53  v
-           101           ░ █│              12    1     5     ░█│                                               
-             1             │                1    -     1      │              
+#include "data/between-bases.txt"
+\end{lstlisting}
+
+
+\subsection{Bit mutation}
+
+This is a look at how the *3 and +1 operations change the bits of a number.
+
+In general, multiplying by 3:
+
+- Changes 1 bit into 2:   `1` -> `11`
+- Changes 2 bits into 4: `11` -> `1001`
+- Does it again on those two individual 1 bits: `1001` -> `11011`
+- Now it goes to hell: both `11` turn to `1001`, but overlap, giving -> `1010001`. The middle bit has been pushed one left
+
+```
+ 1                  1   1 -> 11  
+*3                 11   11 -> 1001
+*3               1001   1001 -> 1 0 01 -> 11 0 11 
+*3              11011   11011 -> 1001000 + 1001 -> 1010 001
+*3            1010001    
+*3           11110011    
+*3         1011011001    
+*3       100010001011    
+*3      1100110100001    
+*3    100110011100011    
+*3   1110011010101001    
+*3 101011001111111011    
+```
+
+Now starting at a random power of two. Note the bit pattern is the same, but shifted left.
+The influence of *3 never goes _lower_ than the lowest bit it starts from.
+
+```
+32                  100000      
+*3                 1100000     
+*3               100100000     
+*3              1101100000     
+*3            101000100000     
+*3           1111001100000     
+*3         101101100100000     
+*3       10001000101100000     
+*3      110011010000100000     
+*3    10011001110001100000 
+*3   111001101010100100000 
+*3 10101100111111101100000 
+```
+
+Now one bit at 1 and one at 32. The influence of MSB and LSB collides quickly.
+
+```
+33                  100001    
+*3                 1100011    
+*3               100101001    
+*3              1101111011    
+*3            101001110001    
+*3           1111101010011    
+*3         101110111111001    
+*3       10001100111101011    
+*3      110100110111000001    
+```
+
+Doing 3n+1 but without /2 normalization, low and high diverge immediately. The +1 turns the low `11` into `100`, which then spawns another `11` etc,
+
+```
+33                  100001    
+*3+1               1100100    
+*3+1             100101101    
+*3+1            1110001000    
+*3+1          101010011001    
+*3+1         1111111001100    
+*3+1       101111101100101    
+*3+1     10001111000110000    
+*3+1    110101101010010001    
+```
+
+
+The full Collatz odd-to-odd step:
+
+```
+33                  100001    
+*3+1  /2s            11001    
+*3+1  /2s            10011    
+*3+1  /2s            11101    
+*3+1  /2s             1011    
+*3+1  /2s            10001    
+*3+1  /2s             1101    
+*3+1  /2s              101    
+*3+1  /2s                1    
+```
+
+No correlation seen once the bits are offset, they interfere with each other immediately.
+
+
+\subsection{A burning fractal}
+
+This is a Collatz odd-to-odd trace of 1 and a single very high bit set.
+
+- It is aligned on the MSB, and binary 0/1 have been replaced with ░/█ to make patterns more clear.
+- Note the CA-style fractal with triangles etc being pushed down from the MSB, one column per step.
+- Right triangles of 1 and 0, different sizes, emerge in a self-similar but non-cycling infinite progression.
+- But carry propagation rolls over the LSB in one step: it is powerless in isolation.
+- Once the LSB and fractal meet, carry propagagion begins to "burn" the trailing edge of the fractal.
+
+\subsubsection{Collatz odd-to-odd orbit of (1 << 100) + 1}
+
+\begin{lstlisting}
+#include "data/burning-triangle.txt"
+\end{lstlisting}
+
+- When the LSB "catches" a white triangle, this corresponds to an up-run in Collatz, with no k-drops, just one /2 per iteration
+- 1.5x growth quickly increases the magnitude of n, and as the MSB "pushes down" the MSB the white triangle bleeds right.
+- These white triangles are the only defense the MSB has against the approaching wavefront of carry propagation.
+- When the carry eventually reaches the MSB, it will flip to a power of two, ending the game.
+
+\begin{lstlisting}
+#include "data/burning-triangle-detail.txt"
+\end{lstlisting}
+
+
+Because the MSB is isolated from +1, and only (mostly) mutating because of 3n, the pristine fractal can be generated closed form: 3^t, for any timestep t. 
+
+\begin{lstlisting}
+1                 =  3^0   (1)
+11                =  3^1   (3)
+1001              =  3^2   (9)
+11011             =  3^3   (27)
+1010001           =  3^4   (81)
+11110011          =  3^5   (243)
+1011011001        =  3^6   (729)
+100010001011      =  3^7   (2187)
+1100110100001     =  3^8   (6561)
+100110011100011   =  3^9   (19683)
+1110011010101001  =  3^10  (59049)
+\end{lstlisting}
+
+Once the carry bit reaches the right edge of the fractal, row-by-row calculation of 3n+1 is needed again, to propagate the differences in the last bits, caused by the carry. But *only* those last bits. 
+Everything to the left of the latest carry event can *still* be found in the top bits of 3^(some value of t), and that will be true all the way to termination.
+This partitions the bits of n into two sequences.
+
+
+## Vertical channels of bits
+
+Here is the 3^t expansion, aligned on the LSB.
+
+Both 0 and 1 appear robustly connected... almost all areas of 0 or 1 (░ or █) are contiguous and can be walked orthogonally, bit by bit. 
+Single disconnected bits are "framed" in an orderly fashion. You can walk around them.
+
+\begin{lstlisting}
+#include "data/align-raw.txt"
+\end{lstlisting}
+
+Here is a version that's been despeckled and eroded to aid [human] pattern recogition by removing visual clutter.
+
+\begin{lstlisting}
+#include "data/align-eroded.txt"
+\end{lstlisting}
+
+Both 0 (░) and 1 (█) are seen to have unbroken bands of vertical connectivity:
+
+\begin{lstlisting}
+#include "data/align-paths.txt"
+\end{lstlisting}
+
+
+
+# Neighbor factor sets
+
+Some things to note:
+- n is shown between the odd factorizations of its neighbors
+- The right neighbor shows perfect power-of-three scaling during upruns
+- The left neighbor often holds a factor set for multiple iterations otherwise
+- For example, at n=1062881 a long uprun of nr (powers of 3) ends, and nl takes over, holding {5 7 13 73} for 3 iterations, after which nr holds {11 43 79} for 4 iterations, etc.
+- In general, nl tends to be smooth with lots of factors
+- The factor set of n itself appears to cycle combinations of small and large factors
+
+\begin{lstlisting}
+#include "data/neighbor-factors-6471.txt"
+\end{lstlisting}
+
+The orbit of n = 27 is below, but first here's a snippet that shows a pattern to watch for:
+
+\begin{lstlisting}
+  n, ofactorsl, factors, ofactorsr, m3,  m5,  m7, m11, m13, m17, m19, m23, m29, m31
+ 91,     {3 5},  {7 13},    {23},   (1), (1), *0,   3,  *0,   6,  15, |22|,  4,  29
+137,      {17},   {137},  {3 23},    2,   2,   4,   5,   7,  (1),  4, |22|, 21,  13   # nr holding 23, nl switches to 17
+103,    {3 17},   {103},    {13},   (1),  3,   5,   4, |12|, (1),  8,  11,  16,  10   # nl holding 17, nr switches to 13
+155,    {7 11},  {5 31},  {3 13},    2,  *0,  (1), (1),|12|,  2,   3,  17,  10,  *0   # nr holding 13, nl switches to {7 11}
+233,      {29},   {233},  {3 13},    2,   3,   2,   2, |12|, 12,   5,   3,  (1), 16   # nr holding 13, nl switches to {29}
+175,    {3 29},   {5 7},    {11},   (1), *0,  *0, |10|,  6,   5,   4,  14,  (1), 20   # nl holding 29, nr switches to 11
+263,     {131},   {263},  {3 11},    2,   3,   4, |10|,  3,   8,  16,  10,   2,  15   # nr holding 11, ml switches to 131
+\end{lstlisting}
+
+- The power-of-3 scaling behavior of nr holds a set of factors at residue -1, marked in bars here for visibility. For example |22| is -1 mod 23, |12| is -1 mod 13, etc.
+- While this happens, nl aligns prime factors moduli at (1), then rolls them over to 2.
+- A 1-1-2 pattern is seen sometimes (see m17 and 29 here) where nl holds a modulus to (1) while nr changes factors, and then rolls over.
+- The factors of n are marked *0 in the residue columns. They show the cursor radical being burned.
+- In short: Collatz holds (n+1)'s factors at residue -1 while systematically rolling n's factors 0->1 and (n-1)'s factors 1->2.
+
+The full trajectory of 27:
+
+\begin{lstlisting}
+#include "data/neighbor-factors-27.txt"
 \end{lstlisting}
 
 
@@ -1888,6 +984,48 @@ TODO: argue for termination through loss of entropy?
 
 - Linking odd numbers to the odd cores of their even neighbors forms a self-similar directed graph over odd integers, terminating at 1.
 
+\subsection{Odd core connectivity graph}
+
+% PLACEHOLDER - rough description follows
+
+At the base is 1, above it is 3. 
+Above and to the sides of 3 are 5 and 7, linking down to 3 and  1.
+Next row up 9, 11, 13, 15, linking down in turn, one link to the row below, one a skip link. This is a universal pattern.
+It continues like this, every row starting with a power of two + 1 and ending with a power of two - 1.
+The outside edge of the graph (powers of two +/- 1) has skip links down to 1.
+Values of n along the center (the odd neighbors of 6, 12, 24, 48, etc) skip link down to 3.
+The connectivity is recursive, splitting the graph. 39 and 41 link to 5, like all numbers on the "center line" of that branch. 55 and 57 link to 7.
+Of odd numbers 1 - 63 inclusive, only 27, 45, and 63 are not primes or radicals.
+27 has known long stopping time. 45 stops after 4 steps.
+Increasing depth, we see composites at 75, 81, 99, 117, 125. These are higher powers of small primes, and a multiple of their radicals.
+There is great regularity in the graph, but because individual primes are unevenly spaced on the number line, they are also so in the hierarchy, exploring the space of relative positions.
+
+% TODO - generate visualization, this is the raw .dot for placeholder
+
+\begin{lstlisting}
+#include "data/ocg127.dot"
+\end{lstlisting}
+
+
+\subsection{Odd core graph of stopping times}
+
+Considering the stopping times of the graph nodes instead of the odd n they represent, I note a couple of patterns:
+
+% PLACEHOLDER - rough description follows
+
+In many, but not all, cases the "center line" of a sub tree has long stopping time nodes.
+The right side of the tree contains many nodes with stopping time 2. The left side has zero.
+The left side has many nodes with stopping time 3, but the right has none of those.
+There are actually very few duplicated stopping times left to right in the main tree for the first 3 levels.
+Many orbits are "switching sides" every iteration as they near the end.
+
+% TODO - generate visualization, this is the raw .dot for placeholder
+
+\begin{lstlisting}
+#include "data/ocg127-dist.dot"
+\end{lstlisting}
+
+
 [Diagram of odd core graph to 31 in top half of page with explanation underneath]
 
 - General topology
@@ -1916,14 +1054,15 @@ TODO: argue for termination through loss of entropy?
 - For odd n, it will be one of (>1, 1, 1, >1) or (1, >1, >1, 1).
 - The Collatz process can run directly fingerprints; you don't need to use n at all.
 
-[Automaton implementation, one page]
-
+TODO:
 - Explain updating neighbor k without re-valuation
 - Explain predicting avalanche using neighbor low bits
 
-[Empirical data: automaton transition statistics]
+\begin{lstlisting}
+#include "automaton.py"
+\end{lstlisting}
 
-- Argument for termination by automaton
+[TODO - Empirical data: automaton transition statistics]
 
 ## Symbolic analysis
 
@@ -1931,15 +1070,13 @@ TODO: argue for termination through loss of entropy?
 - Explain isomorphism to arithmetic
 
 [Case study: trace one odd-to-odd step of Minsky's two-tag machine, show that it's an unrolled carry-propagator isomorphic to the Collatz arithmetic]
-
-
-
-
-
+[This was done for 27, format the (long) trace in multiple columns]
 
 \section{Goldbach Conjecture}
 
-Rough notes:
+[rubs eyes and stands, disoriented]
+
+<soapbox>
 - So the *Goldbach* conjecture is that every even integer 2n above two can be expressed as the sum of two primes p1 and p2. It can be restated this way: for every integer n > 1, there exists an offset d (0 <= d < n) such that both n-d and n+d are prime.
 - For this to be true, they must both survive the Sieve of Eratosthenes, meaning for any prime r < sqrt(n+d), neither n-d nor n+d can be divisible by r.
 - The process can be seen as a double-sieve, every prime r knocking out values of d that would make either n-d or n+d composite.
@@ -1959,6 +1096,7 @@ Rough notes:
 - A prime p can only be a potential common factor of both n-d and n+d if p is a prime factor of 2n itself. For any sieving prime r that does not divide 2n, it is structurally impossible for n-d and n+d to be simultaneously divisible by r.
 - As d increases, the set of its prime factors rad(d) changes. The primality of n-d requires that rad(n-d) and rad(d) must be disjoint. This imposes a constraint: d is forced to be composed of primes that are not currently factors of n-d.
 - The simplest implementation of this dual sieve: let D = {1 <= d < n}, and for each prime r <= sqrt(2n), remove from D the d such that n-d ≡ 0 mod r, or n+d ≡ 0 (mod r). By inclusion/exclusion and the CRT, the number of surviving d is at least n ∏_{p ≤ √(2n)} (1 - 2/p). For finite n, this number is positive, meaning there is always a surviving d such that n-d and n+d are coprime to all p≤2n, and therefore themselves prime.
+
 - Another way to express Goldbach is this: given a complete set of small primes, every even number *up to the next prime* is covered by an additive combination (a pair) from that set.
 - If the Goldbach conjecture holds then, we can consider the first *gap* in even additive coverage after the largest prime an upper bound for the location of the next prime: p_{n+1} <= gap - 3.
 - To stay in the multiplicative domain, let's define "harmonic addition" as multiplication by a correction factor (related to their harmonic mean) that produces the correct sum.
@@ -1968,41 +1106,20 @@ Rough notes:
 - The matrix of prime products is symmetric (pq=qp), and likewise the one of their harmonic sums, because ha(p, q) = ha(q, p).
 - This k-symmetry manifests in a "corridor" of composite numbers between successive primes.
 - A local guarantee that even numbers between primes are covered by additive combinations (i.e. Goldbach partitions) would lift to infinity.
+</soapbox>
+
+[sighs]
 
 
-\section{Riemann Hypothesis}
+<soapbox>
+- Also twin prime centers are anti-primes.
+</soapbox>
 
-Rough notes, work in progress:
-
-Recall the zig-zag corridors of composite properties between primes. There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a crystal clear bird-of-prey motif. But since it's prime, it resets the indentation and throws off a much more likely-looking midprime (204):
-
-```
-197                                 197                  
- 2 ⋅ 3² ⋅ 11                         2 ⋅ 3² ⋅ 11                  
-199           (intruder prime)        199                  
- 2³ ⋅ 5²                               2³ ⋅ 5²                  
-  3 ⋅ 67                                3 ⋅ 67                  
-   2 ⋅ 101                               2 ⋅ 101                  
-    7 ⋅ 29                                7 ⋅ 29                  
-     2² ⋅ 3 ⋅ 17                           2² ⋅ 3 ⋅ 17  (true midprime 204)
-      5 ⋅ 41  (impostor midprime)         5 ⋅ 41                  
-     2 ⋅ 103                             2 ⋅ 103                  
-    3² ⋅ 23                             3² ⋅ 23                  
-   2⁴ ⋅ 13                             2⁴ ⋅ 13                  
-  11 ⋅ 19                             11 ⋅ 19                  
- 2 ⋅ 3 ⋅ 5 ⋅ 7                       2 ⋅ 3 ⋅ 5 ⋅ 7                  
-211                                 211                  
-```
-
-Exceptions reveal the most structural information. There are two forces in conflict exactly here, and 199 won. 197 and 211 have a clear symmetrical relationship, with 199 awkwardly pasted in. This could either represent an "intruder" prime in the corridor, or indicate there was just a hole in a larger pattern which 199 manifested to fill. Either way, it presents a defect in local symmetry.
-
-
+[runs away]
 
 \newpage
 \begin{appendices}
-
 \end{appendices}
-
 \end{document}
 
 % This is work in progress and of course proves nothing about anything; standard disclaimers apply.
