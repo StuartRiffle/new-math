@@ -547,27 +547,6 @@ A new property is visible: self-similarity. A section has been re-indented to hi
 4327
 ```
 
-There are many places where an imperfect instance of the pattern can be found too. Below, you can see that if 199 was *not* a prime, it would be part of a clear bird-of-prey motif. But as a prime, it resets the indentation and throws off a much more likely-looking midprime at 204:
-
-```
-197                   197                  
- 2 ⋅ 3² ⋅ 11           2 ⋅ 3² ⋅ 11                  
-199                     199                  
- 2³ ⋅ 5²                 2³ ⋅ 5²                  
-  3 ⋅ 67                  3 ⋅ 67                  
-   2 ⋅ 101                 2 ⋅ 101                  
-    7 ⋅ 29                  7 ⋅ 29                  
-     2² ⋅ 3 ⋅ 17             2² ⋅ 3 ⋅ 17                  
-      5 ⋅ 41                5 ⋅ 41                  
-     2 ⋅ 103               2 ⋅ 103                  
-    3² ⋅ 23               3² ⋅ 23                  
-   2⁴ ⋅ 13               2⁴ ⋅ 13                  
-  11 ⋅ 19               11 ⋅ 19                  
- 2 ⋅ 3 ⋅ 5 ⋅ 7         2 ⋅ 3 ⋅ 5 ⋅ 7                  
-211                   211                  
-```
-
-I believe these exceptions reveal the most structural information. There are two forces in conflict exactly here, and 199 won.
 
 There is a fixed accordion of internally symmetrical structures at different frequencies too. For example, there is strong regularity in cycles of both 4 and 6, regardless of prime position. They cycle different *sorts* of properties, with their own schedule of symmetry.
 

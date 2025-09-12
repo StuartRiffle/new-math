@@ -16,6 +16,8 @@ arg.add_argument("--cols", type=str, default='oc,k,dist,factors,orbit')
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
 arg.add_argument("--odds", action="store_true")
+arg.add_argument("--evens", action="store_true")
+arg.add_argument("--primes", action="store_true")
 arg.add_argument("--output-file", type=str, default=None)
 arg.add_argument("--column-info", action="store_true")
 arg.add_argument("--header-line", action="store_true")
@@ -232,7 +234,7 @@ def get_radical(n):
 def reverse_string(s):
     return s[::-1]
 
-def align_delimeters(items, delim=','):
+def align_delimiters(items, delim=','):
     col_width = {}
     for item in enumerate(items):
         elems = item.split(delim)
@@ -851,8 +853,8 @@ def calc_n_values(n):
     pierr = val['pi'] - piest
     val['pierr'] = f'{pierr:.3f}'
 
-    col_desc['primedist'] = f'the distance from {paramname} to the nearest prime'
-    val['primedist'] = get_dist_to_prime(param)
+    col_desc['pdist'] = f'the distance from {paramname} to the nearest prime'
+    val['pdist'] = get_dist_to_prime(param)
 
     col_desc['primetriples'] = f'all combinations of three primes that sum to {paramname}, if {paramname} > 5'
     val['primetriples'] = get_additive_triples(param) if param > 5 else ''
@@ -1144,7 +1146,7 @@ column_to_symbol = {
 }
 
 ljust_by_default = [
-    'factor'
+    'factor',
     'psym',
     'mask',
 ]
@@ -1358,6 +1360,10 @@ def print_table():
     ns = []
     for n in range(arg.min, arg.max + 1):
         if arg.odds and n % 2 == 0:
+            continue
+        if arg.evens and n % 2 == 1:
+            continue
+        if arg.primes and not isprime(n):
             continue
         ns.append(n)
     
