@@ -43,7 +43,7 @@ arg.add_argument("--burn-reverse", action="store_true")
 arg.add_argument("--count-factors", action="store_true")
 arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
-arg.add_argument("--mask-symbols", type=str, default=' X')
+arg.add_argument("--mask-symbols", type=str, default=' ■')
 arg.add_argument("--column-symbols", action="store_true")
 arg.add_argument("--psym-limit", type=int, default=12)
 arg.add_argument("--markdown", action="store_true")
@@ -692,6 +692,8 @@ def get_smallest_prime_factor(n):
     return min(fac.keys())
 
 
+VOLATILITY_BASIS = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199]
+
 def get_residue_volatility_abs(n):
     volatility = 0
     for p in primerange(2, int(sqrt(n)) + 1):
@@ -703,8 +705,18 @@ def get_residue_volatility(n):
     volatility = 0
     for p in primerange(2, int(sqrt(n)) + 1):
         r = n % p
-        volatility += r * 1.0 / p
+        if r > 0:
+            volatility += r * 1.0 / p
     return volatility
+
+def get_normalized_rvol(n):
+    volatility = 0
+    harmonic_sum = 0
+    for p in primerange(2, int(sqrt(n)) + 1):
+        r = n % p
+        volatility += r * 1.0 / p
+        harmonic_sum += 1.0 / p
+    return volatility / harmonic_sum if harmonic_sum > 0 else 0
 
 def get_residue_volatility_signed(n):
     volatility = 0
@@ -715,6 +727,14 @@ def get_residue_volatility_signed(n):
         volatility += r * 1.0 / p
     return volatility
 
+def get_tension_weighted_rvol(n):
+    volatility = 0
+    for p in primerange(2, int(sqrt(n)) + 1):
+        r = n % p
+        # Weight by how far from "relaxed" positions (0 or p-1)
+        tension = min(r, p - r) / (p // 2)
+        volatility += tension / p
+    return volatility
 
 def get_harmonic_sum(n):
     # sum 1/p for all factors p
@@ -913,6 +933,12 @@ def calc_n_values(n):
     col_desc['rvol'] = f'the residue volatility of {paramname}, the sum of the prime residues of {paramname} weighted by 1/p'
     val['rvol'] = f'{get_residue_volatility(param):.3f}'
 
+    col_desc['rvoln'] = f'the residue volatility of {paramname} (the sum of the prime residues of {paramname} weighted by 1/p) normalized by harmonic mean'
+    val['rvoln'] = f'{get_normalized_rvol(param):.3f}'
+
+    col_desc['rvolt'] = f'the residue volatility of {paramname} (the sum of the prime residues of {paramname} weighted by 1/p) weighted by prime gap tension'
+    val['rvolt'] = f'{get_tension_weighted_rvol(param):.3f}'
+
     col_desc['rvolabs'] = f'the absolute residue volatility of {paramname}, the sum of the prime residues of {paramname}'
     val['rvolabs'] = f'{get_residue_volatility_abs(param):.3f}'
 
@@ -972,7 +998,7 @@ def calc_n_values(n):
 
     facsep = ', '
     if arg.factor_dots:
-        facsep = '⋅'
+        facsep = ' ⋅ ' if arg.pad else '⋅'
 
     factors_str = facsep.join([str(f) for f in all_factors])
     if factors_str not in unique_factor_sets:
