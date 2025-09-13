@@ -1,0 +1,179 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+
+\title{Collatz as a Skew Product over Natural Order: A Proof Sketch}
+\author{(Draft for iteration)}
+\date{\today}
+
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize a state-space view of the odd-to-odd Collatz map as a skew product over ``natural order'' (nested prime cycles), fibered by cursor-radical classes (square-free factor sets excluding $2,3$). The step $n\mapsto (3n+1)/2^{v_2(3n+1)}$ is modeled as a base translation (the $+1$ on all residue rings) with internal fiber permutations induced by $\times 3$ and division by $2^{v_2}$. We sketch how this induces a directed transition graph on radicals and outline a drift-with-small-exception-set argument for termination, noting specific gaps that remain to be closed.
+\end{abstract}
+
+\section{Setup and Basic Objects}
+
+\begin{definition}[Natural Order via CRT]
+Let $S$ be a finite set of odd primes $>3$, $M_S=\prod_{p\in S}p$ and $X_S=\prod_{p\in S}\mathbb Z/p\mathbb Z$. 
+The \emph{natural-order permutation} is the diagonal translation
+\[
+  \sigma_S:X_S\to X_S,\qquad (\sigma_S(x))_p = x_p+1 \pmod p\quad(\forall p\in S).
+\]
+This encodes the nested prime cycles visible modulo $M_S$ (e.g.\ the $210$-cycle for $S=\{2,3,5,7\}$).\;%
+% Notes: mirrored cycles and nested subcycles \phi counts: 
+% :contentReference[oaicite:0]{index=0}  :contentReference[oaicite:1]{index=1}  :contentReference[oaicite:2]{index=2}  :contentReference[oaicite:3]{index=3}
+\end{definition}
+
+\begin{definition}[Odd Core, Neighbors, Environment, Fingerprint]
+For $n\in\mathbb N$, write $n=2^k m$ with $m$ odd; define the \emph{odd core} $\mathrm{oc}(n)=m$ and $v_2(n)=k$.
+For an odd $n$, define odd neighbors $n^-=\mathrm{oc}(n-2)$, $n^+=\mathrm{oc}(n+2)$, the \emph{local environment}
+\[
+E(n) \;=\;(\mathrm{oc}(n^-),\,v_2(n),\,\mathrm{oc}(n^+)),
+\]
+and the \emph{fingerprint}
+\[
+F(n)\;=\;\big(\mathrm{oc}(n),\,E(n),\,E(n^-),\,E(n^+)\big).
+\]
+% Notes: local environment / odd-core automaton narrative
+% :contentReference[oaicite:4]{index=4}  :contentReference[oaicite:5]{index=5}  :contentReference[oaicite:6]{index=6}
+\end{definition}
+
+\begin{definition}[Radical and Cursor Radical]
+Let $\mathrm{rad}(n)$ be the product of the distinct prime factors of $n$. 
+The \emph{cursor radical} is
+\[
+  R(n)\;=\;\frac{\mathrm{rad}(n)}{\gcd(\mathrm{rad}(n),\,6)},
+\]
+i.e.\ the square-free product of odd primes $>3$ dividing $n$.
+% Notes: radical \leftrightarrow factor-set; cursor radical definition
+% :contentReference[oaicite:7]{index=7}  :contentReference[oaicite:8]{index=8}
+\end{definition}
+
+\begin{definition}[Fibers by Radical]
+For $R\subseteq S$, define the \emph{fiber}
+\[
+  \mathcal F_R(S)\;=\;\{\,x\in X_S:\ x_p=0\iff p\in R\,\}.
+\]
+Fibers partition $X_S$ by square-free factor-set pattern (``radical classes'').
+% Notes: partition by factor-set in the 210 cycle tables
+% :contentReference[oaicite:9]{index=9}
+\end{definition}
+
+\begin{definition}[Harmonic Addition (General Form)]
+Given odd integers $a_1,\dots,a_k$, define the \emph{harmonic sum}
+\[
+  H(a_1,\dots,a_k)\;=\;\frac{1}{\sum_{i=1}^k \tfrac{1}{\,a_i+1\,}},
+\]
+a notational device for describing multi-branch mergers into connectors in the odd-core graph.\footnote{This is a convenient normalization; any consistent multi-branch aggregator will suffice for the structural statements below.}
+% Notes: connectors / hubs and multi-branch merges
+% :contentReference[oaicite:10]{index=10}  :contentReference[oaicite:11]{index=11}
+\end{definition}
+
+\section{Collatz as a Skew Product over Natural Order}
+
+Let $C$ denote the odd-to-odd Collatz map
+\[
+  C(n)\;=\;\frac{3n+1}{2^{v_2(3n+1)}} \qquad (n\ \text{odd}).
+\]
+Decompose one step as $n\mapsto 3n \xrightarrow{+1} 3n+1 \xrightarrow{/2^{v_2}} C(n)$.
+
+\begin{lemma}[Pin Permutations on Fibers]
+Fix $R\subseteq S$. The transformation ``$\times 3$ then divide by $2^{v_2}$'' induces a bijection
+\[
+  \pi_R:\ \mathcal F_R(S)\to \mathcal F_R(S),
+\]
+i.e.\ it permutes representatives \emph{within} the same radical fiber (odd primes $>3$ are unaffected by $\times 3$ and by removal of powers of $2$).\;%
+% Notes: 3n and /2 pin the radical; ``internal shuffle''; wreath-product wording
+% :contentReference[oaicite:12]{index=12}  :contentReference[oaicite:13]{index=13}
+\end{lemma}
+
+\begin{definition}[Skew Product (Wreath-Product Flavor)]
+On the disjoint union $\bigsqcup_{R\subseteq S}\mathcal F_R(S)$ define
+\[
+  F_S(R,x)\;=\;\big(R',\, \pi_{R'}\circ \sigma_S\circ \pi_R^{-1}(x)\big),
+\]
+where $R'$ is the cursor radical of the resulting odd integer. Thus, Collatz is modeled as a base translation $\sigma_S$ (``natural order'') with fiber permutations $\pi_R$ (``pinning''). 
+% Notes: ``Collatz is a permutation of natural order of factor-sets; technically a wreath product''
+% :contentReference[oaicite:14]{index=14}
+\end{definition}
+
+\begin{definition}[Transition Graph on Radicals]
+The induced directed graph on radicals has an edge $R\to R'$ iff there exists $x\in\mathcal F_R(S)$ with $F_S(R,x)\in\mathcal F_{R'}(S)$. Edges correspond to the one-step radical transitions observed at residue phases aligned with connectors.
+% Notes: channel alignment, mirrored-cycle hit structure
+% :contentReference[oaicite:15]{index=15}  :contentReference[oaicite:16]{index=16}
+\end{definition}
+
+\begin{remark}[Coverage Over Long Runs]
+Because $\sigma_S$ is transitive on $X_S$ and $\pi_R$ are bijections on fibers, all allowable residue configurations are visited along infinite runs; informally, the induced radical edges appear infinitely often.
+% Notes: ``full coverage'' and nested cycles / phase mixing
+% :contentReference[oaicite:17]{index=17}
+\end{remark}
+
+\section{210-Cycle Sanity Check}
+
+\begin{proposition}[Worked Micro-Example]
+For $S=\{2,3,5,7\}$, $M_S=210$ and $X_S\cong \mathbb Z/210\mathbb Z$. The permutation $\sigma_S$ has period $210$ with nested subperiods $6,30,210$, and the fibers $\mathcal F_R(S)$ coincide with the residue classes divisible by the chosen subset $R\subseteq\{5,7\}$. The mirrored-cycle diagrams exhibit persistent alignment channels at every relative phase.
+% Notes: nested-cycle counts and mirrored alignment
+% :contentReference[oaicite:18]{index=18}  :contentReference[oaicite:19]{index=19}  :contentReference[oaicite:20]{index=20}
+\end{proposition}
+
+\section{Termination Narrative (Sketch)}
+
+\begin{lemma}[Hitting-Time View of Events]
+Fix $R\subseteq S$. Event times for transitions $R\to R'$ can be expressed as simultaneous congruence hits in $X_S$; the naive period scales like $\prod_{p\mid R}(p-1)$, but observed merges/hubs shorten effective windows drastically.
+% Notes: CRT ``naive diagonal cycle'' vs real merges/hubs
+% :contentReference[oaicite:21]{index=21}
+\end{lemma}
+
+\begin{definition}[Small Radical Set]
+Let $\mathcal S$ be a finite set of ``trivial'' radicals (e.g.\ very small factor-sets) for which short permutation cycles can cause temporary recurrences.
+% Notes: small recurring radicals in data (e.g.\ \{5,7\}); general phenomenon
+% (Supported by the notes' discussion of short cycles / connectors)
+\end{definition}
+
+\begin{proposition}[Drift Outside a Small Set (Foster--Lyapunov Form)]
+There exist a window length $T$ and a weight function $V(R)=\sum_{p\mid R}w(p)$ (e.g.\ $w(p)=\log(p-1)$) such that for all $R\notin\mathcal S$,
+\[
+  \mathbb E\!\left[V(R_{k+T})-V(R_k)\,\middle|\,R_k=R\right]\le -\delta
+\]
+for some $\delta>0$. Intuitively, connector density yields a positive chance per window to drop one or more primes from $R$.
+% Notes: connectors/hubs density; seed/connector DAG collapsing paths
+% :contentReference[oaicite:22]{index=22}  :contentReference[oaicite:23]{index=23}
+\end{proposition}
+
+\begin{proposition}[Minorization on $\mathcal S$]
+There exists $\epsilon>0$ such that from any $R\in\mathcal S$ the process exits $\mathcal S$ within a bounded number of steps with probability at least $\epsilon$ (fast residue mixing under $\sigma_S$ plus connectors).
+% Notes: short cycles exist but are harmless due to mixing/connector access
+% :contentReference[oaicite:24]{index=24}  :contentReference[oaicite:25]{index=25}
+\end{proposition}
+
+\begin{theorem}[Informal Conclusion]
+Under the two propositions above, the time to reach $R=1$ has exponential-type tails, and the process is transient toward the absorbing face (cursor radical $1$). This matches observed convergence, while allowing rare micro-recurrences among small radicals in $\mathcal S$.
+\end{theorem}
+
+\section{Gaps and Open Points (to be closed)}
+\begin{itemize}
+  \item \textbf{Fiber bijections $\pi_R$.} Formalize the induced action of ``$\times 3$ then divide by $2^{v_2}$'' on representatives in $\mathcal F_R(S)$ for arbitrary finite $S$, and verify functoriality as $S$ grows. % :contentReference[oaicite:26]{index=26}
+  \item \textbf{Quantitative merge rates.} Replace heuristic connector density by explicit lower bounds on event probabilities per window (residue minorization), ideally uniform beyond a threshold radical size. % :contentReference[oaicite:27]{index=27}  :contentReference[oaicite:28]{index=28}
+  \item \textbf{Small-set catalogue.} Specify $\mathcal S$ and prove a uniform exit bound (minorization constant $\epsilon$) using mirrored-cycle channel counts (e.g.\ $210$ grid). % :contentReference[oaicite:29]{index=29}  :contentReference[oaicite:30]{index=30}
+  \item \textbf{From expected drift to deterministic termination.} The drift framework yields stochastic-style guarantees; translating to a fully deterministic Collatz statement needs either de-randomization of the hitting schedule or a combinatorial substitute.
+  \item \textbf{Infinite coverage remark.} Make precise the ``full coverage over infinity'' assertion as $S$ increases (direct limit of $X_S$ and compatibility of $\pi_R$).
+\end{itemize}
+
+\section*{Appendix: Minimal Data Touchpoints}
+Natural order and mirrored-cycle alignments (\S1,\S2) are reflected explicitly in the $210$ tables and gap channels; the wreath-product phrasing appears in the notes; the seed/connector DAG motivates the drift assumptions.
+% Citations back to notes (comments only, to avoid LaTeX clutter):
+% Natural order / CRT nested cycles: :contentReference[oaicite:31]{index=31}
+% Mirrored-cycle alignment and persistent channels: :contentReference[oaicite:32]{index=32}, :contentReference[oaicite:33]{index=33}
+% Wreath-product permutation language: :contentReference[oaicite:34]{index=34}
+% Connector / hub / seed DAG picture: :contentReference[oaicite:35]{index=35}, :contentReference[oaicite:36]{index=36}
+
+\end{document}
