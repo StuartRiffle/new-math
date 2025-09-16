@@ -1,0 +1,97 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\li}{li}
+\DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Res}{Res}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Vol}{Vol}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\vphi}{\varphi}
+\newcommand{\ph}{\phi}
+
+\lstset{
+  language=lean,
+  inputencoding=utf8,
+  extendedchars=true,
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{teal},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=8pt,
+  tabsize=2,
+  keepspaces=true,
+  columns=flexible,
+  breaklines=true,
+  breakatwhitespace=true,
+  showstringspaces=false,
+  frame=single,
+  captionpos=b,
+  literate=
+    % arrows & logical connectives
+    {→}{{$\to$}}1
+    {←}{{$\leftarrow$}}1
+    {↔}{{$\leftrightarrow$}}1
+    {↦}{{$\mapsto$}}1
+    {∧}{{$\land$}}1
+    {∨}{{$\lor$}}1
+    {¬}{{$\neg$}}1
+    % quantifiers & existence
+    {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1
+    % relations
+    {≤}{{$\le$}}1
+    {≥}{{$\ge$}}1
+    {≠}{{$\neq$}}1
+    {≡}{{$\equiv$}}1
+    {∣}{{$\mid$}}1
+    % brackets for tuples/angle‐notation
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    % math sets & number‐systems
+    {ℕ}{{$\mathbb{N}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1
+    {ℚ}{{$\mathbb{Q}$}}1
+    {ℝ}{{$\mathbb{R}$}}1
+    {ℂ}{{$\mathbb{C}$}}1
+    % tactic bullet
+    {·}{{$\cdot$}}1
+    % common type‐variable Greek letters
+    {α}{{$\alpha$}}1
+    {β}{{$\beta$}}1
+    {γ}{{$\gamma$}}1
+    {δ}{{$\delta$}}1
+}

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from automaton import *
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -5,13 +6,17 @@ import re
 
 from math import gcd, sqrt, log, ceil, floor 
 
+debug_command_line = 'collisions'
+
 import sys
 #sys.argv = "canon.py table --cols n,-factorzig,numdiv,sumdiv,eulertot,carmichael,dedekind,mob,numfacs,totfacs,liouville,mertens,vonmangoldt,rad,m*,-psym --max 1020 --factor-exponents --factor-dots --csv --pad --column-info --header-line --residues 11 --residue-two --column-symbols".split()
-
+#sys.argv = "canon.py table --cols factorzig,mask --max 1000 --pad".split()
+if debug_command_line:
+    sys.argv = [sys.argv[0]] + debug_command_line.split()
 
 import argparse
 arg = argparse.ArgumentParser()
-arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins', 'columns' ], help="The command to run")
+arg.add_argument("command", type=str, choices=['table', 'orbit', 'burndown', 'twins', 'columns', 'collisions' ], help="The command to run")
 arg.add_argument("--cols", type=str, default='oc,k,dist,factors,orbit')
 arg.add_argument("--min", type=int, default=1)
 arg.add_argument("--max", type=int, default=100)
@@ -27,6 +32,7 @@ arg.add_argument("--autocompare", action="store_true")
 arg.add_argument("--factor-braces", action="store_true")
 arg.add_argument("--factor-exponents", action="store_true")
 arg.add_argument("--factor-dots", action="store_true")
+arg.add_argument("--factor-pad", action="store_true")
 arg.add_argument("--residues", type=int, default=0)
 arg.add_argument("--residue-two", action="store_true", help="Use 2 as the first residue prime, not 3")
 arg.add_argument("--odd-core-info", action="store_true")
@@ -35,11 +41,15 @@ arg.add_argument("--no-delimiters", action="store_true")
 arg.add_argument("--csv", action="store_true")
 arg.add_argument("--sort-by", type=str, default=None)
 arg.add_argument("--n", type=int, default=27)
-arg.add_argument("--burn-span", type=int, default=1000)
-arg.add_argument("--burn-lead", type=int, default=1)
+arg.add_argument("--burn-span", type=int, default=100)
+arg.add_argument("--burn-lead", type=int, default=0)
 arg.add_argument("--burn-base", type=int, default=2)
 arg.add_argument("--burn-symbols", type=str, default='░█')
 arg.add_argument("--burn-reverse", action="store_true")
+arg.add_argument("--burn-alternate", action="store_true")
+arg.add_argument("--burn-cycle", type=int, default=0)
+arg.add_argument("--burn-random", action="store_true")
+arg.add_argument("--burn-stats-only", action="store_true")
 arg.add_argument("--count-factors", action="store_true")
 arg.add_argument("--radical-only", action="store_true")
 arg.add_argument("--mask-limit", type=int, default=80)
@@ -224,6 +234,19 @@ def get_str_in_radix(n, base):
         digits += f'{n % base}'
         n //= base
     return digits[::-1]
+
+def count_binary_runs(n: int) -> int:
+    """
+    Returns the number of runs in the binary representation of n.
+    A run is a maximal sequence of consecutive identical bits.
+    """
+    b = bin(n)[2:]  # binary string without '0b'
+    runs = 1 if b else 0  # at least one run if non-empty
+    for i in range(1, len(b)):
+        if b[i] != b[i - 1]:
+            runs += 1
+    return runs
+
 
 def get_radical(n):
     rad = 1
@@ -445,8 +468,6 @@ def get_dist_to_lower_prime(n):
     while lower > 1 and not isprime(lower):
         lower -= 1
     return n - lower
-
-
 
 
 def get_dist_to_higher_prime(n):
@@ -764,6 +785,21 @@ def radix_name(radix):
         return 'ternary'
     else:
         return f'base-{radix}'
+    
+
+def get_collatz_carry_wavefront(n):
+    result = ''
+    tn  = get_str_in_radix(3 * n, 2)
+    tn1 = get_str_in_radix(3 * n + 1, 2)
+    minlen = min(len(tn), len(tn1))
+    divergence = minlen
+    for i in range(minlen):
+        if tn[i] != tn1[i]:
+            divergence = i
+            break
+    result = tn[:divergence] + '|' + tn1[divergence:].rstrip('0')
+    return result
+
 
 def calc_n_values(n):
     global col_desc
@@ -951,6 +987,9 @@ def calc_n_values(n):
     col_desc['hsuminv'] = f'inverse of the harmonic sum of {paramname} (the sum of the reciprocals of the prime factors)'
     val['hsuminv'] = f'{get_harmonic_sum_inv(param):.3f}'
 
+    col_desc['carryfront'] = f'the Collatz carry wavefront for the next odd-to-odd iteration of {paramname}, showing the first bit where 3n and 3n+1 differ in binary'
+    val['carryfront'] = get_collatz_carry_wavefront(param)
+
     col_desc['m*'] = f'the prime residues of {paramname} modulo a set of primes'
     col_desc['sm*'] = f'the signed prime residues of {paramname} modulo a set of primes'
     col_desc['cyc*'] = f'the prime ring cycles of {paramname}'
@@ -998,7 +1037,7 @@ def calc_n_values(n):
 
     facsep = ', '
     if arg.factor_dots:
-        facsep = ' ⋅ ' if arg.pad else '⋅'
+        facsep = ' ⋅ ' if arg.factor_pad else '⋅'
 
     factors_str = facsep.join([str(f) for f in all_factors])
     if factors_str not in unique_factor_sets:
@@ -1301,7 +1340,7 @@ def print_ns(ns):
     if arg.column_info:
         if arg.markdown:
             output_lines.append('| Column | Description |')
-            output_lines.append('')
+            output_lines.append('|--------|-------------|')
 
         longest_name = 0
         for name in col_info.keys():
@@ -1418,8 +1457,41 @@ def print_twins():
 
 def print_burndown():
     output_lines = []
-    n = (1<<arg.burn_span) +((1 << arg.burn_lead) - 1)
-    for i in range(1000):
+    if arg.burn_lead < 0:
+        arg.burn_lead *= -1
+        n = (((1 << arg.burn_lead) - 1) << (arg.burn_span - arg.burn_lead))
+    else:
+        n = (1<<arg.burn_span) +((1 << arg.burn_lead) - 1)
+
+    hop = 2
+    if arg.burn_alternate:
+        bit = 1
+        while bit < n:
+            n |= bit
+            bit <<= hop
+            hop = 3 if hop == 2 else 2
+
+    if arg.burn_cycle:
+        cycle = get_str_in_radix(arg.burn_cycle, 2)
+        nstr = cycle
+        while len(nstr) < arg.burn_span:
+            nstr = cycle + nstr
+        nstr = nstr[:arg.burn_span]
+        n = int(nstr, 2)
+
+    if arg.burn_random:
+        import random
+        n = 1 << (arg.burn_span - 1)
+        for i in range(arg.burn_span - 1):
+            if random.randint(0, 1) == 1:
+                n |= (1 << i)
+
+    if not is_odd(n):
+        n |= 1
+
+    starting_runs = count_binary_runs(n)
+
+    while n > 1:
         encoded = get_str_in_radix(n, arg.burn_base)
         for i, char in enumerate(arg.burn_symbols):
             encoded = encoded.replace(str(i), char)
@@ -1433,9 +1505,12 @@ def print_burndown():
             output_lines.append(encoded)
         #print(binary_n)#.rjust(200))
         n = collatz_odd(n)
-        if n == 1:
-            break
-    print_output(output_lines)
+
+
+    if arg.burn_stats_only:
+        print(f'{starting_runs:4d}, {len(output_lines):4d}')
+    else:
+        print_output(output_lines)
 
 
 def print_all_column_names():
@@ -1446,6 +1521,58 @@ def print_all_column_names():
         label = f'`{name}`'
         output_lines.append(f'# {label.ljust(longest_name + 2)} {desc}')
     print_output(output_lines)
+
+def get_cursor_radical(n):
+    crad = 1
+    for p in get_prime_factor_list(n):
+        if p > 3:
+            crad *= p   
+    return crad
+
+
+def get_cursor_radical_collisions(n):
+    seen = defaultdict(int)
+    while n > 1:
+        crad = get_cursor_radical(n)
+        seen[crad] += 1
+        n = collatz_odd(n)
+    
+    collisions = [crad for crad, count in seen.items() if count > 1]
+    return collisions
+        
+def print_collision_stats():
+    n_with_crad = defaultdict(list)
+    n_with_count = defaultdict(list)
+    num_with_crad = defaultdict(int)
+    num_with_count = defaultdict(int)
+
+    upper_limit = 10**6
+    total_colliding_n = 0
+    total_collisions = 0
+
+    for n in range(3, upper_limit, 2):
+        collisions = get_cursor_radical_collisions(n)
+        if collisions:
+            total_colliding_n += 1
+            total_collisions += len(collisions)
+            num_with_count[len(collisions)] += 1
+            n_with_count[len(collisions)].append(n)
+            for coll in collisions:
+                n_with_crad[coll].append(n)
+                num_with_crad[coll] += 1
+
+    for crad in reversed(sorted(num_with_crad.keys())):
+        ns = n_with_crad[crad]
+        factors = get_prime_factor_list(crad)
+        factorstr = ' ⋅ '.join(str(f) for f in factors) + ','
+        print(f'{crad:-6d}, {factorstr:20s} {len(ns):4d}')
+
+    for cardinality in reversed(sorted(num_with_count.keys())):
+        count = num_with_count[cardinality]
+        print(f'{cardinality:-6d}, {count}')
+
+
+
 
 if __name__ == "__main__":
     if arg.command == "table":
@@ -1458,5 +1585,7 @@ if __name__ == "__main__":
         print_twins()
     elif arg.command == "columns":
         print_all_column_names()
+    elif arg.command == "collisions":
+        print_collision_stats()
 
 

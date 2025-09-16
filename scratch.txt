@@ -1425,3 +1425,45 @@ Humans see things that aren't there, I see more predictive symmetry than I shoul
 
 
 
+Yep, makes perfect sense. Ok, let's brainstorm nice, hard, deterministic proof strategies. The binary n is a series of 1 runs and 0 runs interleaved. 3n is a different, longer one. It maps to a new series of alternating binary digit runs. The last run is 1 by construction. We consume the whole run. And that's the end of our turn. One run of 1 bits.
+
+So.
+
+The runs at the end of n have a certain expansion under 3n. There is a finite set of possibilities for the trailing runs of n, which maps to a *new* set of runs under 3x rules. We only care about the last of the transformed runs. We delete that run. And that's it, we're done.
+
+
+...
+
+
+With this observation, can we make any stronger statements?
+
+
+
+
+I'd like you to create an integer factorization visualizer. I would like to see the properties of composite numbers.
+
+The idea is to fill in a grid with colors corresponding to the prime factor set of each integer. Then fiddle with the parameters to surface patters in factor distribution.
+
+- Assign every prime a hue, cyclically, make the period adjustable, allow exponential falloff
+- Decrease saturation gradually with increasing magnitude, allow exponential falloff
+- Support optional "fade out" with magnitude, to a background color of either black or white
+- Allow additive or normal blending of the factor colors for every integer.
+- Allow higher exponents to "boost" the contribution of factor colors, make that adjustable.
+- Allow attenuating the contributions of higher factors to the final color
+- Have an optional mode that turns all prime numbers bright white.
+- Allow scaling, etc.
+- Allow grid resolution to be customized
+- Allow numbers to be drawn over the colored backgrounds on the cells. Allow scaling of the relative font size.
+- Fill integers row by row by default. Optionally, support "ulam spiral" mode, which fills in integers from the center of the grid outward.
+- Have a toggle to transpose the grid.
+- Optionally support a hexagonal grid. By default make it work like the normal grid: fill in numbers horizontally on the top row, then the staggered second row beneath, etc. For that mode, allow rows to either be the same length, or for alternating rows (the "inner ones") to have one fewer cell.
+- Have another mode on the hex grid, for triangle fill. Increase the length of each successive row. 
+- Allow download of the generated image. SVG is ideal, but PNG is acceptable if not.
+
+Before getting started, please explain the best way to implement these things. Given the requirements, how would you represent this data, render it, allow interaction, etc.
+
+
+
+
+
+aaabacabbacacbbcaabdcbadaccbbadaadcdcabadbbbacadbdcabdccdabbcccbbcbcdadacbbcabdbcbcbbdaddccdbbacdbbaccadcdabbadcbbcdbcdbcccbccbcbdcdbdadaadbdcabdcabddcbcdbcbbbdcbbbccdcbadacdadacddcabbbcccdddadbcdbbbcdcbbacdcdbddabacabdacdddddbbbcddcdbdcabbcacdcdaabbdbdbcdccbbcbcbdcbabacdbddccadddcadbdadbccccddccadcdbdbcddbdccaadbdbbbddaddadddbbccabccdadbdcdbbdaadbdaddacadbcddcdddcbbcddabcddabcccbdadddbacbbdccacbbdbbbdcbbdbccbdddcddcdbcbacdddbdaddbcbdbdcdabcccabbcacdadbcbdcdbdacaddbdcbbccbddbcdbbbcdbdbdcbbaddddadbcbdcbcdccdcbbddcdaddbdddcadccbdbbcbcdddaadcddddacccbadcbdadaddaddbbddcddbcaadddbcdccdabacdadcdadbdccbbcccddbdabdccbcdbcccdddbadbdcbbddadbdcadbdcbcddcbabadcbddcdddbdabbacdddacddbbdacdcddabbdcaddcdddcdbadadadbadadbbcddddcdadbccdbddbbdbdaddccbbbddadbdccabdddadccddbcccddcddabaccdbbdbdbddacbddbcdddcabadcbdcddddcdbbdbdccdbdabbccdabdcccbadaddbdbcddcbbdacccddddbbdcbcdbcdcddcabdddbdbaddbbbdcdbdcbddddbbbbccadccacdddbabddabdacbdddcccbcdbddddcddacaadbdccbcdbbddcacddddcbcdbbbccdcbacbadaddbbddcbdbdcddddbbdd

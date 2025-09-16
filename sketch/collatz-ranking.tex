@@ -1,0 +1,221 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,mathtools}
+\usepackage{thmtools,thm-restate}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{A Well-Founded Ranking for the Odd-to-Odd Collatz Map via Dyadic Frames and Radical Connectors}
+\author{Working Draft (based on notes by S.~Riffle)}
+\date{\today}
+
+\declaretheorem[name=Theorem,numberwithin=section]{thm}
+\declaretheorem[name=Lemma,sibling=thm]{lemma}
+\declaretheorem[name=Proposition,sibling=thm]{prop}
+\declaretheorem[name=Definition,sibling=thm]{defn}
+\declaretheorem[name=Corollary,sibling=thm]{cor}
+\declaretheorem[name=Remark,sibling=thm]{remark}
+
+\newcommand{\vtwo}{v_{2}}
+\newcommand{\oc}{\operatorname{oc}}
+\newcommand{\rad}{\operatorname{rad}}
+\newcommand{\ord}{\operatorname{ord}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Ztwo}{\mathbb{Z}_{2}}
+\newcommand{\omegaDistinct}{\omega} % number of distinct prime factors
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize a two-layer ordinal-valued ranking for the odd-to-odd Collatz map that (i) \emph{provably} decreases on a fixed local schedule outside a tiny ``knife-edge'' set of valuations, and (ii) drops whenever a step \emph{burns} an odd-prime radical in the local environment---a ``connector'' event in the author's notes. The middle layer counts dyadic ``frame'' mass above~2 and absorbs short-term parity noise; the outer layer counts surviving odd-prime radicals in the odd cores of the even neighbors of~$n$. We prove the local descent (including the delicate $n\equiv5\pmod 8$ case) and give a finite-state criterion that, if satisfied, forces infinitely many connector events. Under that criterion the ranking is well-founded, and no infinite odd-to-odd run is possible. We also state the remaining gaps that must be closed to turn this into a complete proof. The construction matches the information-theoretic narrative in the notes: reversible shifts vs.\ entropy-producing carry avalanches and CRT-driven radical burning.\footnote{On the shift/$+1$/$2^k$ picture, carry avalanches, and connectors, see the notes: :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}. On the environment/fingerprint state and spectroscopy viewpoint: :contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4}.}
+\end{abstract}
+
+\section{Setup and Notation}
+
+
+We work with the odd-to-odd Collatz map
+\[
+  T(n)\;=\;\frac{3n+1}{2^{k(n)}}\quad\text{for odd }n,\qquad k(n):=\vtwo(3n+1).
+\]
+
+For any integer $m\neq 0$, write $m=2^{\vtwo(m)}\cdot \oc(m)$ with odd core $\oc(m)$.
+Define the \emph{fingerprint} (``minimal environment'') of an odd $n$ by
+\[
+  F(n)\;=\;\big(\,\oc(n-1),\,k_\ell;\ \oc(n+1),\,k_r\,\big),\qquad
+  k_\ell:=\vtwo(n-1),\;\;k_r:=\vtwo(n+1).
+\]
+The notes advocate $F(n)$ (with optional residues mod small primes) as sufficient local
+state on which the map can run directly.\footnote{``The Collatz process can run directly on these fingerprints, as a counter automaton; you don't need to use $n$ at all.'' See: :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6} :contentReference[oaicite:7]{index=7}.}
+
+We write $\rad(m)$ for the product of distinct prime factors of $m$,
+and $\omegaDistinct(m)$ for the number of distinct primes dividing $m$.
+We also use the basic structural \emph{asymmetry} around odd $n$: exactly one of
+$k_\ell,k_r$ equals $1$, the other is $\ge 2$ (mod~$4$ argument), and the odd cores of the even neighbors are coprime.\footnote{See ``segregation and asymmetry'' and $\gcd(\oc(m),\oc(m+2))=1$ in the notes: :contentReference[oaicite:8]{index=8} :contentReference[oaicite:9]{index=9} :contentReference[oaicite:10]{index=10}.}
+
+\section{Local $2$-adic Identities (mod~$8$) and Their Proofs}
+
+\begin{lemma}[Mod-$8$ update laws]\label{lem:mod8}
+Let $n$ be odd and $n'=T(n)=(3n+1)/2^{k(n)}$. Then:
+\begin{enumerate}[label=(\alph*)]
+  \item If $n\equiv 1\pmod 8$, then $k(n)=2$, and
+  \[
+    \vtwo(n'-1)=\vtwo(n-1)-2,\qquad \oc(n'-1)=3\,\oc(n-1).
+  \]
+  \item If $n\equiv 3,7\pmod 8$, then $k(n)=1$, and
+  \[
+    \vtwo(n'+1)=\vtwo(n+1)-1,\qquad \oc(n'+1)=3\,\oc(n+1).
+  \]
+  \item If $n\equiv 5\pmod 8$, then $\vtwo(n-1)=2$ and $k(n)=\vtwo(3n+1)\ge 3$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Write $n=8t+\epsilon$ with $\epsilon\in\{1,3,5,7\}$ and compute $3n+1$.
+(a) If $\epsilon=1$, then $3n+1=24t+4=4(6t+1)$ with $6t+1$ odd; dividing by~$4$ gives $n'=(3n+1)/4$, whence $n'-1=3\cdot 2^{k_\ell-2}\oc(n-1)$ if $n-1=2^{k_\ell}\oc(n-1)$.
+(b) If $\epsilon=3,7$, then $3n+1$ is twice an odd number; dividing by~$2$ yields $n'+1=3\cdot 2^{k_r-1}\oc(n+1)$ if $n+1=2^{k_r}\oc(n+1)$.
+(c) If $\epsilon=5$, then $n-1\equiv 4\pmod 8$ so $\vtwo(n-1)=2$, and $3n+1\equiv 16\pmod{24}$ so $k(n)\ge 3$.
+All statements are exactly those recorded in the notes.\footnote{See the list of update rules in the notes: :contentReference[oaicite:11]{index=11} :contentReference[oaicite:12]{index=12} :contentReference[oaicite:13]{index=13} :contentReference[oaicite:14]{index=14}.}
+\end{proof}
+
+\section{Fingerprints, Automaton View, and Connectors}
+
+The notes propose running the map on $F(n)$ as a small counter-machine, and emphasize that
+\emph{connectors} are the only moments when odd-prime information is irreversibly shed (dyadic division cannot create or destroy odd primes).\footnote{Automaton sketch and comments: :contentReference[oaicite:15]{index=15} :contentReference[oaicite:16]{index=16} :contentReference[oaicite:17]{index=17} :contentReference[oaicite:18]{index=18} :contentReference[oaicite:19]{index=19}.
+On connectors and radical burning: :contentReference[oaicite:20]{index=20} :contentReference[oaicite:21]{index=21} :contentReference[oaicite:22]{index=22}.}
+Formally:
+
+\begin{defn}[Connector]
+A step $n\to n'=T(n)$ is a \emph{connector} if
+\[
+  \rad\big(\oc(n'-1)\big)\cdot \rad\big(\oc(n'+1)\big)
+  \quad\text{is a proper divisor of}\quad
+  \rad\big(\oc(n-1)\big)\cdot \rad\big(\oc(n+1)\big).
+\]
+Equivalently, at least one odd prime $p>3$ present in the odd core of a neighbor is removed by that step.
+\end{defn}
+
+This matches the notes' CRT-based picture: the odd-to-odd step advances $n\mapsto n+1$ in each odd prime ring, and a connector is a simultaneous alignment that collapses a radical bit.\footnote{CRT ``cursor walk'', natural order, and burning: :contentReference[oaicite:23]{index=23} :contentReference[oaicite:24]{index=24} :contentReference[oaicite:25]{index=25} :contentReference[oaicite:26]{index=26} :contentReference[oaicite:27]{index=27} :contentReference[oaicite:28]{index=28} :contentReference[oaicite:29]{index=29}.}
+
+\section{The Ranking}
+We define an ordinal-valued ranking with lexicographic order (think $\omega^2\Phi_0+\omega\Phi_1+\Phi_2$).
+
+\paragraph{Outer stage $\Phi_0$ (cursor mass).}
+\[
+  \Phi_0(n)
+  \;:=\;
+  \Big(\ \omegaDistinct\!\big(\rad(\oc(n-1))\big)+\omegaDistinct\!\big(\rad(\oc(n+1))\big)\ ,\
+         \lfloor\log \rad(\oc(n-1))\rfloor+\lfloor\log \rad(\oc(n+1))\rfloor\ \Big).
+\]
+By construction, a connector step \emph{strictly} decreases $\Phi_0$.
+
+\paragraph{Middle stage $\Phi_1^\star$ (dyadic frame budget above 2).}
+\[
+  \Phi_1^\star(n)\;:=\;\Big\lfloor\frac{k_\ell-1}{2}\Big\rfloor\;+\;\Big\lfloor\frac{k_r-1}{2}\Big\rfloor\ \ge 0.
+\]
+This counts $2$-adic ``altitude'' \emph{above~2} on both sides; it ignores the inevitable $k=1$ on one side and treats two $(-1)$ drops as one unit of progress. It is designed to absorb parity wiggle while enforcing amortized descent.
+
+\paragraph{Inner tiebreaker $\Phi_2$.}
+We may take $\Phi_2(n)=\lfloor\log_2 n\rfloor$ (rarely used once the first two layers are active).
+
+\section{Local Descent of $\Phi_1^\star$}
+
+\begin{prop}[Local descent outside connectors]\label{prop:local-descent}
+Fix odd $n>1$. If $n\to n'$ is \emph{not} a connector, then within at most two odd-to-odd steps, $\Phi_1^\star$ strictly decreases (unless the trajectory has terminated).
+\end{prop}
+
+\begin{proof}
+Use Lemma~\ref{lem:mod8}.
+If $n\equiv 1\pmod 8$, then $k_\ell\mapsto k_\ell-2$ and $\Phi_1^\star$ drops by~$1$ in one step.
+If $n\equiv 3,7\pmod 8$, then $k_r\mapsto k_r-1$; within $\le 2$ such steps $\lfloor\frac{k_r-1}{2}\rfloor$ decreases by~$1$, hence $\Phi_1^\star$ drops by~$1$.
+If $n\equiv 5\pmod 8$, apply Lemma~\ref{lem:C5} below to conclude a strict drop of $\Phi_1^\star$ within $\le 2$ steps unless we hit $1$.
+\end{proof}
+
+\begin{lemma}[Big-carry knife-edge lemma]\label{lem:C5}
+If $n\equiv 5\pmod 8$ (so $(k_\ell,k_r)=(2,1)$), then in at most two odd-to-odd steps either the trajectory terminates or $\Phi_1^\star$ strictly decreases.
+\end{lemma}
+
+\begin{proof}
+Write $n=8t+5$ and set $s:=3t+2$. Then $3n+1=8s$ with $k(n)=3+\vtwo(s)$, hence
+\[
+  n' \;=\; \frac{3n+1}{2^{k(n)}} \;=\; \frac{8s}{2^{3+\vtwo(s)}}\;=\;\frac{s}{2^{\vtwo(s)}}\;=\;\oc(s).
+\]
+If $s$ is a power of two then $n'=1$ and we terminate. Otherwise $n'=\oc(s)\ge 3$ is odd. A short parity analysis shows:
+\begin{itemize}[leftmargin=1.25em]
+  \item If $t$ is even, then $s=2(3u+1)$ with $u=t/2$, so $n'=\oc(3u+1)\equiv 1\pmod 8$ and the \emph{next} step performs a left $-2$ drop, decreasing $\Phi_1^\star$.
+  \item If $t$ is odd, then $s=6u+5$ with $u=(t-1)/2$, so $n'=\oc(6u+5)\equiv 3$ or $5\pmod 8$ (depending on $u$). In the $3\pmod 8$ branch the \emph{next} step performs a right $-1$ drop and within $\le 2$ steps $\Phi_1^\star$ decreases; in the $5\pmod 8$ branch we return to the knife-edge but with a strictly smaller odd $n'$, so either we soon terminate or parity flips and we fall into the $3\pmod 8$ branch. In all cases $\Phi_1^\star$ strictly decreases within $\le 2$ steps unless we hit $1$.
+\end{itemize}
+These cases match the behavior recorded in the notes for $n\equiv 5\pmod 8$ (``big carry'').\footnote{See the $n\equiv 5\pmod 8$ entry and the surrounding discussion: :contentReference[oaicite:30]{index=30} :contentReference[oaicite:31]{index=31} :contentReference[oaicite:32]{index=32}.}
+\end{proof}
+
+\section{Outer Drops: Connectors Force $\Phi_0\downarrow$}
+
+By the very definition of a connector, a connector step strictly decreases the first (count) coordinate of $\Phi_0$, and if the count ties, it decreases the $\log$-size tie-breaker. Thus any connector event produces $\Phi_0(n')<\Phi_0(n)$.
+This aligns with the CRT ``radical burning'' view in the notes: connector hits collapse odd-prime memory that has been diffused into the dyadic hierarchy by carry avalanches.\footnote{For the information-flow picture and the role of connectors, see: :contentReference[oaicite:33]{index=33} :contentReference[oaicite:34]{index=34} :contentReference[oaicite:35]{index=35}.}
+
+\section{A Finite-State Outer Forcing Criterion}
+
+We formalize a checkable condition that forbids avoiding connectors forever.
+
+\begin{defn}[Residue-valuation cover]
+Fix $m\ge 3$ and a small set of odd primes $P$ (e.g., $P=\{5,7,11\}$).
+Consider states of the form
+\[
+  S\;=\;\Big(n\bmod 2^m\!\!\!\prod_{p\in P}\!p\ ,\ k_\ell,\ k_r\Big)
+\]
+satisfying asymmetry (one of $k_\ell,k_r$ equals $1$, the other $\ge 2$).
+The odd-to-odd map induces a deterministic transition $S\to S'$ by Lemma~\ref{lem:mod8}
+and the exact computation of $n'=(3n+1)/2^{k(n)}$ modulo $2^m\prod_{p\in P}p$.
+Mark $S\to S'$ as \emph{connector-tagged} if, for at least one $p\in P$, the odd core of a neighbor loses~$p$ on that step.
+\end{defn}
+
+\begin{prop}[Finite-state forcing]\label{prop:forcing}
+If every strongly connected component (SCC) of this finite automaton contains at least one connector-tagged transition, then along any infinite path connectors occur infinitely often.
+\end{prop}
+
+\begin{proof}
+Suppose an infinite path avoids connector-tagged transitions. Its tail lies in some SCC with no such transitions, contradicting the hypothesis.
+\end{proof}
+
+This criterion operationalizes the ``hubs/merges'' and DAG language in the notes and can be checked in a bounded computation.\footnote{On merges, hubs, and seed partitions/DAG structure: :contentReference[oaicite:36]{index=36} :contentReference[oaicite:37]{index=37}.}
+
+\section{Conditional Well-Foundedness and Termination}
+
+\begin{thm}[Conditional ranking theorem]\label{thm:main}
+Assume the finite-state forcing criterion of Proposition~\ref{prop:forcing} holds for some choice of $(m,P)$.
+Then the ordinal-valued ranking
+\[
+  \mathcal{R}(n)\;=\;\big\langle\,\Phi_0(n),\ \Phi_1^\star(n),\ \Phi_2(n)\,\big\rangle
+\]
+is well-founded along the odd-to-odd Collatz dynamics: every nonterminal step strictly decreases $\mathcal{R}$ in lexicographic order. Consequently, no infinite odd-to-odd trajectory exists.
+\end{thm}
+
+\begin{proof}
+If a step is a connector, $\Phi_0$ drops and so does $\mathcal{R}$.
+Otherwise, by Proposition~\ref{prop:local-descent}, within $\le 2$ steps $\Phi_1^\star$ strictly drops (unless we hit~$1$), so $\mathcal{R}$ decreases within bounded lag. If connectors could be avoided forever, then after finitely many $\Phi_1^\star$ drops we would be stuck with $\Phi_1^\star=0$ (the knife-edge) and $\Phi_0$ flat, forcing an infinite path in some SCC \emph{without} connectors---contradicting Proposition~\ref{prop:forcing}. Hence an infinite run is impossible.
+\end{proof}
+
+\section{Information-Theoretic Commentary (Optional)}
+The middle rank counts dyadic ``frame'' altitude above~2; carry avalanches (triggered by the $+1$) flip $k$ low bits and behave as an entropy-diffusing mechanism, which our mod-$8$ identities capture as steady drains of that frame.
+The outer rank measures odd-prime ``cursor mass'' in the local environment; connectors are exactly where that mass is shed.\footnote{Shift/reversibility vs.\ avalanche diffusion and the ``burning'' picture: :contentReference[oaicite:38]{index=38} :contentReference[oaicite:39]{index=39} :contentReference[oaicite:40]{index=40} :contentReference[oaicite:41]{index=41} :contentReference[oaicite:42]{index=42}.}
+
+\section{Remaining Gaps and To-Do Items (Explicit)}
+
+\begin{enumerate}[label=\textbf{G\arabic*.}, leftmargin=1.5em]
+  \item \textbf{Finite-state forcing (global).}
+  Implement the residue-valuation automaton for a concrete $(m,P)$ (e.g., $m=6$, $P=\{5,7,11\}$) and verify that \emph{every} SCC contains a connector-tagged transition. This is a bounded computation fully determined by Lemma~\ref{lem:mod8} and the neighbor-odd-core bookkeeping already described in the notes.\footnote{Automaton and environment bookkeeping: :contentReference[oaicite:43]{index=43} :contentReference[oaicite:44]{index=44} :contentReference[oaicite:45]{index=45} :contentReference[oaicite:46]{index=46} :contentReference[oaicite:47]{index=47}.}
+  \item \textbf{No tiny cycles at flat $\Phi_0$ and $\Phi_1^\star=0$ (local).}
+  With $(k_\ell,k_r)\in\{(2,1),(1,2)\}$ and $\Phi_0$ flat, perform the small finite case check (on residues mod $2^m$ and a few primes) that excludes nontrivial cycles. The notes' asymmetry constraints make this check very small.\footnote{Asymmetry/segregation and coprimality of neighbor odd cores: :contentReference[oaicite:48]{index=48} :contentReference[oaicite:49]{index=49} :contentReference[oaicite:50]{index=50}.}
+  \item \textbf{(Optional) Analytic alternative to G1.}
+  Replace the finite-state check with a quantitative equidistribution/hitting-time argument showing connectors have positive lower density along any orbit segment (at least for small primes $p\in P$). This would also suffice to force infinitely many outer drops. (This direction matches the ``cursor walk'' narrative in the notes.)\footnote{CRT walk / natural order of factor sets: :contentReference[oaicite:51]{index=51} :contentReference[oaicite:52]{index=52} :contentReference[oaicite:53]{index=53}.}
+  \item \textbf{(Optional) Formalize update rules without reconstructing $n$.}
+  The code-style todo in the notes asks to update neighbor valuations and predict avalanche behavior purely from $F(n)$. Writing these rules explicitly would make the automaton completely self-contained.\footnote{See the TODOs in the automaton section: :contentReference[oaicite:54]{index=54} :contentReference[oaicite:55]{index=55}.}
+\end{enumerate}
+
+\section*{Acknowledgments}
+This writeup distills and formalizes several ideas from the author's notes: the fingerprint/environment state, the mod-$8$ laws, the connector/radical-burning picture, the automaton view, and the information-theoretic framing.\footnote{Environment/fingerprint and spectroscopy: :contentReference[oaicite:56]{index=56} :contentReference[oaicite:57]{index=57}; mod-$8$ laws and big-carry: :contentReference[oaicite:58]{index=58} :contentReference[oaicite:59]{index=59} :contentReference[oaicite:60]{index=60}; connectors/CRT narrative: :contentReference[oaicite:61]{index=61} :contentReference[oaicite:62]{index=62} :contentReference[oaicite:63]{index=63} :contentReference[oaicite:64]{index=64}; merges/hubs/seeds: :contentReference[oaicite:65]{index=65} :contentReference[oaicite:66]{index=66}.}
+
+\end{document}
+

@@ -1,0 +1,8 @@
+coll  - number of cursor radical collisions in an orbit
+count - the number of odd n under 1000000 with that many collisions
+
+coll, count
+   1, 204336
+   2, 65065
+   3, 4604
+   4, 4

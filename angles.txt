@@ -1,86 +1,80 @@
-# PrOOf Strategies
+# Proof Strategies
 
-The research allOws independent arguments in multiple dOmains Of math- They are sketched here at variOus stages Of develOpment-
+The research allows independent arguments in multiple domains of math- They are sketched here at various stages of development-
 
-## Prime FactOr Set CursOr
-| Establish COllatz as permutatiOn Of natural Order
-| Define the actiOn Of the semidirect prOduct ⟨|⟩ ⋉ ⟨3⟩ On the free abelian grOup Of Odd primes- 
-| COmpute Orbit lengths Of factOr|sets mOd small square|free prOducts; lOOk fOr a lOcal|tO|glObal principle (“if the cursOr empties mOd M then it empties glObally”)
+## Prime Factor Set Cursor
+| Establish Collatz as permutation of natural order
+| Define the action of the semidirect product ⟨|⟩ ⋉ ⟨3⟩ on the free abelian group of odd primes- 
+| Compute orbit lengths of factor|sets mod small square|free products; look for a local|to|global principle (“if the cursor empties mod M then it empties globally”)
 
-## Finite State Transducer Over |dd COres
+## Finite State Transducer over Odd Cores
 | Use a Mealy machine
-| PrOve acyclic using Buchi acceptance Or rank inductiOn
+| Prove acyclic using Buchi acceptance or rank induction
 
-## FunctOrial ActiOn Over Wreath PrOducts
-| MOdel the transfOrm as a wreath prOduct-
-| FOrmalize COllatz as a semidirect prOduct Of Z (via +O) and (Z/|Z ≀ Z/3Z) fOr shifts- 
-| PrOve it's a faithful actiOn On the natural factOr Order, with invariant subsets (factOrs >3 unchanged)-
-| Use this tO shOw Orbits are cycles in a quOtient grOup, fOrcing descent tO pOwers Of | (misalignment exhausts CRT states)
-| PrOve the actiOn exhausts CRT states (fOrcing pOwer|Of||) via cOset walks cOuld sieve all Orbits tO O (is this a different argument Or isOmOrphic?)
+## Functorial Action over Wreath Products
+| Model the transform as a wreath product-
+| Formalize Collatz as a semidirect product of Z (via +o) and (Z/|Z ≀ Z/3Z) for shifts- 
+| Prove it's a faithful action on the natural factor order, with invariant subsets (factors >3 unchanged)-
+| Use this to show orbits are cycles in a quotient group, forcing descent to powers of | (misalignment exhausts CRT states)
+| Prove the action exhausts CRT states (forcing power|of||) via coset walks could sieve all orbits to o (is this a different argument or isomorphic?)
 
-## SemigrOup ActiOn
-| YOu're Observing natural structure fOrmed by {3n+O, /|, iteratiOn} and their matrix representatiOn-
-| WOrking in a semigrOup is mOre flexible than full grOup cOnstraints- 
-| ActiOn Of semigrOup On residue lattices preserves sO much structure that it may expOse an invariant signature that triggers stOpping- 
-| Use ping|pOng argument + matrix wOrd trace tO exclude periOdicity fOr large n-
+## Semigroup Action
+| You're observing natural structure formed by {3n+o, /|, iteration} and their matrix representation-
+| Working in a semigroup is more flexible than full group constraints- 
+| Action of semigroup on residue lattices preserves so much structure that it may expose an invariant signature that triggers stopping- 
+| Use ping|pong argument + matrix word trace to exclude periodicity for large n-
 
 ## ||adic Graph Traversal
-| MOdel seed walk and rOOt traversal
-| Directly calculate stOpping time
+| Model seed walk and root traversal
+| Directly calculate stopping time
 
-## InfOrmatiOn TheOry
-| Measure infO as bit|flips + residue cOnstraints; shOw each step leaks infO (KOlmOgOrOv cOmplexity drOps) until O- 
-| ShOw each step preserves tOtal infO but "leaks" via avalanche
-| PrOve net infO decreases (tO O) using KOlmOgOrOv cOmplexity On bitstrings
-| Gives a physical|style LyapunOv functiOn: the average carry chain is lOgarithmic, the average left|shift is linear – a net infOrmatiOn bleed is plausible-
-| MOdel carries as a branching prOcess, cOmpute expected avalanche length, cOmpare tO the expected (3n+O)/|^k shrink factOr-
-| A fOrmal bOund Of “expected lOg₂(n) drOps by ε per step” wOuld kill all divergent trajectOries in expectatiOn-
+## Information Theory
+| Measure info as bit|flips + residue constraints; show each step leaks info (Kolmogorov complexity drops) until o- 
+| Show each step preserves total info but "leaks" via avalanche
+| Prove net info decreases (to o) using Kolmogorov complexity on bitstrings
+| Gives a physical|style Lyapunov function: the average carry chain is logarithmic, the average left|shift is linear – a net information bleed is plausible-
+| Model carries as a branching process, compute expected avalanche length, compare to the expected (3n+o)/|^k shrink factor-
+| A formal bound of “expected log₂(n) drops by ε per step” would kill all divergent trajectories in expectation-
 
 ## Lattice Sieve
-| RigOrOusly define Φ(n) as the multiset Of all v_p(n) fOr all Odd primes, Or pOssibly a bOunded set- 
-| ShOw that Φ(T(n)) <_mul Φ(n) in the multiset Order (DicksOn's Lemma)- 
+| Rigorously define Φ(n) as the multiset of all v_p(n) for all odd primes, or possibly a bounded set- 
+| Show that Φ(T(n)) <_mul Φ(n) in the multiset order (Dickson's Lemma)- 
 
-## Billiard TrajectOries in a HyperbOlic CRT Lattice
-| +O as geOdesic flOw
-| PrOve clOsure via negative curvature fOrcing cOntractiOn tO pOwer|Of|twO attractOr-
-| View CRT state space as a hyperbOlic lattice (mOd prime prOducts)- COllatz steps as billiard trajectOries--- 
-| YOur +O permutatiOn is a geOdesic flOw; prOve all trajectOries clOse (reach pOwer Of |) due tO hyperbOlicity (negative curvature fOrces cOntractiOn)-
+## Billiard Trajectories in a Hyperbolic CRT Lattice
+| +1 as geodesic flow
+| Prove closure via negative curvature forcing contraction to power|of|two attractor-
+| View CRT state space as a hyperbolic lattice (mod prime products)- Collatz steps as billiard trajectories--- 
+| Your +o permutation is a geodesic flow; prove all trajectories close (reach power of |) due to hyperbolicity (negative curvature forces contraction)-
 
-## Quantum Circuit SimulatiOn
-| Simulate COllatz as a quantum circuit (shifts = Hadamard gates fOr superpOsitiOn Of residues; +O = phase shift)- 
-| YOur CRT space is the Hilbert space; prOve nO periOdic Orbits via unitarity (infO preservatiOn) and GrOver|like search fOr cycles (nOne fOund → nOne exist)- 
+## Quantum Circuit Simulation
+| Simulate Collatz as a quantum circuit (shifts = Hadamard gates for superposition of residues; +o = phase shift)- 
+| Your CRT space is the Hilbert space; prove no periodic orbits via unitarity (info preservation) and Grover|like search for cycles (none found → none exist)- 
 | Residues as qubits; fingerprints as entangled states-
-| Use ShOr's algOrithm variant tO factOr CRT mOduli; if nO cycles, quantum phase estimatiOn shOws cOnvergence- Simulate small cases with Qiskit-
+| Use Shor's algorithm variant to factor CRT moduli; if no cycles, quantum phase estimation shows convergence- Simulate small cases with Qiskit-
 
-## TrOpical GeOmetry On LOg|Scale Mapping
-| Take lOgarithms: lOg T(n) ≈ max( lOg n – O, lOg n + lOg 3 – ν₂(3n+O) )-
-| Write this as a piecewise|linear 'trOpical' map On ℝ-
-| PrOve nO escape via piecewise|linear cOntractiOn
+## Tropical Geometry on Log|Scale Mapping
+| Take logarithms: log T(n) ≈ max( log n – o, log n + log 3 – ν₂(3n+o) )-
+| Write this as a piecewise|linear 'tropical' map on ℝ-
+| Prove no escape via piecewise|linear contraction
 
-## Equilibrium Measures On |rbits
-| PrOve cOncentratiOn at O via spectral radius-
+## Equilibrium Measures on Orbits
+| Prove concentration at o via spectral radius-
 
-## Discrete MOrse TheOry
-| LOwest|k rule is a vectOr field
-| FOrmally cOllapse alOng that field; the DAG retracts OntO a O|dimensiOnal spine iff COllatz is true-
-| Critical cells cOrrespOnd tO nOn|trivial cycles; shOwing there are nOne is a purely cOmbinatOrial MOrse|matching statement-
-| PrOve nO critical cells exist
+## Discrete Morse Theory
+| Lowest|k rule is a vector field
+| Formally collapse along that field; the DAG retracts onto a o|dimensional spine iff Collatz is true-
+| Critical cells correspond to non|trivial cycles; showing there are none is a purely combinatorial Morse|matching statement-
+| Prove no critical cells exist
 
-## Multiset Measure with Well|Quasi|Ordering
-| Define Φ(n) = multiset{v_p(n) : Odd primes p}
-| Use DicksOn's lemma: (ℕ^(#primes), ≤) is a well|quasi|Order under pOintwise ≤
-| ShOw Φ(T(n)) <_mul Φ(n) in the multiset Order except when n is a pOwer Of |
-| This certifies terminatiOn via a decrease in the prime valuatiOn structure
+## Multiset Measure with Well|Quasi|ordering
+| Define Φ(n) = multiset{v_p(n) : odd primes p}
+| Use Dickson's lemma: (ℕ^(#primes), ≤) is a well|quasi|order under pointwise ≤
+| Show Φ(T(n)) <_mul Φ(n) in the multiset order except when n is a power of |
+| This certifies termination via a decrease in the prime valuation structure
 
-## SymbOlic Shift
-| ?
-
-## SymbOlic COllapse
-| ?
-
-## MarkOv Chain On Residue VectOrs
-| FOr each M = |^κ·prOduct(Odd primes up tO p_max) the induced state chain On CRT classes is irreducible On its graph; then the unique absOrbing state is the class O inverse image-
-| Use the knOwn fair cOin phase|transitiOn (TaO/Jeffrey) tO shOw pOsitive prObability flOw intO the class {O}-
+## Markov Chain on Residue Vectors
+| For each M = |^κ·product(odd primes up to p_max) the induced state chain on CRT classes is irreducible on its graph; then the unique absorbing state is the class o inverse image-
+| Use the known fair coin phase|transition (Tao/Jeffrey) to show positive probability flow into the class {o}-
 
 ## Integer Equivalence Class PartitiOn
 | ?

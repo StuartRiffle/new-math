@@ -1,0 +1,106 @@
+                                                                          0  
+                                                                          | X
+                                                                          |XX
+                                                                         X0.X
+                                                                        XX0XX
+                                                                      XXX.0.X
+                                                                     XXXX.0XX
+                                                              1    X.XX...0.X
+                                                              |  X...X....0XX
+                                                              | XX..XX....0.X
+                                                              1..XXXXXXX..0XX
+                                                             X1X..XXXXXX..0.X
+                                                           X.X1XX..XXXXXX.0XX
+                                                         X....1XXX.XXXXXX.0.X
+                                                        XX....1XX..XXXXXX.0XX
+                                                      X......X1XXX.XXXXXX.0.X
+                                                     XX......X1XX..XXXXX..0XX
+                                               0   XXX.......11....XXXX...0.X
+                                               |  XXXX.....XX1......XXX...0XX
+                                               |X.XXX.....X111......XXX...0.X
+                                              X0..XXX.....11.......XXXX...0XX
+                                             XX00XXXXXX.XX1........XXX....0.X
+                                      1    XXXXX0XXXXXXXXX1...XXX.........0XX
+                                      |   XXXXX.0XXXXXXXXX1..XXXXX........0.X
+                                      | X.XXXXXX0..XX...XX1X.XXXXX....X...0XX
+                                      1....XXXX.0..X....XX1....XXX...XXX..0.X
+                                     X1...XXXXX.00XX......11...XXXXXXXXX..0XX
+                                   XXX1..XXXXXXXX0.XX......1..XXXXXXXXXX..0.X
+                              0   XXXX1X.XXXXXXXX0..X.....X1X.XXXXXXXXXXX.0XX
+                              | XXXXXX1..XXXXXXX.0.XX.....X1..XXXXXXX..XX.0.X
+                              |XXXXXXX1X...XXXX..0..X.....X1X.XXXXX.......0XX
+                        1    X0XXXXXXX1....XXXX..0.XXX...XX1..XXXX........0.X
+                        |  X..0XXXXXXX1...XXXXX..0.XX...XXX1X.XXXX........0XX
+                        | XX..0.XXXXXX1..XXXXXXX.0......1111...XXXXX......0.X
+                        1XXXX.0XXXXXXX1X.XXXXXXX.0......1X.....XXXXXXX....0XX
+                       X1XXXX.0XXXXXXX1..XXXXXXX.0......1......XXXXXXX....0.X
+                     X.X1XXXXX0XXXXXXX1X.XXXXXX..0.....X1....X....XXXX....0XX
+                   X....1XXXX.0XXXXXXX1X..XXXX...0......1...XXX...XX.XXXX.0.X
+                  XX...X1XXXXX0XXX...X1XX..XXX...0.....X1XXXXXXXXXX...XXX.0XX
+                X......X1XXXX.0XX.....1XXX...XXX.00.....1XXXXXXXXXX.......0.X
+           0   XXX.....X1XX...0.X.....1XX......XXX0.....1XXXXXXXXX........0XX
+           | XXXXX.....X1X....0XX.....1XX......XXX0.....1XXXXXXXXX........0.X
+       1   |XXXXXX.....X1X....0.XXX..X1XX.....XXXX0.....1XXXXXXXXX........0XX
+       |  X0XXXX.XXX..XX1XX...0...XX.X1XX.....XXX.0.....1XXXXXXXXX.....X..0.X
+       |X..0XXX....XXXXX1X....0...X..X1XXXXX......0.....1XX...XXXX....XXX.0XX
+   0   1X..0..XX...XXXXX1.....0..XX.XX1XXXXXX.....0.....11....XXX.....XXX.0.X
+   | XX1...0...X...XXXXX1....00XXX..XX1XXXXXX.....0.X....1..........XXXXX.0XX
+   |XXX1...0..XXX...XXX11X...0XXXXX.XX1XXXXXX.....0XXX..X1X.........XXXXX.0.X
+  X0XXX1...0..XX....XX11.XX..0XXXX..XX1XXXXXXXXXX.0XXX..X1X.........XXXX..0XX
+X..0.XX1...0...X....XX1...X..0XXXXX.XX1XXXXXXXXXXX0XXX.XX1X....XX...XXX...0.X
+   |   |   |          |      |        |           |      |                |  
+   |   |   |          |      |        |           |      |                |  
+   0   1   0          1      0        1           0      1                0  
+
+                                                                            X
+                                                                           XX
+                                                                         X..X
+                                                                        XX.XX
+                                                                      X.X...X
+                                                                     XXXX..XX
+                                                                   X.XX.XX..X
+                                                                 X...X...X.XX
+                                                                XX..XX.X....X
+                                                              X..XX..XXX...XX
+                                                             XXX..XX.X.X.X..X
+                                                           X.X.XX..XXXXXXX.XX
+                                                         X......XX.XXXXXX...X
+                                                        XX....X.X..XXXX.X..XX
+                                                      X..X...XXXXX.XX.XXXX..X
+                                                     XX.XX.X.XXXX..X..XX.X.XX
+                                                   X.X..X....XX.X.XXX.X.....X
+                                                  XXXX.XX..X.X....X.XXX....XX
+                                                X.XXX...X.XXXX..X...X.X..X..X
+                                              X...X.X.X...XX.X.XX..XXXX.XX.XX
+                                             XX..XXXXXX.X.X.....XX.XXX..X...X
+                                           X..XX.XXXX.XXXXX...X.X..X.X.XX..XX
+                                          XXX.X..XXX..XXX.X..XXXXX......XX..X
+                                        X.X.XXXX.X.XX.X.XXXX.XXX.X....X..X.XX
+                                      X.....XXX....X....XXX..X.XXX...XXX....X
+                                     XX...X.X.X...XX..X.X.XX...X.X.X.X.X...XX
+                                   X..X..XXXXXX.X..XX......X..XXXXXXXXXX.X..X
+                                  XX.XXX.XXXX.XXXX..X.....XXX.XXXXXXXX.XXX.XX
+                                X.X..XX..XXX..XX.X.XX...X.XX..XXXXXXX..XX...X
+                               XXXXX..XX.X.XX.X.....X.X....XX.XXXXX.XX..X..XX
+                             X.XXX.XX.X.....XXX....XXXX..X.X..XXXX...X.XXX..X
+                           X...XX...XXX...X.X.X..X.XX.X.XXXXX.XX.X.X...X.X.XX
+                          XX.X..X.X.X.X..XXXXXXX...X....XXXX...XXXXX.X......X
+                        X..XXX.XXXXXXXXX.XXXXX.X..XX..X.XX.X.X.XXX.XXX.....XX
+                       XXX.XX..XXXXXXXX..XXX.XXXX..XX...X......XX..X.X...X..X
+                     X.XX...XX.XXXXXX.XX.XX..XX.XX..X..XX....X..X.XXXX..XX.XX
+                   X....X.X.X..XXXXX..X...XX.X...X.XXX..X...XXX...XX.XX.X...X
+                  XX...XXXXXXX.XXX.X.XX.X..XXX.X...X.X.XX.X.X.X.X.X...XXX..XX
+                X..X.X.XXXXXX..XX.....XXXX.X.XXX.X......XXXXXXXXXXX.X.X.XX..X
+               XXX.....XXXX.XX..X...X.XXX....X.XXX....X.XXXXXXXXXX.......X.XX
+             X.X.X...X.XXX...X.XX.X...X.X..X...X.X..X...XXXXXXXX.X.....X....X
+            XXXXXX.X...X.X.X....XXX..XXXX.XX..XXXX.XX.X.XXXXXX.XXX....XX...XX
+          X.XXXX.XXX..XXXXXX..X.X.XX.XXX...XX.XXX..X....XXXXX..X.X..X..X.X..X
+        X...XXX..X.XX.XXXX.XX.....X..X.X.X.X..X.X.XX..X.XXX.X.XXXX.XX.XXXX.XX
+       XX.X.X.XX...X..XXX...X....XX.XXXXXXXXX......XX...XX....XXX..X..XXX...X
+     X.X.......X..XXX.X.X..XX..X.X..XXXXXXX.X....X..X.X..X..X.X.X.XXX.X.X..XX
+    XXXX......XXX.X.XXXXXX..X.XXXXX.XXXXX.XXX...XX.XXXX.XXX.......X.XXXXXX..X
+  X.XX.X....X.XX....XXXX.XX...XXXX..XXXX..X.X.X.X..XXX..X.X.....X...XXXX.X.XX
+X....XXX..X....X..X.XXX...X.X.XX.XX.XX.X.XXXXXXXXX.X.X.XXXX....XX.X.XXX.....X
+   |   |   |          |      |        |           |      |                |  
+   |   |   |          |      |        |           |      |                |  
+   0   1   0          1      0        1           0      1                0  
